@@ -5,20 +5,18 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
 import androidx.fragment.app.Fragment;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AllLayout#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class AllLayout extends Fragment {
 
     // TODO: Rename and change types of parameters
     MainActivity main;
     Context context = null;
-
+    int []images={R.drawable.img,R.drawable.img,R.drawable.img,R.drawable.img};
+    ImageAdapter adapter;
     public AllLayout() {
     }
 
@@ -37,6 +35,7 @@ public class AllLayout extends Fragment {
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
+
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -46,6 +45,11 @@ public class AllLayout extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_all_layout, container, false);
+        View view;
+        view=inflater.inflate(R.layout.fragment_all_layout, container, false);
+        adapter=new ImageAdapter(requireContext(),images);
+        GridView gridView = view.findViewById(R.id.gridView);
+        gridView.setAdapter(adapter);
+        return view;
     }
 }
