@@ -5,10 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".FavoriteLayout">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <GridView
+        android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Favorite" />
-
+        android:numColumns="3" />
 </FrameLayout>

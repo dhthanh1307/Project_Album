@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
 import androidx.fragment.app.Fragment;
 
@@ -17,7 +18,8 @@ public class FavoriteLayout extends Fragment {
 
     MainActivity main;
     Context context = null;
-
+    public static Image []images={new Image(R.drawable.img),new Image(R.drawable.img),new Image(R.drawable.img),new Image(R.drawable.img)};
+    ImageAdapter adapter;
     public FavoriteLayout() {
         // Required empty public constructor
     }
@@ -46,6 +48,13 @@ public class FavoriteLayout extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorite_layout, container, false);
+        // Inflate the layout for this fragment
+        View view;
+        view=inflater.inflate(R.layout.fragment_all_layout, container, false);
+        adapter=new ImageAdapter(requireContext(),images);
+        GridView gridView = view.findViewById(R.id.gridView);
+        gridView.setAdapter(adapter);
+        return view;
     }
+
 }
