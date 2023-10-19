@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -16,6 +18,8 @@ import androidx.fragment.app.Fragment;
 public class TrashCanLayout extends Fragment {
     MainActivity main;
     Context context = null;
+    TextView txtTrash;
+    GridView mGridView;
     public TrashCanLayout() {
         // Required empty public constructor
     }
@@ -44,6 +48,12 @@ public class TrashCanLayout extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_trash_can_layout, container, false);
+        View mView = inflater.inflate(R.layout.fragment_trash_can_layout, container, false);
+        txtTrash = mView.findViewById(R.id.txt_bin);
+        mGridView=mView.findViewById(R.id.grid_view);
+        Image[] mImages=AllLayout.images;
+        ImageAdapter mGridAdapter=new ImageAdapter(context,mImages);
+        mGridView.setAdapter(mGridAdapter);
+        return mView;
     }
 }

@@ -15,7 +15,7 @@ public class AllLayout extends Fragment {
     // TODO: Rename and change types of parameters
     MainActivity main;
     Context context = null;
-    int []images={R.drawable.img,R.drawable.img,R.drawable.img,R.drawable.img};
+    public static Image []images={new Image(R.drawable.img),new Image(R.drawable.img),new Image(R.drawable.img),new Image(R.drawable.img)};
     ImageAdapter adapter;
     public AllLayout() {
     }

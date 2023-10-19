@@ -11,9 +11,9 @@ import android.widget.ImageView;
 
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
-    private int[] mImageIds;
+    private Image[] mImageIds;
 
-    public ImageAdapter(Context context, int[] imageIds) {
+    public ImageAdapter(Context context, Image[] imageIds) {
         mContext = context;
         mImageIds = imageIds;
     }
@@ -46,7 +46,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageResource(mImageIds[position]);
+        imageView.setImageResource(mImageIds[position].imgView);
         return imageView;
     }
 }
