@@ -1,6 +1,8 @@
 package com.example.project_album;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -13,6 +15,8 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends FragmentActivity {
+    public static int Width;
+    public static int Height;
     NavigationView navigationView;
     FragmentTransaction ft;
     AllLayout allLayout;
@@ -28,6 +32,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ver2);
 
+        getSizeWindow();
         menu = getLayoutInflater().inflate(R.layout.fragment_menu, null);
 
         accountLayout = AccountLayout.newInstance("account");
@@ -110,4 +115,16 @@ public class MainActivity extends FragmentActivity {
 //        ft.replace(R.id.flFragment, accountLayout);
 //        ft.commit();
 //    }
+    private void getSizeWindow(){
+        DisplayMetrics dis = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dis);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            Width = dis.widthPixels;
+            Height = dis.heightPixels;
+        }
+        else{
+            Height = dis.widthPixels;
+            Width = dis.heightPixels;
+        }
+    }
 }
