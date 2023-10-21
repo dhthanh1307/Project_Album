@@ -1,6 +1,7 @@
 package com.example.project_album;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 
 import androidx.fragment.app.Fragment;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,8 +21,10 @@ public class FavoriteLayout extends Fragment {
 
     MainActivity main;
     Context context = null;
-    public static Image []images={new Image(R.drawable.img),new Image(R.drawable.img),new Image(R.drawable.img),new Image(R.drawable.img)};
+    public static ArrayList<Image> images = new ArrayList<Image>();
     ImageAdapter adapter;
+    private ImageAdapter image_adapter;
+    private GridView gridviewImage;
     public FavoriteLayout() {
         // Required empty public constructor
     }
@@ -36,6 +41,9 @@ public class FavoriteLayout extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        for(int i = 0;i<20;i++){
+            images.add(new Image(R.drawable.img));
+        }
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
@@ -49,12 +57,29 @@ public class FavoriteLayout extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         // Inflate the layout for this fragment
-        View view;
-        view=inflater.inflate(R.layout.fragment_all_layout, container, false);
-        adapter=new ImageAdapter(requireContext(),images);
-        GridView gridView = view.findViewById(R.id.gridView);
-        gridView.setAdapter(adapter);
+        View view = inflater.inflate(R.layout.fragment_favorite_layout, container, false);
+        gridviewImage = (GridView)view.findViewById(R.id.gridView);
+        image_adapter = new ImageAdapter(main,R.layout.item_image,images);
+
+        DoSthWithOrientation(getResources().getConfiguration().orientation);
+        gridviewImage.setAdapter(image_adapter);
+
         return view;
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int newOrientation = newConfig.orientation;
+        DoSthWithOrientation(newOrientation);
+        image_adapter.notifyDataSetChanged();
+    }
 
+    private void DoSthWithOrientation(int newOrientation ) {
+        if (newOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            gridviewImage.setNumColumns(5);
+        } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            gridviewImage.setNumColumns(3);
+        }
+        //Toast.makeText(getContext(),"oke",Toast.LENGTH_SHORT).show();
+    }
 }

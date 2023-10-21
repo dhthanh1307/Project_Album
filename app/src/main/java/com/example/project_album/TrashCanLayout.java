@@ -1,6 +1,7 @@
 package com.example.project_album;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +11,16 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link TrashCanLayout#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class TrashCanLayout extends Fragment {
+    ImageAdapter mGridAdapter;
+    public static ArrayList<Image> images = new ArrayList<Image>();
     MainActivity main;
     Context context = null;
     TextView txtTrash;
@@ -36,6 +41,9 @@ public class TrashCanLayout extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        for(int i = 0;i<20;i++){
+            images.add(new Image(R.drawable.img));
+        }
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
@@ -51,9 +59,24 @@ public class TrashCanLayout extends Fragment {
         View mView = inflater.inflate(R.layout.fragment_trash_can_layout, container, false);
         txtTrash = mView.findViewById(R.id.txt_bin);
         mGridView=mView.findViewById(R.id.grid_view);
-        Image[] mImages=AllLayout.images;
-        ImageAdapter mGridAdapter=new ImageAdapter(context,mImages);
+        mGridAdapter=new ImageAdapter(main,R.layout.item_image,images);
         mGridView.setAdapter(mGridAdapter);
         return mView;
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int newOrientation = newConfig.orientation;
+        DoSthWithOrientation(newOrientation);
+        mGridAdapter.notifyDataSetChanged();
+    }
+
+    private void DoSthWithOrientation(int newOrientation ) {
+        if (newOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mGridView.setNumColumns(5);
+        } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            mGridView.setNumColumns(3);
+        }
+        //Toast.makeText(getContext(),"oke",Toast.LENGTH_SHORT).show();
     }
 }
