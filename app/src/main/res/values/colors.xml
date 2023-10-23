@@ -13,7 +13,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#2752EF</color>
     <color name="green">#5FE401</color>
-    <color name="black_1">#BA0F0101</color>
+    <color name="black_1">#2F0F0101</color>
     <color name="blue_press">#612752EF</color>
     <color name="grey">#61FFFFFF</color>
 </resources>

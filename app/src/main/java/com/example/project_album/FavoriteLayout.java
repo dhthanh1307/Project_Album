@@ -3,6 +3,7 @@ package com.example.project_album;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class FavoriteLayout extends Fragment {
     private ImageAdapter image_adapter;
     private GridView gridviewImage;
     public FavoriteLayout() {
+        debug("Constructor");
         // Required empty public constructor
     }
 
@@ -40,13 +42,16 @@ public class FavoriteLayout extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        debug("onCreate");
         super.onCreate(savedInstanceState);
-        for(int i = 0;i<20;i++){
-            images.add(new Image(R.drawable.img));
-        }
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
+            if(images.size() ==0){
+                for(int i = 0;i<20;i++){
+                    images.add(AllLayout.images.get(i));
+                }
+            }
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -55,14 +60,17 @@ public class FavoriteLayout extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        debug("onCreateView");
         // Inflate the layout for this fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_favorite_layout, container, false);
         gridviewImage = (GridView)view.findViewById(R.id.gridView);
         image_adapter = new ImageAdapter(main,R.layout.item_image,images);
 
+
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         gridviewImage.setAdapter(image_adapter);
+        gridviewImage.setSelection(images.size()-1) ;
 
         return view;
     }
@@ -81,5 +89,8 @@ public class FavoriteLayout extends Fragment {
             gridviewImage.setNumColumns(3);
         }
         //Toast.makeText(getContext(),"oke",Toast.LENGTH_SHORT).show();
+    }
+    private void debug(String str){
+        Log.e("FavoriteLayout",str);
     }
 }

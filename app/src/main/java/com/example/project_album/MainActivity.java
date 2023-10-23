@@ -1,8 +1,12 @@
 package com.example.project_album;
 
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -14,7 +18,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+
 public class MainActivity extends FragmentActivity {
+    public static DataResource dataResource;
     public static int Width;
     public static int Height;
     NavigationView navigationView;
@@ -31,8 +40,29 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ver2);
-
+        dataResource = new DataResource(this);
+        dataResource.open();
         getSizeWindow();
+        initUI();
+
+
+//
+//        ft = getSupportFragmentManager().beginTransaction();
+//        ft.replace(R.id.NavigationView, menuLayout);
+//        ft.commit();
+    }
+    @Override
+    protected void onResume(){
+        dataResource.open();
+        super.onResume();
+    }
+    @Override
+    protected void onPause(){
+        dataResource.cloe();
+        super.onPause();
+    }
+
+    private void initUI() {
         menu = getLayoutInflater().inflate(R.layout.fragment_menu, null);
 
         accountLayout = AccountLayout.newInstance("account");
@@ -46,7 +76,6 @@ public class MainActivity extends FragmentActivity {
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.replace_fragment_layout, allLayout);
         ft.commit();
-
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         mBottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -77,12 +106,6 @@ public class MainActivity extends FragmentActivity {
                 return true;
             }
         });
-
-
-//
-//        ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.NavigationView, menuLayout);
-//        ft.commit();
     }
 
     //Đoạn code dưới này là của VH
@@ -126,5 +149,27 @@ public class MainActivity extends FragmentActivity {
             Height = dis.widthPixels;
             Width = dis.heightPixels;
         }
+    }
+    public byte[] ChangeImageToByte(int idImage){
+        Bitmap image = BitmapFactory.decodeResource(getResources(), idImage);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 40 , stream);
+        byte imageInByte[] = stream.toByteArray();
+        return imageInByte;
+    }
+    public Bitmap ChangeByteToBitmap(byte[] outImage){
+        ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
+        Bitmap theImage = BitmapFactory.decodeStream(imageStream);
+        return theImage;
+    }
+    public Bitmap ChangeImageToBitmap(int idImage){
+        Bitmap image = BitmapFactory.decodeResource(getResources(), idImage);
+        return image;
+    }
+    public byte[] ChangeBitmapToByte(Bitmap image){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte imageInByte[] = stream.toByteArray();
+        return imageInByte;
     }
 }

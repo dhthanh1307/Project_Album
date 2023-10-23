@@ -28,7 +28,8 @@
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:scaleType="fitStart"
-                android:drawableLeft="@drawable/ic_add_album"/>
+                android:drawableLeft="@drawable/ic_add_album"
+                android:foreground="@drawable/custom_button_add_foreground"/>
             <TextView
                 android:id="@+id/tv_album_small"
                 android:layout_alignParentLeft="true"
