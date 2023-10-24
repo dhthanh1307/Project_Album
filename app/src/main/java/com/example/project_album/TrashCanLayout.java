@@ -22,11 +22,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TrashCanLayout#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class TrashCanLayout extends Fragment {
     ImageAdapter mGridAdapter;
     public static ArrayList<Image> images = new ArrayList<Image>();
@@ -44,13 +40,13 @@ public class TrashCanLayout extends Fragment {
     }
 
     public static TrashCanLayout newInstance(String strArg) {
-        for(int i = 0;i<5;i++){
-            images.add(new Image(R.drawable.img));
-            images.add(new Image(R.drawable.img_1));
-            images.add(new Image(R.drawable.img_3));
-            images.add(new Image(R.drawable.img_4));
-
-        }
+//        for(int i = 0;i<5;i++){
+//            images.add(new Image(R.drawable.img));
+//            images.add(new Image(R.drawable.img_1));
+//            images.add(new Image(R.drawable.img_3));
+//            images.add(new Image(R.drawable.img_4));
+//
+//        }
         TrashCanLayout fragment = new TrashCanLayout();
         Bundle args = new Bundle();
         args.putString("strArg1", strArg);
@@ -154,7 +150,7 @@ public class TrashCanLayout extends Fragment {
             }
         });
 
-        mGridView=mView.findViewById(R.id.gridView);
+        mGridView=mView.findViewById(R.id.grid_view_trashcan);
         mGridAdapter=new ImageAdapter(main,R.layout.item_image,images);
         mGridView.setAdapter(mGridAdapter);
         mGridView.setSelection(images.size()-1) ;
