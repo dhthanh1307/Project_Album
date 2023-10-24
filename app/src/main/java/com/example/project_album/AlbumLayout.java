@@ -8,12 +8,16 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -97,11 +101,11 @@ public class AlbumLayout extends Fragment {
             public void onScrollChange(View view,int i, int i1, int i2, int i3) {
                 if(tv_album_big.getGlobalVisibleRect(new Rect()) == false){
                     tv_album_small.setTextSize(20);
-                    layout_icon.setBackground(getResources().getDrawable(R.color.black_n));
+                    layout_icon.setBackground(getContext().getDrawable(R.color.black_1));
                 }
                 else{
                     tv_album_small.setTextSize(0);
-                    layout_icon.setBackground(getResources().getDrawable(R.color.black));
+                    layout_icon.setBackground(getContext().getDrawable(R.color.black));
                 }
             }
         });
@@ -232,6 +236,7 @@ public class AlbumLayout extends Fragment {
                 dialog.setContentView(v);
                 Window window = dialog.getWindow();
                 window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
                 WindowManager.LayoutParams attribute = window.getAttributes();
                 attribute.gravity = Gravity.CENTER;
 //                dialog.registerForContextMenu(getLayoutInflater().inflate(R.layout.item_image,null));
@@ -326,17 +331,17 @@ public class AlbumLayout extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-//                if(txtTitle.length() != 0){
-//                    btnSave.setTextColor(getResources().getColor(R.color.blue));
-//                    btnSave.setBackground(getResources().getDrawable(R.drawable.custtom_button));
-//                     btnSave.setClickable(true);
-//
-//                }
-//                else{
-//                    btnSave.setTextColor(getContext().getColor(R.color.grey));
-//                    btnSave.setBackground(getContext().getDrawable(R.color.black_1));
-//                    btnSave.setClickable(false);
-//                }
+                if(txtTitle.length() != 0){
+                    btnSave.setTextColor(Color.BLUE);
+                    btnSave.setBackgroundResource(R.drawable.custtom_button);
+                    btnSave.setClickable(true);
+
+                }
+                else{
+                    btnSave.setTextColor(Color.GRAY);
+                    btnSave.setBackgroundResource(R.color.black);
+                    btnSave.setClickable(false);
+                }
             }
         });
 

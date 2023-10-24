@@ -62,10 +62,17 @@ public class TrashCanLayout extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         myOriginalMemoryBundle = savedInstanceState;
+
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
+            if(images.size() ==0){
+                for(int i = 20;i<40;i++){
+                    images.add(AllLayout.images.get(i));
+                }
+            }
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -76,6 +83,7 @@ public class TrashCanLayout extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View mView = inflater.inflate(R.layout.fragment_trash_can_layout, container, false);
+
         mGridView=mView.findViewById(R.id.grid_view_trashcan);
         txtTotal=mView.findViewById(R.id.txt_display_total_picture_deleted);
         mGridAdapter=new ImageAdapter(main,R.layout.item_image,images);
@@ -145,6 +153,11 @@ public class TrashCanLayout extends Fragment {
                 }
             }
         });
+
+        mGridView=mView.findViewById(R.id.gridView);
+        mGridAdapter=new ImageAdapter(main,R.layout.item_image,images);
+        mGridView.setAdapter(mGridAdapter);
+        mGridView.setSelection(images.size()-1) ;
         return mView;
     }
     @Override
