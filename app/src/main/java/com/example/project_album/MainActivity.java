@@ -24,8 +24,7 @@ public class MainActivity extends FragmentActivity {
     FavoriteLayout favoriteLayout;
     TrashCanLayout trashCanLayout;
     AccountLayout accountLayout;
-    MenuLayout menuLayout;
-    View menu;
+
     BottomNavigationView mBottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +32,12 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main_ver2);
 
         getSizeWindow();
-        menu = getLayoutInflater().inflate(R.layout.fragment_menu, null);
 
         accountLayout = AccountLayout.newInstance("account");
         allLayout = AllLayout.newInstance("all");
         albumLayout = AlbumLayout.newInstance("album");
         trashCanLayout = TrashCanLayout.newInstance("trashcan");
         favoriteLayout = FavoriteLayout.newInstance("favorite");
-        menuLayout = MenuLayout.newInstance("menu");
 
 
         ft = getSupportFragmentManager().beginTransaction();
@@ -78,43 +75,9 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
-
-//
-//        ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.NavigationView, menuLayout);
-//        ft.commit();
     }
 
-    //Đoạn code dưới này là của VH
-//    public void clickAllLayout(View view) {
-//        ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.flFragment, allLayout);
-//        ft.commit();
-//    }
-//
-//    public void clickAlbumLayout(View view) {
-//        ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.flFragment, albumLayout);
-//        ft.commit();
-//    }
-//
-//    public void clickTrashCanLayout(View view) {
-//        ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.flFragment, trashCanLayout);
-//        ft.commit();
-//    }
-//
-//    public void clickFavoriteLayout(View view) {
-//        ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.flFragment, favoriteLayout);
-//        ft.commit();
-//    }
-//
-//    public void clickAccountLayout(View view) {
-//        ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.flFragment, accountLayout);
-//        ft.commit();
-//    }
+
     private void getSizeWindow(){
         DisplayMetrics dis = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dis);

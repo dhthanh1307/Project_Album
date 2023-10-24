@@ -62,8 +62,6 @@ public class AlbumLayout extends Fragment {
     private ScrollView sv;
     private RelativeLayout layout_icon;
 
-
-
     private AlbumLayout(){
         InitAlbums();
     }
