@@ -57,31 +57,29 @@ public class ImageAdapter extends BaseAdapter {
         view = activity.getLayoutInflater().inflate(idLayout, null);
         ImageView img = view.findViewById(R.id.img);
         img.setImageResource(images.get(i).imgView);
-        img.setTag(i);
-        final int position = i;
         checkBoxChoose = view.findViewById(R.id.check_box);
         //Vì mỗi lần cuộn là GridView sẽ bị như notify ấy, nên là cần setCheck lại
-       checkBoxChoose.setChecked(mSelectedItems.get(i));
+         checkBoxChoose.setChecked(mSelectedItems.get(i));
 
         if (isCheckBoxVisible == true) {
             checkBoxChoose.setVisibility(View.VISIBLE);
             //Toast.makeText(activity, "day la", Toast.LENGTH_SHORT).show();
 
-            img.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Đảo ngược trạng thái của checkbox khi click vào hình ảnh
-                    boolean newState = !mSelectedItems.get(position);
-                    setItemSelection(position, newState);
-                    checkBoxChoose.setChecked(newState);
-                    //notifyDataSetChanged();
-                }
-            });
+//            img.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    // Đảo ngược trạng thái của checkbox khi click vào hình ảnh
+//                    boolean newState = !mSelectedItems.get(i);
+//                    setItemSelection(i, newState);
+//                    checkBoxChoose.setChecked(newState);
+//                    //notifyDataSetChanged();
+//                }
+//            });
             checkBoxChoose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    Log.e("Loi", "Helllllll"+String.valueOf(position));
-                    setItemSelection(position, b);
+                    Log.e("Loi", "Helllllll"+String.valueOf(i));
+                    setItemSelection(i, b);
                     //notifyDataSetChanged();
                     talk();
                 }
