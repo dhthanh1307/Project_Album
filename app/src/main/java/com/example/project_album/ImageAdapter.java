@@ -2,6 +2,8 @@ package com.example.project_album;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter {
@@ -56,7 +59,7 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         view = activity.getLayoutInflater().inflate(idLayout, null);
         ImageView img = view.findViewById(R.id.img);
-        img.setImageResource(images.get(i).imgView);
+        img.setImageBitmap(ChangeByteToBitmap(images.get(i).getImgView()));
         checkBoxChoose = view.findViewById(R.id.check_box);
         //Vì mỗi lần cuộn là GridView sẽ bị như notify ấy, nên là cần setCheck lại
          checkBoxChoose.setChecked(mSelectedItems.get(i));
@@ -113,5 +116,11 @@ public class ImageAdapter extends BaseAdapter {
             }
         }
         Log.e("Loi", temp);
+    }
+
+    public Bitmap ChangeByteToBitmap(byte[] outImage ){
+        ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
+        Bitmap theImage = BitmapFactory.decodeStream(imageStream);
+        return theImage;
     }
 }

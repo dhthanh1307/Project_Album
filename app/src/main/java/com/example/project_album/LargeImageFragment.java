@@ -50,7 +50,7 @@ public class LargeImageFragment extends Fragment {
         imgDelete=view.findViewById(R.id.img_delete);
         btnDeleteImmediately=view.findViewById(R.id.btn_delete_immediately);
         btnRestore=view.findViewById(R.id.btn_restore);
-        imgDelete.setImageResource(myImage.imgView);
+        imgDelete.setImageBitmap(main.ChangeByteToBitmap(myImage.getImgView()));
 
         btnRestore.setOnClickListener(new View.OnClickListener() {
             @Override
