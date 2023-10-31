@@ -24,7 +24,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\Admin\AppData\Local\Temp\baseline_settings_24.xml" />
+                                                <entry key="imagePath" value="C:\Users\Admin\AppData\Local\Temp\baseline_photo_camera_24.xml" />
                                                 <entry key="opacityPercent" value="60" />
                                               </map>
                                             </option>
@@ -36,7 +36,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/settings/baseline_settings_24.xml" />
+                                                <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/photo_camera/baseline_photo_camera_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -64,6 +64,11 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="outputName" value="add_camera" />
                                     </map>
                                   </option>
                                 </PersistentState>

@@ -102,7 +102,7 @@ public class MainActivity extends FragmentActivity {
     public byte[] ChangeImageToByte(int img){
         Bitmap image = BitmapFactory.decodeResource(getResources(), img);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        image.compress(Bitmap.CompressFormat.JPEG, 40, stream);
         byte imageInByte[] = stream.toByteArray();
         return imageInByte;
     }
