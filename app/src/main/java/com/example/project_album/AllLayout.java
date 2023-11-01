@@ -16,9 +16,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
 import android.hardware.Camera;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -47,6 +50,7 @@ public class AllLayout extends Fragment {
     public static ArrayList<Image> images= new ArrayList<Image>();
     ImageAdapter adapter;
     GridView gridView;
+    Spinner spinner;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
     FloatingActionButton btnAddCamera;
@@ -94,6 +98,56 @@ public class AllLayout extends Fragment {
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         gridView.setAdapter(adapter);
         gridView.setSelection(images.size() - 1);
+        spinner = view.findViewById(R.id.spinner);
+        ArrayList<String> data = new ArrayList<>();
+        data.add("Date");
+        data.add("ID");
+        data.add("Default");
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(main, android.R.layout.simple_spinner_item, data);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = data.get(position);
+                if (selectedItem.equals("Date")) {
+                    // Xử lý sự kiện khi chọn mục "Date"
+                    ArrayList<Image> copiedImages = new ArrayList<>();
+                    copiedImages.addAll(images);
+                    for (int i = 0; i < copiedImages.size() - 1; i++)
+                        for (int j = i + 1; j < copiedImages.size(); j++) {
+                            if (copiedImages.get(i).getDate().compareTo(copiedImages.get(j).getDate()) < 0) {
+                                Image temp = copiedImages.get(i);
+                                copiedImages.set(i, copiedImages.get(j));
+                                copiedImages.set(j, temp);
+                            }
+                        }
+                    adapter = new ImageAdapter(main, R.layout.item_image, copiedImages);
+                    gridView.setAdapter(adapter);
+                } else if (selectedItem.equals("ID")) {
+                    // Xử lý sự kiện khi chọn mục "ID"
+                    ArrayList<Image> copiedImages = new ArrayList<>();
+                    copiedImages.addAll(images);
+                    for (int i = 0; i < copiedImages.size() - 1; i++)
+                        for (int j = i + 1; j < copiedImages.size(); j++) {
+                            if (copiedImages.get(i).getId() < copiedImages.get(j).getId()) {
+                                Image temp = copiedImages.get(i);
+                                copiedImages.set(i, copiedImages.get(j));
+                                copiedImages.set(j, temp);
+                            }
+                        }
+                    adapter = new ImageAdapter(main, R.layout.item_image, copiedImages);
+                    gridView.setAdapter(adapter);
+                }else if(selectedItem.equals("Default")){
+                    adapter = new ImageAdapter(main, R.layout.item_image, images);
+                    gridView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Xử lý sự kiện khi không có mục nào được chọn
+            }
+        });
         btnAddCamera = view.findViewById(R.id.btn_add_camera);
         btnAddCamera.setOnClickListener(new View.OnClickListener() {
             @Override
