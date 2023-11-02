@@ -18,6 +18,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_DESCRIBE = "describe";
+    public static final String COLUMN_IS_DELETE = "is_delete";// chỗ này nếu true thì sẽ k hiển thị ở all layout
+    //mà chỉ hiển thị ở trash can, biến này kiểu trong SQL là text
+
+
 
     private static final String DATABASE_CREATE = "create table "+TABLE_PICTURE+"( "+COLUMN_ID
             +" integer primary key autoincrement, "
@@ -32,6 +36,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             +COLUMN_DATE
             +" text not null, "
             +COLUMN_TYPE
+            +" text not null, "
+            +COLUMN_IS_DELETE
             +" text not null, "
             +COLUMN_DESCRIBE
             +" text);";

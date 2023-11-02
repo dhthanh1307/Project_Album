@@ -61,35 +61,16 @@ public class ImageAdapter extends BaseAdapter {
         ImageView img = view.findViewById(R.id.img);
         img.setImageBitmap(ChangeByteToBitmap(images.get(i).getImgView()));
         checkBoxChoose = view.findViewById(R.id.check_box);
+
         //Vì mỗi lần cuộn là GridView sẽ bị như notify ấy, nên là cần setCheck lại
-         checkBoxChoose.setChecked(mSelectedItems.get(i));
-
-        if (isCheckBoxVisible == true) {
+        if (mSelectedItems.get(i)){
             checkBoxChoose.setVisibility(View.VISIBLE);
-            //Toast.makeText(activity, "day la", Toast.LENGTH_SHORT).show();
-
-//            img.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    // Đảo ngược trạng thái của checkbox khi click vào hình ảnh
-//                    boolean newState = !mSelectedItems.get(i);
-//                    setItemSelection(i, newState);
-//                    checkBoxChoose.setChecked(newState);
-//                    //notifyDataSetChanged();
-//                }
-//            });
-            checkBoxChoose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    Log.e("Loi", "Helllllll"+String.valueOf(i));
-                    setItemSelection(i, b);
-                    //notifyDataSetChanged();
-                    talk();
-                }
-            });
-        } else {
+            checkBoxChoose.setChecked(true);
+        }else{
             checkBoxChoose.setVisibility(View.GONE);
+            checkBoxChoose.setChecked(false);
         }
+
         RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.parent);
         if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
             img.setLayoutParams(new RelativeLayout.LayoutParams(MainActivity.Width / 3 - 40, MainActivity.Width / 3 - 40));
@@ -102,6 +83,15 @@ public class ImageAdapter extends BaseAdapter {
     // Phương thức để thiết lập trạng thái của mục (được chọn hoặc không được chọn)
     public void setItemSelection(int position, boolean isSelected) {
         mSelectedItems.set(position, isSelected);
+    }
+    public void resetItemSelectionArray(ArrayList<Image> listImage){
+        mSelectedItems.clear();
+        images.clear();
+        for (int i=0;i<listImage.size();i++){
+            mSelectedItems.add(false);
+            images.add(listImage.get(i));
+        }
+
     }
 
     public void setIsCheckBoxVisible(boolean check) {

@@ -10,6 +10,7 @@ public class Image {
     private Date date;
     private String type;
     private String describe;
+    private String is_deleted;
     public Image(){
 
     }
@@ -22,6 +23,7 @@ public class Image {
         this.id=0;
         this.date = new Date();
         this.describe = "";
+        this.is_deleted="T";
     }
 
     public byte[] getImgView(){
@@ -45,6 +47,9 @@ public class Image {
     public String getDescribe(){
         return describe;
     }
+    public String getDeleted() {
+        return is_deleted;
+    }
     public void setImgView(byte[] imgView){
         this.imgView = imgView;
     }
@@ -65,5 +70,9 @@ public class Image {
     }
     public void setId(long id){
         this.id = id;
+    }
+
+    public void setDeleted(String deleted) {
+        this.is_deleted = deleted;
     }
 }
