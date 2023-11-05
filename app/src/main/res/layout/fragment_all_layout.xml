@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="66dp"
             android:padding="8dp"
-            android:textColor="@color/white"
+            android:textColor="@color/blue"
             android:textSize="15dp"/>
         <GridView
             android:gravity="center"

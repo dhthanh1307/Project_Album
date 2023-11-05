@@ -44,6 +44,7 @@ public class TrashCanLayout extends Fragment {
     private ArrayList<Boolean> mSelectedItems;
 
     public TrashCanLayout() {
+        Log.e("TrashCanLayout","constructor");
         // Required empty public constructor
     }
 

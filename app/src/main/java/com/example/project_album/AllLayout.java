@@ -22,6 +22,7 @@ import android.widget.GridView;
 
 import android.hardware.Camera;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -32,6 +33,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,16 +50,25 @@ public class AllLayout extends Fragment {
     MainActivity main;
     Context context = null;
     public static ArrayList<Image> images= new ArrayList<Image>();
+    private ArrayList<Image> copiedImages = new ArrayList<Image>();
     ImageAdapter adapter;
     GridView gridView;
     Spinner spinner;
+    ArrayAdapter<String> spinnerAdapter;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
     FloatingActionButton btnAddCamera;
     public AllLayout() {
         debug("constructor");
         images = MainActivity.dataResource.getAllImage();
-        debug(String.valueOf(images.size()));
+        if(images.size()!= 0) {
+            for (int i = images.size() - 1; i >= images.size() - 15; i--) {
+                debug(String.valueOf(i));
+                images.get(i).setImgBitmap(ChangeByteToBitmap(images.get(i).getImgView()));
+            }
+            Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
+            myBackgroundThread.start();
+        }
     }
 
     public static AllLayout newInstance(String strArg) {
@@ -81,6 +92,7 @@ public class AllLayout extends Fragment {
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
+        debug("finish onCreate");
     }
     @Override
     public void onResume(){
@@ -93,61 +105,34 @@ public class AllLayout extends Fragment {
         debug("onCreateView");
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_all_layout, container, false);
-        adapter=new ImageAdapter(main,R.layout.item_image,images);
+
+        copiedImages.addAll(images);
+        debug(String.valueOf(copiedImages.size()));
+
+        adapter=new ImageAdapter(main,R.layout.item_image,copiedImages);
         gridView = view.findViewById(R.id.gridView);
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         gridView.setAdapter(adapter);
         gridView.setSelection(images.size() - 1);
-        spinner = view.findViewById(R.id.spinner);
-        ArrayList<String> data = new ArrayList<>();
-        data.add("Date");
-        data.add("ID");
-        data.add("Default");
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(main, android.R.layout.simple_spinner_item, data);
-        spinner.setAdapter(spinnerAdapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = data.get(position);
-                if (selectedItem.equals("Date")) {
-                    // Xử lý sự kiện khi chọn mục "Date"
-                    ArrayList<Image> copiedImages = new ArrayList<>();
-                    copiedImages.addAll(images);
-                    for (int i = 0; i < copiedImages.size() - 1; i++)
-                        for (int j = i + 1; j < copiedImages.size(); j++) {
-                            if (copiedImages.get(i).getDate().compareTo(copiedImages.get(j).getDate()) < 0) {
-                                Image temp = copiedImages.get(i);
-                                copiedImages.set(i, copiedImages.get(j));
-                                copiedImages.set(j, temp);
-                            }
-                        }
-                    adapter = new ImageAdapter(main, R.layout.item_image, copiedImages);
-                    gridView.setAdapter(adapter);
-                } else if (selectedItem.equals("ID")) {
-                    // Xử lý sự kiện khi chọn mục "ID"
-                    ArrayList<Image> copiedImages = new ArrayList<>();
-                    copiedImages.addAll(images);
-                    for (int i = 0; i < copiedImages.size() - 1; i++)
-                        for (int j = i + 1; j < copiedImages.size(); j++) {
-                            if (copiedImages.get(i).getId() < copiedImages.get(j).getId()) {
-                                Image temp = copiedImages.get(i);
-                                copiedImages.set(i, copiedImages.get(j));
-                                copiedImages.set(j, temp);
-                            }
-                        }
-                    adapter = new ImageAdapter(main, R.layout.item_image, copiedImages);
-                    gridView.setAdapter(adapter);
-                }else if(selectedItem.equals("Default")){
-                    adapter = new ImageAdapter(main, R.layout.item_image, images);
-                    gridView.setAdapter(adapter);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Xử lý sự kiện khi không có mục nào được chọn
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getContext(),"set Wallpaper successfull!"
+                ,Toast.LENGTH_SHORT).show();
+                main.setWallPaper(images.get(i).getImgView());
             }
         });
+        SetGridViewItemLongClick();
+        gridView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+//                debug("scroll");
+//                adapter.notifyDataSetChanged();
+            }
+        });
+
+        spinner = view.findViewById(R.id.spinner);
+        initSpinerView();
         btnAddCamera = view.findViewById(R.id.btn_add_camera);
         btnAddCamera.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +145,71 @@ public class AllLayout extends Fragment {
             }
         });
 
+
         return view;
+    }
+
+    private void SetGridViewItemLongClick() {
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                debug("scroll");
+                adapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+    }
+
+    private void initSpinerView() {
+        ArrayList<String> data = new ArrayList<>();
+        data.add("Date");
+        data.add("ID");
+        data.add("Default");
+        spinnerAdapter = new ArrayAdapter<>(main, android.R.layout.simple_spinner_item, data);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = data.get(position);
+                if (selectedItem.equals("Date")) {
+                    debug("date");
+                    // Xử lý sự kiện khi chọn mục "Date"
+                    for (int i = 0; i < copiedImages.size() - 1; i++) {
+                        for (int j = i + 1; j < copiedImages.size(); j++) {
+                            if (copiedImages.get(i).getDate().compareTo(copiedImages.get(j).getDate()) < 0) {
+                                Image temp = copiedImages.get(i);
+                                copiedImages.set(i, copiedImages.get(j));
+                                copiedImages.set(j, temp);
+                            }
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                } else if (selectedItem.equals("ID")) {
+                    debug("12");
+                    for (int i = 0; i < copiedImages.size() - 1; i++) {
+                        for (int j = i + 1; j < copiedImages.size(); j++) {
+                            if (copiedImages.get(i).getId() < copiedImages.get(j).getId()) {
+                                Image temp = copiedImages.get(i);
+                                copiedImages.set(i, copiedImages.get(j));
+                                copiedImages.set(j, temp);
+                            }
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                }else if(selectedItem.equals("Default")){
+                    copiedImages.clear();
+                    copiedImages.addAll(images);
+                    adapter.notifyDataSetChanged();
+                    debug1();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                debug("11");
+                // Xử lý sự kiện khi không có mục nào được chọn
+            }
+        });
     }
 
     public void startCamera() {
@@ -222,15 +271,11 @@ public class AllLayout extends Fragment {
                     R.drawable.img_4,R.drawable.img_5,R.drawable.img_6};
             for(int j =0;j<9;j++){
                 for(int i = 0; i<6;i++) {
-//                    Bitmap image = BitmapFactory.decodeResource(getResources(), img[i]);
-//                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                    image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//                    byte imageInByte[] = stream.toByteArray();
                     images.add(new Image(main.ChangeImageToByte(img[i])));
-                    debug(String.valueOf(j*6+i));
                     images.get(j*6+i).setId(MainActivity.dataResource.
                             InsertImage(images.get(j*6+i), 1));
-                    debug(String.valueOf(j*6+i));
+                    images.get(j*6+i).setImgBitmap(main.ChangeImageToBitmap(img[i]));
+                    //debug(String.valueOf(j*6+i));
                 }
             }
         }
@@ -251,7 +296,40 @@ public class AllLayout extends Fragment {
         }
         //Toast.makeText(getContext(),"oke",Toast.LENGTH_SHORT).show();
     }
+
+    private Runnable image_bitmap_backgroundTask = new Runnable() {
+        @Override
+        public void run() { // busy work goes here...
+            try {
+                for(int i = images.size() -16;i >=0;i--) {
+                    Thread.sleep(1);
+                    images.get(i).setImgBitmap(
+                            ChangeByteToBitmap(images.get(i).getImgView()));
+                    debug(String.valueOf(i));
+                }
+                //adapter.notifyDataSetChanged();
+            }
+            catch (InterruptedException e) { }
+        }
+    };
+
+    @Override
+    public void onStart(){
+        super.onStart();
+    }
+
+    public void debug1(){
+        for(int i =0;i<copiedImages.size();i++){
+            debug(String.valueOf(copiedImages.get(i).getId()));
+        }
+    }
+
     private void debug(String str){
         Log.e("AllLayout",str);
+    }
+    private Bitmap ChangeByteToBitmap(byte[] outImage ){
+        ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
+        Bitmap theImage = BitmapFactory.decodeStream(imageStream);
+        return theImage;
     }
 }

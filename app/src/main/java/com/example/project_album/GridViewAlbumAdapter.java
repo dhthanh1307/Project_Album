@@ -41,7 +41,8 @@ public class GridViewAlbumAdapter extends BaseAdapter {
         TextView tv_name = view.findViewById(R.id.tv_album_name);
         TextView tv_length = view.findViewById(R.id.tv_album_length);
         if(albums.get(i).length() != 0 ){
-            img.setImageResource(albums.get(i).get_image(albums.get(i).length() -1 ));
+            img.setImageBitmap(albums.get(i).get_image(
+                    albums.get(i).length() -1 ).getImgBitmap());
             img.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
         else{
