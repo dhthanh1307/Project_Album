@@ -6,3 +6,5 @@
 .gradle/buildOutputCleanup/buildOutputCleanup.lock
 .gradle/file-system.probe
 local.properties
+*.bin
+*.lock

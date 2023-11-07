@@ -134,6 +134,20 @@ public class DataResource {
         return cursor.getCount();
     }
 
+    public boolean checkLogin(String username, String password) {
+        Cursor cursor = database.query(DatabaseHelper.TABLE_USERS,
+                new String[]{DatabaseHelper.COLUMN_USERNAME},
+                DatabaseHelper.COLUMN_USERNAME + "=? AND " + DatabaseHelper.COLUMN_PASSWORD + "=?",
+                new String[]{username, password},
+                null, null, null);
+        int cursorCount = cursor.getCount();
+        cursor.close();
+        if (cursorCount > 0) {
+            return true;
+        }
+        return false;
+    }
+
     private void debug(String str) {
         Log.e("DataResource", str);
     }

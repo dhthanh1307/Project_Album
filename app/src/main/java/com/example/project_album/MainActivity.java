@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
+import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -23,6 +25,7 @@ public class MainActivity extends FragmentActivity {
     public static DataResource dataResource;
     public static int Width;
     public static int Height;
+    public static String username;
     NavigationView navigationView;
     FragmentTransaction ft;
     AllLayout allLayout;
@@ -37,8 +40,12 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ver2);
 
-        dataResource = new DataResource(this);
-        dataResource.open();
+        Intent data = getIntent();
+        Bundle bundle = data.getExtras();
+        username = bundle.getString("username");
+
+//        dataResource = new DataResource(this);
+//        dataResource.open();
         getSizeWindow();
 
         accountLayout = AccountLayout.newInstance("account");
