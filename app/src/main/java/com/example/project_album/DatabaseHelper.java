@@ -19,10 +19,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_DESCRIBE = "describe";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PHONE = "phone";
-    public static final String COLUMN_PASSWORD = "password";
-    public static final String COLUMN_EMAIL = "email";
+        public static final String COLUMN_USERNAME = "username";
+        public static final String COLUMN_PHONE = "phone";
+        public static final String COLUMN_PASSWORD = "password";
+        public static final String COLUMN_EMAIL = "email";
 
     public static final String COLUMN_IS_DELETE = "is_delete";// chỗ này nếu true thì sẽ k hiển thị ở all layout
     //mà chỉ hiển thị ở trash can, biến này kiểu trong SQL là text

@@ -34,6 +34,19 @@ public class DataResource {
         helper.close();
     }
 
+    public long InsertUser(User user) {
+        try {
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COLUMN_USERNAME, user.getUsername());
+            values.put(DatabaseHelper.COLUMN_PASSWORD, user.getPass());
+            values.put(DatabaseHelper.COLUMN_PHONE, user.getPhone());
+            values.put(DatabaseHelper.COLUMN_EMAIL,user.getEmail());
+            long insertId = database.insert(DatabaseHelper.TABLE_USERS, null, values);
+            return insertId;
+        } catch (Exception ex) {
+            return -1;
+        }
+    }
     public long InsertImage(Image image, int USER) {
         try {
             ContentValues values = new ContentValues();
@@ -142,12 +155,21 @@ public class DataResource {
                 null, null, null);
         int cursorCount = cursor.getCount();
         cursor.close();
-        if (cursorCount > 0) {
+        if (cursorCount == 0) {
             return true;
         }
         return false;
     }
-
+    public boolean checkSignUp(String name) {
+        String mySQL = "SELECT username FROM users WHERE username = ?";
+        Cursor cursor = database.rawQuery(mySQL, new String[]{name});
+        int cursorCount = cursor.getCount();
+        cursor.close();
+        if (cursorCount == 0) {
+            return true;
+        }
+        return false;
+    }
     private void debug(String str) {
         Log.e("DataResource", str);
     }

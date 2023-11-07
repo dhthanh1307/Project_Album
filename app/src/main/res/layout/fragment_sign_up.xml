@@ -34,16 +34,16 @@
         android:text="Enter your email address" />
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/editEmail"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:inputType="text"
         android:textColor="@color/white"
         android:background="@drawable/custom_signup"
         android:layout_marginBottom="50dp"
-
+        android:textColorHint="@color/white"
         android:textSize="20dp"
-        android:text="Email" />
+        android:hint="Email" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -69,15 +69,16 @@
                 android:text="User name" />
 
             <EditText
-                android:id="@+id/editTextText2"
+                android:id="@+id/editUserName"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:inputType="text"
                 android:textColor="@color/white"
                 android:textSize="20dp"
                 android:background="@drawable/custom_signup"
+                android:textColorHint="@color/white"
 
-                android:text="Name" />
+                android:hint="Name" />
         </LinearLayout>
 
         <LinearLayout
@@ -97,15 +98,16 @@
                 android:text="Phone number" />
 
             <EditText
-                android:id="@+id/editTextText3"
+                android:id="@+id/editPhone"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:inputType="text"
                 android:textColor="@color/white"
                 android:textSize="20dp"
                 android:background="@drawable/custom_signup"
+                android:textColorHint="@color/white"
 
-                android:text="Phone" />
+                android:hint="Phone" />
         </LinearLayout>
 
     </LinearLayout>
@@ -120,12 +122,13 @@
         android:text="Enter your password" />
 
     <EditText
-        android:id="@+id/editTextTextPassword"
+        android:id="@+id/editPassword"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="@drawable/custom_signup"
         android:layout_marginBottom="50dp"
-
+        android:hint="Password"
+        android:textColorHint="@color/white"
         android:inputType="textPassword" />
 
     <TextView
@@ -138,16 +141,18 @@
         android:text="Confirm password" />
 
     <EditText
-        android:id="@+id/editTextTextPassword2"
+        android:id="@+id/editPassword2"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:textSize="20dp"
         android:background="@drawable/custom_signup"
         android:layout_marginBottom="50dp"
+        android:hint="Password"
+        android:textColorHint="@color/white"
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnSignUp"
         android:layout_width="230dp"
         android:layout_height="45dp"
         android:background="@drawable/custom_signup"

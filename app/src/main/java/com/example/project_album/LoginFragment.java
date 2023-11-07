@@ -57,11 +57,11 @@ public class LoginFragment extends Fragment {
         toSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                ft = getFragmentManager().beginTransaction();
-//                ft.replace(R.id.login_container, new SignUpFragment());
-//                ft.commit();
+                ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.login_container, new SignUpFragment());
+                ft.commit();
 
-                //getFragmentManager().beginTransaction().replace(R.id.container, new SignUpFragment()).commit();
+               // getFragmentManager().beginTransaction().replace(R.id.container, new SignUpFragment()).commit();
             }
         });
         btnLogin = view.findViewById(R.id.btnLogin);
