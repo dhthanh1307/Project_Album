@@ -155,7 +155,7 @@ public class DataResource {
                 null, null, null);
         int cursorCount = cursor.getCount();
         cursor.close();
-        if (cursorCount == 0) {
+        if (cursorCount > 0) {
             return true;
         }
         return false;
