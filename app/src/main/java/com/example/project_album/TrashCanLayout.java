@@ -79,14 +79,14 @@ public class TrashCanLayout extends Fragment {
                 // Đọc dữ liệu thì đã có bên Allayout đọc rồi
                 //Không cần đọc lại, chỉ cần lấy ra những biến là "T" thôi
 
-//                for (int i = 0; i < AllLayout.images.size(); i++) {
-//                    if (AllLayout.images.get(i).getDeleted().equals("T")){
-//                        images.add(AllLayout.images.get(i));
-//                    }
-//                }
-                for (int i = 0; i < 54; i++) {
-                    images.add(AllLayout.images.get(i));
+                for (int i = 0; i < AllLayout.images.size(); i++) {
+                    if (AllLayout.images.get(i).getDeleted().equals("T")){
+                        images.add(AllLayout.images.get(i));
+                    }
                 }
+//                for (int i = 0; i < 54; i++) {
+//                    images.add(AllLayout.images.get(i));
+//                }
                 mSelectedItems = new ArrayList<>();
                 for (int i = 0; i < images.size(); i++) {
                     mSelectedItems.add(false);
