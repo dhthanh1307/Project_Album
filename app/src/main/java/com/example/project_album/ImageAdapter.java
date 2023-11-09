@@ -84,14 +84,11 @@ public class ImageAdapter extends BaseAdapter {
     public void setItemSelection(int position, boolean isSelected) {
         mSelectedItems.set(position, isSelected);
     }
-    public void resetItemSelectionArray(ArrayList<Image> listImage){
+    public void resetItemSelectionArray(int size){
         mSelectedItems.clear();
-        images.clear();
-        for (int i=0;i<listImage.size();i++){
+        for (int i=0;i<size;i++){
             mSelectedItems.add(false);
-            images.add(listImage.get(i));
         }
-
     }
 
     public void setIsCheckBoxVisible(boolean check) {

@@ -23,7 +23,7 @@ public class ViewPagerTrashCanFragment extends Fragment {
     ViewPager2 mViewPager;
     TextView txtTimeDelete;
     TextView txtNumberPerAll;
-    Button btnDeleteImmediately, btnRestore;
+    TextView btnDeleteImmediately, btnRestore;
     MainActivity main;
     Context context = null;
     ViewPagerInTrashCanAdapter mAdapter;
