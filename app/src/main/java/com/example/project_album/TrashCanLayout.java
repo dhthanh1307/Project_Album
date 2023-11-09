@@ -1,6 +1,8 @@
 package com.example.project_album;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
 
 
 public class TrashCanLayout extends Fragment {
-    ImageAdapter mGridAdapter;
+    public  static ImageAdapter mGridAdapter;
     public static ArrayList<Image> images = new ArrayList<Image>();
     MainActivity main;
     Context context = null;
@@ -41,9 +43,10 @@ public class TrashCanLayout extends Fragment {
     LinearLayout lastLinear;
 
     int count = 0;
-    private ArrayList<Boolean> mSelectedItems;
+    public static ArrayList<Boolean> mSelectedItems;
 
     public TrashCanLayout() {
+        Log.e("TrashCanLayout", "constructor");
         // Required empty public constructor
     }
 
@@ -72,7 +75,15 @@ public class TrashCanLayout extends Fragment {
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
-            if (images.size() == 0) {
+            if (images.size() == 0) {// cần if chỗ này để xử lí ấn từ all->trash->all->trash
+                // Đọc dữ liệu thì đã có bên Allayout đọc rồi
+                //Không cần đọc lại, chỉ cần lấy ra những biến là "T" thôi
+
+//                for (int i = 0; i < AllLayout.images.size(); i++) {
+//                    if (AllLayout.images.get(i).getDeleted().equals("T")){
+//                        images.add(AllLayout.images.get(i));
+//                    }
+//                }
                 for (int i = 0; i < 54; i++) {
                     images.add(AllLayout.images.get(i));
                 }
@@ -80,6 +91,12 @@ public class TrashCanLayout extends Fragment {
                 for (int i = 0; i < images.size(); i++) {
                     mSelectedItems.add(false);
                 }
+            }else{
+                Log.e("Day la loi","-------------ELSE------------");
+                for (int i=0;i<images.size();i++){
+                    Log.e("Day la loi","ID Anh="+String.valueOf(images.get(i).getId()));
+                }
+
             }
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
@@ -119,7 +136,6 @@ public class TrashCanLayout extends Fragment {
             public void onClick(View view) {
                 if (btnChoose.getText().toString().equals("Choose")) {
                     doBtnChooseWhenIsChoose();
-
                 } else {
                     doBtnChooseWhenIsCancel();
                 }
@@ -176,11 +192,21 @@ public class TrashCanLayout extends Fragment {
         }
     }
 
+    public static void resetSelectedItemWhenReturnFromViewPager(){
+
+        mSelectedItems.remove(0);// Do hàm này chỉ nhận xóa đúng 1 cái cho nên là xóa ở thằng nào cũng đc
+        mGridAdapter.resetItemSelectionArray(images.size());// reset lại bên adapter
+//        for(int i=0;i<images.size();i++){
+//            Log.e("Day la lo1 trong image main","Anh= "+String.valueOf(images.get(i).getId()));
+//        }
+
+    }
     private void showBigScreen(int position) {
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ft.replace(R.id.replace_fragment_layout, new LargeImageFragment(images.get(position)));
-        // ở đây còn khúc bên larg image xóa r gởi dề nữa
+        ViewPagerTrashCanFragment newFragment=new ViewPagerTrashCanFragment(images,position);
+        ft.replace(R.id.replace_fragment_layout, newFragment);
+        // ở đây còn khúc bên large image xóa r gởi dề nữa
         ft.commit();
     }
 
@@ -218,10 +244,10 @@ public class TrashCanLayout extends Fragment {
                     checkboxChoose.setVisibility(View.GONE);
                     checkboxChoose.setChecked(false);
                 }
-                if (count>0){
-                    btnDeleteChosenImages.setText("Delete "+String.valueOf(count)+" images");
-                    btnRestoreChosenImages.setText("Restore "+String.valueOf(count)+" images");
-                }else{
+                if (count > 0) {
+                    btnDeleteChosenImages.setText("Delete " + String.valueOf(count) + " images");
+                    btnRestoreChosenImages.setText("Restore " + String.valueOf(count) + " images");
+                } else {
                     btnDeleteChosenImages.setText("Delete All");
                     btnRestoreChosenImages.setText("Restore All");
                 }
@@ -230,44 +256,65 @@ public class TrashCanLayout extends Fragment {
         btnDeleteChosenImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Long> arrayIdDelete=new ArrayList<>();
-                for (int i=0;i<images.size();i++){
-                    if(mSelectedItems.get(i)){
-                        arrayIdDelete.add(images.get(i).getId());
-                    }
-                }
-//                Log.e("Err","kj"+String.valueOf(arrayIdDelete.size()));
-//                Log.e("Err","kj"+String.valueOf(mSelectedItems.size()));
-//                for (int i=0;i<arrayIdDelete.size();i++){
-//                    Log.e("Err","kjkdkd"+String.valueOf(arrayIdDelete.get(i)));
-//                }
-                for (int i=0;i<mSelectedItems.size();i++){
-                    if (mSelectedItems.get(i)){
-                        Log.e("Err","Dung "+String.valueOf(i));
+
+                // Hiển thị Dialog
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(main);
+                alertDialogBuilder.setMessage("Are you sure you want to delete?");
+                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (btnDeleteChosenImages.getText().toString().equals("Delete All")) {
+                            images.clear();
+                            mSelectedItems.clear();
+                            mGridAdapter.resetItemSelectionArray(images.size());
+                            doBtnChooseWhenIsCancel();
+                        }
+                        ArrayList<Long> arrayIdDelete = new ArrayList<>();
+                        for (int i = 0; i < images.size(); i++) {
+                            if (mSelectedItems.get(i)) {
+                                arrayIdDelete.add(images.get(i).getId());
+                            }
+                        }
+                        for (int i = 0; i < mSelectedItems.size(); i++) {
+                            if (mSelectedItems.get(i)) {
+                                Log.e("Err", "Dung " + String.valueOf(i));
+                            }
+                        }
+                        //Xóa dòng hình ảnh đó đó ở dataResource
+                        MainActivity.dataResource.deleteArrayImage(arrayIdDelete);
+                        Log.e("Err", "ffff" + String.valueOf(MainActivity.dataResource.getCount()));
+                        //xóa ảnh ở images hiện hành
+                        int size = images.size();
+                        for (int i = 0; i < size; i++) {
+                            if (mSelectedItems.get(i)) {
+                                size--;
+                                images.remove(i);
+                                mSelectedItems.remove(i);
+                                i--;
+                            }
+                        }
+                        //reset lại mSelection trong Adapter
+                        mGridAdapter.resetItemSelectionArray(images.size());
+                        doBtnChooseWhenIsCancel();
+
 
                     }
-                }
+                });
 
-//                Log.e("Err","ffff"+String.valueOf(MainActivity.dataResource.getCount()));
 
-                //Xóa dòng hình ảnh đó đó ở dataResource
-                MainActivity.dataResource.deleteArrayImage(arrayIdDelete);
-                Log.e("Err","ffff"+String.valueOf(MainActivity.dataResource.getCount()));
+                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Xử lý khi chọn Cancel
+                        dialog.dismiss(); // Đóng AlertDialog mà không làm gì cả
+                    }
+                });
 
-                mSelectedItems.clear();
-                images.clear();
 
-                //Lấy lại hình ảnh có is_delete="T" và set lại cho adapter
-                images=MainActivity.dataResource.getImageInDbHasIsDeletedIsTrue();
+                // Hiển thị AlertDialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
 
-//                Log.e("Err","ffff"+String.valueOf(MainActivity.dataResource.getCount()));
-                for (int i=0;i<images.size();i++){
-                    mSelectedItems.add(false);
-                }
-                //VERY IMPORTANT
-                //Này là thay đổi selection,image ở bên adapter ở adapter thôi
-                mGridAdapter.resetItemSelectionArray(images);
-                doBtnChooseWhenIsCancel();
             }
         });
     }
@@ -282,6 +329,11 @@ public class TrashCanLayout extends Fragment {
         btnDeleteChosenImages.setVisibility(View.GONE);
         btnRestoreChosenImages.setVisibility(View.GONE);
         btnChoose.setText("Choose");
+        if (images.size() == 0) {
+            btnChoose.setVisibility(View.INVISIBLE);
+        } else {
+            btnChoose.setVisibility(View.VISIBLE);
+        }
         btnChoose.setBackgroundColor(getResources().getColor(R.color.blue_press, context.getTheme()));
         mGridAdapter.setIsCheckBoxVisible(false);
         for (int i = 0; i < images.size(); i++) {

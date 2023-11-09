@@ -1,5 +1,9 @@
 package com.example.project_album;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.ByteArrayInputStream;
 import java.util.Date;
 
 public class Image {
@@ -11,6 +15,7 @@ public class Image {
     private String type;
     private String describe;
     private String is_deleted;
+    private Bitmap imgBitmap;
     public Image(){
 
     }
@@ -23,9 +28,12 @@ public class Image {
         this.id=0;
         this.date = new Date();
         this.describe = "";
+        this.imgBitmap = ChangeByteToBitmap(imgView);
         this.is_deleted="T";
     }
 
+
+    public Bitmap getImgBitmap(){return imgBitmap;}
     public byte[] getImgView(){
         return imgView;
     }
@@ -71,8 +79,17 @@ public class Image {
     public void setId(long id){
         this.id = id;
     }
+    void setImgBitmap(Bitmap img){
+        imgBitmap = img;
+    }
 
     public void setDeleted(String deleted) {
         this.is_deleted = deleted;
     }
+    private Bitmap ChangeByteToBitmap(byte[] outImage ) {
+        ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
+        Bitmap theImage = BitmapFactory.decodeStream(imageStream);
+        return theImage;
+    }
+
 }

@@ -67,7 +67,7 @@ public class AlbumLayout extends Fragment {
     private RelativeLayout layout_icon;
 
     private AlbumLayout(){
-        InitAlbums();
+
     }
     public static AlbumLayout newInstance(String strArg){
         if (instance == null){
@@ -79,6 +79,12 @@ public class AlbumLayout extends Fragment {
         return instance;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        InitAlbums();
+
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -182,7 +188,8 @@ public class AlbumLayout extends Fragment {
         TextView tvname = viewchild.findViewById(R.id.tv_album_name);
         TextView tvlength = viewchild.findViewById(R.id.tv_album_length);
         if(albums.get(position).length() != 0 ){
-            img.setImageResource(albums.get(position).get_image(albums.get(position).length() -1 ));
+            img.setImageBitmap(albums.get(position).get_image(
+                    albums.get(position).length() -1 ).getImgBitmap());
             img.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
         else{
@@ -195,11 +202,12 @@ public class AlbumLayout extends Fragment {
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
-//                FragmentTransaction ft = fragmentmanager.beginTransaction();
-//                ft.replace(R.id.replace_fragment_layout,new ShowImageFragment(albums.get(position).getImages()));
-//                ft.commit();
-                talk();
+                FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
+                FragmentTransaction ft = fragmentmanager.beginTransaction();
+                ft.replace(R.id.replace_fragment_layout,new
+                        ShowImageInAlbumFragment(albums.get(position).getImages()));
+                ft.commit();
+                //talk();
             }
         });
         img.setOnLongClickListener(new View.OnLongClickListener() {
@@ -208,7 +216,8 @@ public class AlbumLayout extends Fragment {
                 View v = getActivity().getLayoutInflater().inflate(R.layout.custtom_edit_album, null);
                 ImageView img = v.findViewById(R.id.image);
                 try{
-                    img.setImageResource(albums.get(position).get_image(albums.get(position).length() - 1));
+                    img.setImageBitmap(albums.get(position).get_image(
+                            albums.get(position).length() - 1).getImgBitmap());
                 } catch(Exception e){
                     img.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 }
@@ -256,35 +265,34 @@ public class AlbumLayout extends Fragment {
         return viewchild;
     }
     private void InitAlbums() {
-        ArrayList<Integer> images = new ArrayList<Integer>();
-        images.add(R.drawable.img_6);
-        images.add(R.drawable.img_1);
-        Album a3 = new Album("Airplane",images);
+        if(albums.size() == 0){
+            ArrayList<Image> images = new ArrayList<Image>();
+            for(int i =0;i<4;i++){
+                images.add(AllLayout.images.get(i));
+            }
+            Album a3 = new Album("Airplane",images);
 
-        ArrayList<Integer> images1 = new ArrayList<Integer>();
-        images1.add(R.drawable.img_2);
-        images1.add(R.drawable.img_3);
-        Album a4 = new Album("Fruit",images1);
+            ArrayList<Image> images1 = new ArrayList<Image>();
+            images1.addAll(images);
+            Album a4 = new Album("Fruit",images1);
 
-        ArrayList<Integer> images2 = new ArrayList<Integer>();
-        images2.add(R.drawable.img_4);
-        images2.add(R.drawable.img_5);
-        Album a5 = new Album("Holiday",images2);
+            ArrayList<Image> images2 = new ArrayList<Image>();
+            images2.addAll(images);
+            Album a5 = new Album("Holiday",images2);
 
-        ArrayList<Integer> images3 = new ArrayList<Integer>();
-        Album a2 = new Album("Mục yêu thích",images3);
+            ArrayList<Image> images3 = new ArrayList<Image>();
+            Album a2 = new Album("Mục yêu thích",images3);
 
-        ArrayList<Integer> images4 = new ArrayList<Integer>();
-        images4.add(R.drawable.img);images4.add(R.drawable.img_1);
-        images4.add(R.drawable.img_2);images4.add(R.drawable.img_3);
-        images4.add(R.drawable.img_5);images4.add(R.drawable.img_4);
-        Album a1 = new Album("Tất cả",images4);
+            ArrayList<Image> images4 = new ArrayList<Image>();
+            images4.addAll(AllLayout.images);
+            Album a1 = new Album("Tất cả",images4);
 
-        albums.add(a1);
-        albums.add(a2);
-        albums.add(a3);
-        albums.add(a4);
-        albums.add(a5);
+            albums.add(a1);
+            albums.add(a2);
+            albums.add(a3);
+            albums.add(a4);
+            albums.add(a5);
+        }
     }
     private void AllMyAlbumClick(){
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
@@ -355,7 +363,7 @@ public class AlbumLayout extends Fragment {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Integer> image = new ArrayList<Integer>();
+                ArrayList<Image> image = new ArrayList<Image>();
                 Album album = new Album(txtTitle.getText().toString(),image);
                 albums.add(album);
                 dialog.cancel();

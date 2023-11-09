@@ -59,23 +59,23 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         view = activity.getLayoutInflater().inflate(idLayout, null);
         ImageView img = view.findViewById(R.id.img);
-        img.setImageBitmap(ChangeByteToBitmap(images.get(i).getImgView()));
+        img.setImageBitmap(images.get(i).getImgBitmap());
+        Log.e("ImageAdapter:",String.valueOf(i));
         checkBoxChoose = view.findViewById(R.id.check_box);
+        RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.parent);
+        if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            img.setLayoutParams(new RelativeLayout.LayoutParams(MainActivity.Width / 3 - 40, MainActivity.Width / 3 - 40));
+        else {
+            img.setLayoutParams(new RelativeLayout.LayoutParams(MainActivity.Height / 5 - 30, MainActivity.Height / 5 - 30));
+        }
 
-        //Vì mỗi lần cuộn là GridView sẽ bị như notify ấy, nên là cần setCheck lại
+        //       Vì mỗi lần cuộn là GridView sẽ bị như notify ấy, nên là cần setCheck lại
         if (mSelectedItems.get(i)){
             checkBoxChoose.setVisibility(View.VISIBLE);
             checkBoxChoose.setChecked(true);
         }else{
             checkBoxChoose.setVisibility(View.GONE);
             checkBoxChoose.setChecked(false);
-        }
-
-        RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.parent);
-        if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-            img.setLayoutParams(new RelativeLayout.LayoutParams(MainActivity.Width / 3 - 40, MainActivity.Width / 3 - 40));
-        else {
-            img.setLayoutParams(new RelativeLayout.LayoutParams(MainActivity.Height / 5 - 30, MainActivity.Height / 5 - 30));
         }
         return view;
     }

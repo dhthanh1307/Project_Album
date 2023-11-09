@@ -1,8 +1,12 @@
 package com.example.project_album;
 
+import android.app.WallpaperManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
@@ -23,6 +27,8 @@ import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends FragmentActivity {
     public static DataResource dataResource;
+    private WallpaperManager wallpaperManager;
+    private byte[] wallpaperImage;
     public static int Width;
     public static int Height;
     public static String username;
@@ -46,6 +52,7 @@ public class MainActivity extends FragmentActivity {
 
 //        dataResource = new DataResource(this);
 //        dataResource.open();
+        wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
         getSizeWindow();
 
         accountLayout = AccountLayout.newInstance("account");
@@ -130,4 +137,47 @@ public class MainActivity extends FragmentActivity {
         dataResource.cloe();
         super.onPause();
     }
+    public void setWallPaper(byte[] img){
+        wallpaperImage = img;
+        Thread myBackgroundThread = new Thread( wallPaper_backgroundTask);
+        myBackgroundThread.start();
+    }
+    private Runnable wallPaper_backgroundTask = new Runnable() {
+        @Override
+        public void run() { // busy work goes here...
+            try {
+                Thread.sleep(1);
+                Bitmap image = ChangeByteToBitmap(wallpaperImage);
+                Bitmap imageEdit = Bitmap.createBitmap((int)Width, (int)Height, Bitmap.Config.ARGB_8888);
+
+                float originalWidth = image.getWidth();
+                float originalHeight = image.getHeight();
+
+                Canvas canvas = new Canvas(imageEdit);
+
+                float scale = Width / originalWidth;
+
+                float xTranslation = 0.0f;
+                float yTranslation = (Height - originalHeight * scale) / 2.0f;
+
+                Matrix transformation = new Matrix();
+                transformation.postTranslate(xTranslation, yTranslation);
+                transformation.preScale(scale, scale);
+
+                Paint paint = new Paint();
+                paint.setFilterBitmap(true);
+
+                canvas.drawBitmap(image, transformation, paint);
+
+                try {
+                    wallpaperManager.setBitmap(imageEdit);
+                }
+                catch (Exception e){
+
+                }
+
+            }
+            catch (InterruptedException e) { }
+        }
+    };
 }
