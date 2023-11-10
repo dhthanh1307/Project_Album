@@ -1,9 +1,12 @@
 package com.example.project_album;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.io.File;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "manage_account.db";
@@ -42,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_USER
             + " integer, "
             + COLUMN_IMAGE
-            + " BLOB, "
+            + " text not null, "
             + COLUMN_NAME
             + " text not null, "
             + COLUMN_SIZE
@@ -55,9 +58,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + " text not null, "
             + COLUMN_DESCRIBE
             + " text);";
-
+    public File directory;
+    public static String PATH;
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        ContextWrapper cw =new ContextWrapper(context);
+        directory = cw.getDir("Picture",Context.MODE_PRIVATE);
+        PATH = directory.getPath();
     }
 
     @Override

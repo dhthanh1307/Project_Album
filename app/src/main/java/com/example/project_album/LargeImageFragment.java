@@ -44,7 +44,7 @@ public class LargeImageFragment extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_layout_solo_picture_in_trashcan, container, false);
         imgDelete=view.findViewById(R.id.img_delete);
-        imgDelete.setImageBitmap(main.ChangeByteToBitmap(myImage.getImgView()));
+        imgDelete.setImageBitmap(myImage.getImgBitmap());
         return view;
     }
     @Override

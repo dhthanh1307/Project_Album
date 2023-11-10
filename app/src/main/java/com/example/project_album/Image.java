@@ -2,13 +2,15 @@ package com.example.project_album;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 public class Image {
     private long id;
-    private byte[] imgView;
+    private String path;
     private String name;
     private float size;
     private Date date;
@@ -20,22 +22,25 @@ public class Image {
 
     }
 
-    public Image(byte[] imgView) {
-        this.imgView = imgView;
-        this.size = 0;
+    public Image(Bitmap imgbitmap,String name) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        imgbitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] imageInByte = stream.toByteArray();
+        this.size= imageInByte.length / 1024;
+        Log.e("Image",String.valueOf(size));
         this.type = "";
-        this.name="";
+        this.name=name;
         this.id=0;
         this.date = new Date();
         this.describe = "";
-        this.imgBitmap = ChangeByteToBitmap(imgView);
+        this.imgBitmap = imgbitmap;
         this.is_deleted="T";
     }
 
 
     public Bitmap getImgBitmap(){return imgBitmap;}
-    public byte[] getImgView(){
-        return imgView;
+    public String getPath(){
+        return path;
     }
     public String getName(){
         return name;
@@ -58,8 +63,8 @@ public class Image {
     public String getDeleted() {
         return is_deleted;
     }
-    public void setImgView(byte[] imgView){
-        this.imgView = imgView;
+    public void setPath(String path){
+        this.path = path;
     }
     public void setName(String name){
         this.name = name;

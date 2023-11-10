@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
@@ -64,12 +66,13 @@ public class AllLayout extends Fragment {
         if(images.size()!= 0) {
             for (int i = images.size() - 1; i >= images.size() - 15; i--) {
                 debug(String.valueOf(i));
-                images.get(i).setImgBitmap(ChangeByteToBitmap(images.get(i).getImgView()));
+                images.get(i).setImgBitmap(getImageFromPath(images.get(i).getPath()));
             }
             Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
             myBackgroundThread.start();
         }
     }
+
 
     public static AllLayout newInstance(String strArg) {
         AllLayout fragment = new AllLayout();
@@ -121,7 +124,7 @@ public class AllLayout extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(getContext(),"set Wallpaper successfull!"
                         ,Toast.LENGTH_SHORT).show();
-                main.setWallPaper(images.get(i).getImgView());
+                //main.setWallPaper(images.get(i).getImgView());
             }
         });
         SetGridViewItemLongClick();
@@ -271,9 +274,9 @@ public class AllLayout extends Fragment {
             int img[] = {R.drawable.img,R.drawable.img_2,
                     R.drawable.img_3,
                     R.drawable.img_4,R.drawable.img_5,R.drawable.img_6};
-            for(int j =0;j<9;j++){
+            for(int j =0;j<5;j++){
                 for(int i = 0; i<6;i++) {
-                    images.add(new Image(main.ChangeImageToByte(img[i])));
+                    images.add(new Image(main.ChangeImageToBitmap(img[i]),main.GenerateName()));
                     images.get(j*6+i).setId(MainActivity.dataResource.
                             InsertImage(images.get(j*6+i), 1));
                     //images.get(j*6+i).setImgBitmap(main.ChangeImageToBitmap(img[i]));
@@ -306,7 +309,7 @@ public class AllLayout extends Fragment {
                 for(int i = images.size() -16;i >=0;i--) {
                     Thread.sleep(1);
                     images.get(i).setImgBitmap(
-                            ChangeByteToBitmap(images.get(i).getImgView()));
+                            getImageFromPath(images.get(i).getPath()));
                     debug(String.valueOf(i));
                 }
                 //adapter.notifyDataSetChanged();
@@ -329,9 +332,18 @@ public class AllLayout extends Fragment {
     private void debug(String str){
         Log.e("AllLayout",str);
     }
-    private Bitmap ChangeByteToBitmap(byte[] outImage ){
-        ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
-        Bitmap theImage = BitmapFactory.decodeStream(imageStream);
-        return theImage;
+    private Bitmap getImageFromPath(String path) {
+        Bitmap b =null;
+        debug(path);
+        try {
+            File f = new File(path);
+            b = BitmapFactory.decodeStream(new FileInputStream(f));
+        }
+        catch (FileNotFoundException e)
+        {
+
+            e.printStackTrace();
+        }
+        return b;
     }
 }

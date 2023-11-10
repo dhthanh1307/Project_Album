@@ -2,11 +2,15 @@ package com.example.project_album;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +18,7 @@ import java.util.ArrayList;
 public class DataResource {
     private SQLiteDatabase database,database1;
     private DatabaseHelper helper;
+    private Context context;
     private String[] allColumns = {DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_USER, DatabaseHelper.COLUMN_IMAGE
             , DatabaseHelper.COLUMN_NAME, DatabaseHelper.COLUMN_SIZE, DatabaseHelper.COLUMN_DATE,
             DatabaseHelper.COLUMN_TYPE, DatabaseHelper.COLUMN_DESCRIBE, DatabaseHelper.COLUMN_IS_DELETE};
@@ -21,6 +26,7 @@ public class DataResource {
     //    private String[] allColumns = {DatabaseHelper.COLUMN_ID,DatabaseHelper.COLUMN_IMAGE
 //        ,DatabaseHelper.COLUMN_DATE};
     public DataResource(Context context) {
+        this.context  = context;
         helper = new DatabaseHelper(context);
     }
 
@@ -30,7 +36,7 @@ public class DataResource {
 
     }
 
-    public void cloe() {
+    public void close() {
         helper.close();
     }
 
@@ -51,7 +57,7 @@ public class DataResource {
         try {
             ContentValues values = new ContentValues();
             values.put(DatabaseHelper.COLUMN_USER, USER);
-            values.put(DatabaseHelper.COLUMN_IMAGE, image.getImgView());
+            values.put(DatabaseHelper.COLUMN_IMAGE, helper.PATH+"/"+image.getName());
             values.put(DatabaseHelper.COLUMN_NAME, image.getName());
             values.put(DatabaseHelper.COLUMN_SIZE, image.getSize());
 
@@ -62,11 +68,23 @@ public class DataResource {
             values.put(DatabaseHelper.COLUMN_IS_DELETE, image.getDeleted());
 
             long insertId = database.insert(DatabaseHelper.TABLE_PICTURE, null, values);
-//            Cursor cursor =database.query(DatabaseHelper.TABLE_PICTURE,allColumns,DatabaseHelper.COLUMN_ID
-//                    +" = "+ insertId,null,null,null,null);
-//            cursor.moveToFirst();
-//            MyPerson newPerson = cursorToPerson(cursor);
-//            cursor.close();
+
+            //luu image vao internal storage
+                ContextWrapper cw = new ContextWrapper(context);
+                File file = new File(helper.directory, image.getName());
+                if (!file.exists()) {
+                    Log.d("path", file.toString());
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(file);
+                        image.getImgBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        fos.flush();
+                        fos.close();
+                    } catch (java.io.IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
             return insertId;
         } catch (Exception ex) {
             return -1;
@@ -76,6 +94,7 @@ public class DataResource {
         long id = image.getId();
         Log.e("SQLite","Person entry delete with id: "+id);
         try {
+            context.deleteFile(image.getPath());
             database.delete(DatabaseHelper.TABLE_PICTURE, DatabaseHelper.COLUMN_ID + " = " + id,
                     null);
             return true;
@@ -108,6 +127,7 @@ public class DataResource {
         while (!cursor.isAfterLast()) {
             list.add(cursorToImage(cursor));
             cursor.moveToNext();
+            debug(String.valueOf(list.size()));
         }
         Log.e("Err","Loi o day3");
         return list;
@@ -130,7 +150,7 @@ public class DataResource {
         image.setId(cursor.getLong(0));
         image.setName(cursor.getString(3));
         image.setSize(cursor.getFloat(4));
-        image.setImgView(cursor.getBlob(2));
+        image.setPath(cursor.getString(2));
         image.setType(cursor.getString(6));
         image.setDescribe(cursor.getString(7));
         image.setDeleted(cursor.getString(8));

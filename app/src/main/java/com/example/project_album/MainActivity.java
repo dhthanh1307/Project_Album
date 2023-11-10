@@ -138,7 +138,7 @@ public class MainActivity extends FragmentActivity {
     }
     @Override
     protected void onPause(){
-        dataResource.cloe();
+        dataResource.close();
         super.onPause();
     }
     public void setWallPaper(byte[] img){
@@ -184,4 +184,7 @@ public class MainActivity extends FragmentActivity {
             catch (InterruptedException e) { }
         }
     };
+    public String GenerateName(){
+        return System.currentTimeMillis() + ".jpeg";
+    }
 }
