@@ -82,6 +82,7 @@ public class TrashCanLayout extends Fragment {
                 for (int i = 0; i < AllLayout.images.size(); i++) {
                     if (AllLayout.images.get(i).getDeleted().equals("T")){
                         images.add(AllLayout.images.get(i));
+                        Log.e("TrashCanLayout",String.valueOf(i));
                     }
                 }
 //                for (int i = 0; i < 54; i++) {

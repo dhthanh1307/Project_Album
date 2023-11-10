@@ -127,6 +127,10 @@ public class MainActivity extends FragmentActivity {
         return theImage;
     }
 
+    public Bitmap ChangeImageToBitmap(int id){
+        return BitmapFactory.decodeResource(getResources(), id);
+    }
+
     @Override
     protected void onResume(){
         dataResource.open();

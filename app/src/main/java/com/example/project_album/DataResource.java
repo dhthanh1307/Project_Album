@@ -133,6 +133,7 @@ public class DataResource {
         image.setImgView(cursor.getBlob(2));
         image.setType(cursor.getString(6));
         image.setDescribe(cursor.getString(7));
+        image.setDeleted(cursor.getString(8));
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         try {
             image.setDate(df.parse(cursor.getString(5)));
