@@ -27,6 +27,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -119,12 +121,21 @@ public class AllLayout extends Fragment {
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         gridView.setAdapter(adapter);
         gridView.setSelection(images.size() - 1);
+        // Chỗ này set ảnh màn hình của huy chưa thêm vô, để thêm vô sau.
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Toast.makeText(getContext(),"set Wallpaper successfull!"
+//                        ,Toast.LENGTH_SHORT).show();
+//                //main.setWallPaper(images.get(i).getImgView());
+//            }
+//        });
+
+        //Khi click vào ảnh bất kì
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(),"set Wallpaper successfull!"
-                        ,Toast.LENGTH_SHORT).show();
-                //main.setWallPaper(images.get(i).getImgView());
+                showBigScreen(i);
             }
         });
         SetGridViewItemLongClick();
@@ -328,7 +339,14 @@ public class AllLayout extends Fragment {
             debug(String.valueOf(copiedImages.get(i).getId()));
         }
     }
+    public void showBigScreen(int position){
+        FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
+        FragmentTransaction ft = fragmentmanager.beginTransaction();
+        ViewPagerAllLayoutFragment newFragment=new ViewPagerAllLayoutFragment(images,position);
+        ft.replace(R.id.replace_fragment_layout, newFragment);
+        ft.commit();
 
+    }
     private void debug(String str){
         Log.e("AllLayout",str);
     }

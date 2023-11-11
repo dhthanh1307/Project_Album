@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,13 +20,15 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     ArrayList<Image> images = new ArrayList<>();
     ViewPager2 mViewPager;
     TextView txtTimeCapture;
-    TextView txtInformation;
+    ImageView txtInformation;
 
-    TextView txtDeleteIntoTrashCan;
+    ImageView txtDeleteIntoTrashCan;
 
-    TextView txtFavorite;
+    ImageView txtFavorite;
 
-    TextView txtShare;
+    ImageView txtShare;
+
+    ImageView txtEdit;
 
     MainActivity main;
     Context context = null;
@@ -54,12 +57,13 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_pager_all_layout, container, false);
-
+        //Chỗ này là imageView mà sa chwua đổi txt tên ở id bên xml á.
         txtTimeCapture=view.findViewById(R.id.edt_time_capture);
         txtDeleteIntoTrashCan=view.findViewById(R.id.txt_delete_into_trashcan);
         txtFavorite=view.findViewById(R.id.txt_favorite);
         txtInformation=view.findViewById(R.id.txt_information);
         txtShare=view.findViewById(R.id.txt_share);
+        txtEdit=view.findViewById(R.id.txt_edit);
 
 
         mViewPager = view.findViewById(R.id.viewpager_in_all_layout);
@@ -100,6 +104,13 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(main, "Information", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        txtEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(main, "Edit", Toast.LENGTH_SHORT).show();
             }
         });
         return view;
