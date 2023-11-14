@@ -9,10 +9,15 @@ import android.util.Log;
 import java.io.File;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+    // ten database va version cua no
     private static final String DATABASE_NAME = "manage_account.db";
     private static final int DATABASE_VERSION = 1;
+    // ten cac bang tong database
     public static final String TABLE_PICTURE = "picture";
     public static final String TABLE_USERS = "users";
+    public static final String TABLE_ALBUM = "album";
+    public static final String TABLE_ALBUM_IMAGE = "album_image";
+    // cac truong trong bang
     public static final String COLUMN_USER = "user";
 
     public static final String COLUMN_ID = "id";
@@ -27,10 +32,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String COLUMN_PASSWORD = "password";
         public static final String COLUMN_EMAIL = "email";
 
+    public static final String COLUMN_NAME_ALBUM = "name_album";
+    public static final String COLUMN_ID_IMAGE = "id_image";
+
     public static final String COLUMN_IS_DELETE = "is_delete";// chỗ này nếu true thì sẽ k hiển thị ở all layout
     //mà chỉ hiển thị ở trash can, biến này kiểu trong SQL là text
 
 
+    // cac cau lenh tao bang
     private static final String DATABASE_CREATE_USERS = "create table " + TABLE_USERS + "( " + COLUMN_USERNAME
             + " text primary key, "
             + COLUMN_PHONE
@@ -58,6 +67,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + " text not null, "
             + COLUMN_DESCRIBE
             + " text);";
+
+    private static final String DATABASE_CREATE_ALBUM = "create table " + TABLE_ALBUM + "( "
+            + COLUMN_ID
+            + " integer primary key autoincrement, "
+            + COLUMN_NAME_ALBUM
+            + " text not null);";
+    private static final String DATABASE_CREATE_ALBUM_IMAGE = "create table " +
+            TABLE_ALBUM_IMAGE + "( "
+            + COLUMN_ID
+            + " integer primary key autoincrement, "
+            + COLUMN_ID_IMAGE
+            + " integer, "
+            + COLUMN_NAME_ALBUM
+            + " text not null);";
     public File directory;
     public static String PATH;
     public DatabaseHelper(Context context) {
@@ -71,7 +94,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(DATABASE_CREATE);
         sqLiteDatabase.execSQL(DATABASE_CREATE_USERS);
-
+        sqLiteDatabase.execSQL(DATABASE_CREATE_ALBUM);
+        sqLiteDatabase.execSQL(DATABASE_CREATE_ALBUM_IMAGE);
     }
 
     @Override
@@ -81,6 +105,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + ", which will destroy all data");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PICTURE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ALBUM);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ALBUM_IMAGE);
 
         onCreate(sqLiteDatabase);
     }

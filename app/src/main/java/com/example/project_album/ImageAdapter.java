@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter {
@@ -59,7 +61,15 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         view = activity.getLayoutInflater().inflate(idLayout, null);
         ImageView img = view.findViewById(R.id.img);
-        img.setImageBitmap(images.get(i).getImgBitmap());
+        Log.e("ImageAdapter:",String.valueOf(1));
+        Bitmap b =images.get(i).getImgBitmap();
+        Log.e("ImageAdapter:",String.valueOf(2));
+        img.setImageBitmap(b);
+//        File f = new File(images.get(i).getPath());
+//        Log.e("ImageAdapter:",String.valueOf(1));
+//        Uri uri = Uri.fromFile(f);
+//        Log.e("ImageAdapter:",String.valueOf(2));
+//        img.setImageURI(uri);
         Log.e("ImageAdapter:",String.valueOf(i));
         checkBoxChoose = view.findViewById(R.id.check_box);
         RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.parent);

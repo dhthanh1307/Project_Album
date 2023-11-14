@@ -40,6 +40,139 @@ public class DataResource {
         helper.close();
     }
 
+    //--------------------------- ALBUM SPACE----------------------------
+
+    public long InsertAlbum(String name){
+        SQLiteDatabase db = database;
+        db.beginTransaction();
+        long id = -1;
+        try{
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COLUMN_NAME_ALBUM,name);
+            id = database.insert(DatabaseHelper.TABLE_ALBUM,
+                    null,values);
+            db.setTransactionSuccessful();
+            debug("insert sucessfull: "+name);
+
+        }
+        catch (Exception ex){
+            debug("Error while insert Album");
+        }
+        finally {
+            db.endTransaction();
+        }
+        return id;
+    }
+
+    public long InsertAlbumImage(String album_name,long idImage){
+        SQLiteDatabase db = database;
+        db.beginTransaction();
+        long id = -1;
+        try{
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COLUMN_ID_IMAGE, idImage);
+            values.put(DatabaseHelper.COLUMN_NAME_ALBUM,album_name);
+            id = database.insert(DatabaseHelper.TABLE_ALBUM_IMAGE,
+                    null,values);
+            db.setTransactionSuccessful();
+            debug("insert sucessfull: "+String.valueOf(idImage));
+        }
+        catch (Exception ex){
+            debug("Error while insert AlbumImage");
+        }
+        finally {
+            db.endTransaction();
+        }
+        return id;
+    }
+
+    public ArrayList<Album> getAllAlbum(){
+        ArrayList<Album> albums = new ArrayList<>();
+        String columnAlbum[] = {DatabaseHelper.COLUMN_NAME_ALBUM};
+        Cursor cursor = database.query(DatabaseHelper.TABLE_ALBUM,columnAlbum, null,
+                null, null, null, null);
+        debug(String.valueOf(cursor.getCount()));
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            albums.add(cursorToAlbum(cursor));
+            cursor.moveToNext();
+            debug("Album length: " +String.valueOf(albums.size()));
+        }
+        return albums;
+    }
+
+    private Album cursorToAlbum(Cursor cursor){
+        return getAlbum(cursor.getString(0));
+    }
+
+    public Album getAlbum(String name){
+        debug(name);
+        ArrayList<Image> images = new ArrayList<>();
+        String columnImage_id[] = {DatabaseHelper.COLUMN_ID_IMAGE};
+        Cursor cursor = database.rawQuery("select "+DatabaseHelper.COLUMN_ID_IMAGE+
+                " from "+DatabaseHelper.TABLE_ALBUM_IMAGE+" where "+
+                DatabaseHelper.COLUMN_NAME_ALBUM +" = '" + name+"'", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Image i= new Image();
+            i.setId(cursor.getLong(0));
+            images.add(i);
+            debug(String.valueOf(i.getId()));
+            cursor.moveToNext();
+
+        }
+        return new Album(name,images);
+    }
+
+    public boolean deleteImageInAlbum(Image image,String name){
+        long id = image.getId();
+        Log.e("SQLite","Person entry delete with id: "+id);
+        try {
+            database.delete(DatabaseHelper.TABLE_ALBUM_IMAGE,
+                    DatabaseHelper.COLUMN_ID_IMAGE + " = " + id + " and "+
+                            DatabaseHelper.COLUMN_NAME_ALBUM +" = " +name,
+                    null);
+            return true;
+        }
+        catch (Exception ex){
+            return false;
+        }
+
+    }
+
+    public boolean deleteAlbum(String name){
+        database.beginTransaction();
+        try {
+            database.delete(DatabaseHelper.TABLE_ALBUM,
+                    DatabaseHelper.COLUMN_NAME_ALBUM
+                            + " = '" + name+"'",
+                    null);
+            database.delete(DatabaseHelper.TABLE_ALBUM_IMAGE,
+                    DatabaseHelper.COLUMN_NAME_ALBUM
+                            + " = '" + name+"'",
+                    null);
+            database.setTransactionSuccessful();
+            return true;
+        }
+        catch (Exception ex){
+            debug("Exception with album "+name);
+            return false;
+        }
+        finally {
+            database.endTransaction();
+        }
+
+    }
+    public void updateName(String oldName,String newName){
+        ContentValues key = new ContentValues();
+        key.put(DatabaseHelper.COLUMN_NAME_ALBUM,newName);
+        database.update(DatabaseHelper.TABLE_ALBUM,key,
+                DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'",null);
+        database.update(DatabaseHelper.TABLE_ALBUM_IMAGE,key,
+                DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'",null);
+    }
+    //-------------------------------finish album space------------------------------------
+
     public long InsertUser(User user) {
         try {
             ContentValues values = new ContentValues();
@@ -47,7 +180,8 @@ public class DataResource {
             values.put(DatabaseHelper.COLUMN_PASSWORD, user.getPass());
             values.put(DatabaseHelper.COLUMN_PHONE, user.getPhone());
             values.put(DatabaseHelper.COLUMN_EMAIL,user.getEmail());
-            long insertId = database.insert(DatabaseHelper.TABLE_USERS, null, values);
+            long insertId = database.insert(DatabaseHelper.TABLE_USERS,
+                    null, values);
             return insertId;
         } catch (Exception ex) {
             return -1;

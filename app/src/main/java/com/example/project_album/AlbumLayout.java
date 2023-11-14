@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,6 +50,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class AlbumLayout extends Fragment {
+    MainActivity main;
 
     public static ArrayList<Album> albums = new ArrayList<Album>();
     private Bundle saveInstanceState;
@@ -65,9 +67,11 @@ public class AlbumLayout extends Fragment {
     private Button btnAddAlbum;
     private ScrollView sv;
     private RelativeLayout layout_icon;
+    private boolean isInit = false;
 
     private AlbumLayout(){
-
+        debug("constructor");
+        albums = MainActivity.dataResource.getAllAlbum();
     }
     public static AlbumLayout newInstance(String strArg){
         if (instance == null){
@@ -82,7 +86,10 @@ public class AlbumLayout extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        main = (MainActivity)getActivity() ;
+        debug("onCreate "+String.valueOf(albums.size()));
         InitAlbums();
+        isInit = true;
 
     }
     @Override
@@ -134,6 +141,7 @@ public class AlbumLayout extends Fragment {
 
         return mainView;
     }
+
 
 
     @Override
@@ -205,7 +213,7 @@ public class AlbumLayout extends Fragment {
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
                 ft.replace(R.id.replace_fragment_layout,new
-                        ShowImageInAlbumFragment(albums.get(position).getImages()));
+                        ShowImageInAlbumFragment(albums.get(position)));
                 ft.commit();
                 //talk();
             }
@@ -254,6 +262,7 @@ public class AlbumLayout extends Fragment {
                 tv_delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        MainActivity.dataResource.deleteAlbum(albums.get(position).getName());
                         albums.remove(position);
                         dialog.cancel();
                         UpdateConfiguration(getResources().getConfiguration());
@@ -265,39 +274,58 @@ public class AlbumLayout extends Fragment {
         return viewchild;
     }
     private void InitAlbums() {
-        if(albums.size() == 0){
-            ArrayList<Image> images = new ArrayList<Image>();
-            for(int i =0;i<4;i++){
-                images.add(AllLayout.images.get(i));
+        if(!isInit) {
+            if (albums.size() == 0) {
+                long id = MainActivity.dataResource.InsertAlbum("Airplane");
+                id = MainActivity.dataResource.InsertAlbum("Fruit");
+//            MainActivity.dataResource.InsertAlbum("Holiday");
+                debug(String.valueOf(id));
+                for (int i = 0; i < 4; i++) {
+                    id = MainActivity.dataResource.InsertAlbumImage("Airplane",
+                            AllLayout.images.get(i).getId());
+                }
+                for (int i = 5; i < 7; i++) {
+                    id = MainActivity.dataResource.InsertAlbumImage("Fruit",
+                            AllLayout.images.get(i).getId());
+                }
+
+                albums = MainActivity.dataResource.getAllAlbum();
             }
-            Album a3 = new Album("Airplane",images);
-
-            ArrayList<Image> images1 = new ArrayList<Image>();
-            images1.addAll(images);
-            Album a4 = new Album("Fruit",images1);
-
-            ArrayList<Image> images2 = new ArrayList<Image>();
-            images2.addAll(images);
-            Album a5 = new Album("Holiday",images2);
-
             ArrayList<Image> images3 = new ArrayList<Image>();
-            Album a2 = new Album("Mục yêu thích",images3);
+            Album a2 = new Album("Mục yêu thích", images3);
 
             ArrayList<Image> images4 = new ArrayList<Image>();
             images4.addAll(AllLayout.images);
-            Album a1 = new Album("Tất cả",images4);
-
-            albums.add(a1);
-            albums.add(a2);
-            albums.add(a3);
-            albums.add(a4);
-            albums.add(a5);
+            Album a1 = new Album("Tất cả", images4);
+            albums.add(0, a1);
+            albums.add(1, a2);
+            ConvertAlbum();
         }
+
+    }
+    private void ConvertAlbum(){
+        for(int i = 2;i<albums.size();i++){
+            debug(albums.get(i).getName()+" "+albums.get(i).getImages().size());
+            for(int j = 0;j<albums.get(i).getImages().size();j++){
+                debug(String.valueOf(i));
+                albums.get(i).getImages().set(j,
+                        getImage(albums.get(i).getImages().get(j).getId()));
+            }
+        }
+
+    }
+    private Image getImage(long id){
+        for(int i = 0;i<AllLayout.images.size();i++){
+            if(id == AllLayout.images.get(i).getId()){
+                return AllLayout.images.get(i);
+            }
+        }
+        return null;
     }
     private void AllMyAlbumClick(){
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ft.replace(R.id.replace_fragment_layout,new MyAlbumFragment());
+        ft.replace(R.id.replace_fragment_layout,new MyAlbumFragment(false));
         //ft.addToBackStack(fragment.getClass().getSimpleName());
         ft.commit();
     }
@@ -305,7 +333,7 @@ public class AlbumLayout extends Fragment {
     private void AddAlbumForm(){
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ft.replace(R.id.replace_fragment_layout,new MyAlbumFragment());
+        ft.replace(R.id.replace_fragment_layout,new MyAlbumFragment(false));
         ft.commit();
 
         Dialog dialog = new Dialog(getActivity());
@@ -366,8 +394,10 @@ public class AlbumLayout extends Fragment {
                 ArrayList<Image> image = new ArrayList<Image>();
                 Album album = new Album(txtTitle.getText().toString(),image);
                 albums.add(album);
+                MainActivity.dataResource.InsertAlbum(album.getName());
                 dialog.cancel();
-                MyAlbumFragment.gridViewAlbumAdapter.notifyDataSetChanged();
+                MyAlbumFragment.DataChange(album);
+                //MyAlbumFragment.gridViewAlbumAdapter.notifyDataSetChanged();
             }
         });
 
@@ -376,5 +406,8 @@ public class AlbumLayout extends Fragment {
 
     private void talk(){
         Toast.makeText(getActivity(), "click",Toast.LENGTH_SHORT).show();
+    }
+    private void debug(String k){
+        Log.e("Album Layout",k);
     }
 }

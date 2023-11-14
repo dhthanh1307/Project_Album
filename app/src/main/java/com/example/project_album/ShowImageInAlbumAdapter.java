@@ -12,6 +12,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -19,11 +22,14 @@ import java.util.ArrayList;
 public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlbumAdapter.ViewHolder> {
     private ArrayList<Image> images;
     private int idLayout;
-    private Activity activity;
+    private MainActivity activity;
     private ArrayList<Boolean> ischoose = new ArrayList<>();
+    public ArrayList<Image> image_chosen = new ArrayList<>();
     private boolean choose_selection;
+    public int count = 0;
+    private TextView tv_chose;
 
-    ShowImageInAlbumAdapter(Activity activity,int idLayout,ArrayList<Image>images){
+    ShowImageInAlbumAdapter(MainActivity activity,int idLayout,ArrayList<Image>images){
         this.activity = activity;
         this.idLayout = idLayout;
         this.images = images;
@@ -35,6 +41,7 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = activity.getLayoutInflater().inflate(idLayout,parent,false);
+        tv_chose = activity.findViewById(R.id.tv1);
 
         return new ViewHolder(view);
     }
@@ -59,10 +66,12 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
         }
 
         if(!ischoose.get(position)){
+
             holder.cb.setChecked(false);
             holder.cb.setVisibility(View.INVISIBLE);
         }
         else{
+
             holder.cb.setChecked(true);
             holder.cb.setVisibility(View.VISIBLE);
         }
@@ -74,15 +83,30 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
                         ischoose.set(position,false);
                         holder.cb.setChecked(false);
                         holder.cb.setVisibility(View.INVISIBLE);
+                        count --;
+                        image_chosen.remove(images.get(position));
                     }
                     else{
+                        image_chosen.add(images.get(position));
                         ischoose.set(position,true);
                         holder.cb.setChecked(true);
                         holder.cb.setVisibility(View.VISIBLE);
+                        count++;
+                    }
+                    if(count>0) {
+                        tv_chose.setText("Đã chọn " + String.valueOf(count) + " ảnh");
+                    }
+                    else{
+                        tv_chose.setText("Chọn mục");
                     }
                 }
                 else{
-
+                    FragmentManager fragmentmanager = activity.getSupportFragmentManager();
+                    FragmentTransaction ft = fragmentmanager.beginTransaction();
+                    Fragment fragment = new ViewPagerAllLayoutFragment(images,position);
+                    ft.add(R.id.replace_fragment_layout,fragment);
+                    ft.addToBackStack(fragment.getClass().getSimpleName());
+                    ft.commit();
                 }
             }
         });
@@ -111,10 +135,16 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
     }
     public void setChooseSelection(boolean check){
         choose_selection = check;
+        if(!check){
+            image_chosen.clear();
+        }
     }
     public void resetChooseSelection(){
+        count = 0;
+        tv_chose.setText("Chọn mục");
         for(int i=0;i<images.size();i++){
             ischoose.set(i,false);
         }
+        image_chosen.clear();
     }
 }

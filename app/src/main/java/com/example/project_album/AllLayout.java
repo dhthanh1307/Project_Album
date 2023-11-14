@@ -178,9 +178,9 @@ public class AllLayout extends Fragment {
 
     private void initSpinerView() {
         ArrayList<String> data = new ArrayList<>();
-        data.add("Date");
-        data.add("ID");
         data.add("Default");
+        data.add("ID");
+        data.add("Date");
         spinnerAdapter = new ArrayAdapter<>(main, android.R.layout.simple_spinner_item, data);
         spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -342,7 +342,7 @@ public class AllLayout extends Fragment {
     public void showBigScreen(int position){
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ViewPagerAllLayoutFragment newFragment=new ViewPagerAllLayoutFragment(images,position);
+        ViewPagerAllLayoutFragment newFragment=new ViewPagerAllLayoutFragment(copiedImages,position);
         ft.replace(R.id.replace_fragment_layout, newFragment);
         ft.commit();
 

@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -41,6 +42,7 @@ public class MainActivity extends FragmentActivity {
     AccountLayout accountLayout;
 
     BottomNavigationView mBottomNavigationView;
+    ConstraintLayout bottom_navigation_album;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +69,7 @@ public class MainActivity extends FragmentActivity {
         ft.commit();
 
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottom_navigation_album = findViewById(R.id.bottom_navigation_album);
         mBottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

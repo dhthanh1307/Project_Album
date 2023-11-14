@@ -29,6 +29,17 @@ public class Album {
     public void addImage(int index,Image image){
         images.add(index,image);
     }
+    public void addImage(Image image){
+        images.add(image);
+    }
+    public void removeImage(Image img){
+        for(int i = 0;i<images.size();i++){
+            if (img.getName().equals(images.get(i).getName())){
+                removeImage(i);
+                return;
+            }
+        }
+    }
     public void clear(){
         images.clear();
     }
