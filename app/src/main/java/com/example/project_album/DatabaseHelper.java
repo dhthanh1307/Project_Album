@@ -31,7 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String COLUMN_PHONE = "phone";
         public static final String COLUMN_PASSWORD = "password";
         public static final String COLUMN_EMAIL = "email";
-
+        public static final String COLUMN_NICKNAME = "nickname";
     public static final String COLUMN_NAME_ALBUM = "name_album";
     public static final String COLUMN_ID_IMAGE = "id_image";
 
@@ -47,6 +47,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_EMAIL
             + " text not null, "
             + COLUMN_PASSWORD
+            + " text not null, "
+            + COLUMN_NICKNAME
             + " text not null);";
 
     private static final String DATABASE_CREATE = "create table " + TABLE_PICTURE + "( " + COLUMN_ID

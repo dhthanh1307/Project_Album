@@ -73,6 +73,7 @@ public class LoginFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra("username", username);
                 startActivity(intent);
+                main.finish();
                 //Khi sử dụng thật xóa 4 dòng trên, bỏ comment các dòng dưới này
 //                if (inputUsername.getText().toString().length() == 0) {
 //                    Toast.makeText(main, "Tên đăng nhập không thể để trống", Toast.LENGTH_SHORT).show();

@@ -180,6 +180,7 @@ public class DataResource {
             values.put(DatabaseHelper.COLUMN_PASSWORD, user.getPass());
             values.put(DatabaseHelper.COLUMN_PHONE, user.getPhone());
             values.put(DatabaseHelper.COLUMN_EMAIL,user.getEmail());
+            values.put(DatabaseHelper.COLUMN_NICKNAME,user.getUsername());
             long insertId = database.insert(DatabaseHelper.TABLE_USERS,
                     null, values);
             return insertId;
@@ -315,6 +316,7 @@ public class DataResource {
         }
         return false;
     }
+
     public boolean checkSignUp(String name) {
         String mySQL = "SELECT username FROM users WHERE username = ?";
         Cursor cursor = database.rawQuery(mySQL, new String[]{name});
@@ -325,6 +327,25 @@ public class DataResource {
         }
         return false;
     }
+
+    public ArrayList<String> getAccountInfo(String username) {
+        ArrayList<String> userInfo = new ArrayList<>();
+        Cursor cursor = database.query(DatabaseHelper.TABLE_USERS, new String[] { DatabaseHelper.COLUMN_NICKNAME, DatabaseHelper.COLUMN_PASSWORD }, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username }, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            userInfo.add(cursor.getString(0));
+            userInfo.add(cursor.getString(1));
+            cursor.close();
+        }
+        return userInfo;
+    }
+
+    public void updateAccountInfo(String username, String newNickname, String newPassword) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_NICKNAME, newNickname);
+        values.put(DatabaseHelper.COLUMN_PASSWORD, newPassword);
+        database1.update(DatabaseHelper.TABLE_USERS, values, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username });
+    }
+
     private void debug(String str) {
         Log.e("DataResource", str);
     }

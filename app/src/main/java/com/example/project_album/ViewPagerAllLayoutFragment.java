@@ -1,7 +1,10 @@
 package com.example.project_album;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +13,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.FragmentActivity;
 
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class ViewPagerAllLayoutFragment extends Fragment {
@@ -88,6 +94,8 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(main, "Share", Toast.LENGTH_SHORT).show();
+                Uri UriToShare = saveImage(images.get(index).getImgBitmap());
+                shareImageUri(UriToShare);
             }
         });
         txtDeleteIntoTrashCan.setOnClickListener(new View.OnClickListener() {
@@ -134,5 +142,30 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         }else if(newOrientation==Configuration.ORIENTATION_PORTRAIT){
 
         }
+    }
+
+    private Uri saveImage(Bitmap image) {
+        File imagesFolder = new File(main.getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imagesFolder.mkdirs();
+            File file = new File(imagesFolder, "shared_image.png");
+            FileOutputStream stream = new FileOutputStream(file);
+            image.compress(Bitmap.CompressFormat.PNG, 90, stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(main, "com.example.fileprovider", file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return uri;
+    }
+
+    private void shareImageUri(Uri uri){
+        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setType("image/*");
+        main.startActivity(intent);
     }
 }

@@ -16,45 +16,95 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:adjustViewBounds="false"
-        android:background="#5A0606"
-        app:layout_constraintBottom_toTopOf="@+id/editNickname"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.638" />
-
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="112dp"
+        android:layout_marginBottom="32dp"
         android:text="Đăng xuất"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.954"
+        app:layout_constraintHorizontal_bias="0.952"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/btnEdit"
+        android:id="@+id/btnEditAccount"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_marginStart="20dp"
-        android:layout_marginBottom="112dp"
+        android:layout_marginBottom="32dp"
         android:text="Lưu thay đổi"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.05"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/editNickname"
+        android:id="@+id/editNewPassword"
+        android:layout_width="350dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="44dp"
+        android:background="@drawable/custom_input"
+        android:ems="10"
+        android:hint="Mật khẩu mới"
+        android:inputType="textPassword"
+        android:textColorHint="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/editRetypeNewPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/labelNewPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="12dp"
+        android:text="Mật khẩu mới (Optional)"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/editNewPassword"
+        app:layout_constraintStart_toStartOf="@+id/editNewPassword"
+        app:layout_constraintTop_toBottomOf="@+id/editAccountPassword"
+        app:layout_constraintVertical_bias="0.904" />
+
+    <TextView
+        android:id="@+id/labelRetypeNewPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="Nhập lại mật khẩu mới (Optional)"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/editRetypeNewPassword"
+        app:layout_constraintStart_toStartOf="@+id/editRetypeNewPassword"
+        app:layout_constraintTop_toBottomOf="@+id/editNewPassword"
+        app:layout_constraintVertical_bias="0.6" />
+
+    <EditText
+        android:id="@+id/editAccountPassword"
+        android:layout_width="350dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="52dp"
+        android:background="@drawable/custom_input"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/editNewPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/labelPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Mật khẩu"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/editAccountPassword"
+        app:layout_constraintStart_toStartOf="@+id/editAccountPassword" />
+
+    <EditText
+        android:id="@+id/editAccountNickname"
         android:layout_width="350dp"
         android:layout_height="45dp"
         android:layout_marginBottom="48dp"
@@ -62,41 +112,47 @@
         android:ems="10"
         android:inputType="text"
         android:text="Nickname"
-        app:layout_constraintBottom_toTopOf="@+id/editPassword"
+        app:layout_constraintBottom_toTopOf="@+id/editAccountPassword"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.997" />
 
     <EditText
-        android:id="@+id/editPassword"
+        android:id="@+id/editRetypeNewPassword"
         android:layout_width="350dp"
         android:layout_height="45dp"
-        android:layout_marginBottom="236dp"
+        android:layout_marginBottom="144dp"
         android:background="@drawable/custom_input"
         android:ems="10"
-        android:hint="Password"
+        android:hint="Nhập lại mật khẩu mới"
         android:inputType="textPassword"
+        android:textColorHint="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/labelPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="Mật khẩu"
-        app:layout_constraintBottom_toTopOf="@+id/editPassword"
-        app:layout_constraintStart_toStartOf="@+id/editPassword" />
 
     <TextView
         android:id="@+id/labelNickname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:text="Tên hiển thị"
-        app:layout_constraintBottom_toTopOf="@+id/editNickname"
-        app:layout_constraintStart_toStartOf="@+id/editNickname" />
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/editAccountNickname"
+        app:layout_constraintStart_toStartOf="@+id/editAccountNickname" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="130dp"
+        android:layout_height="123dp"
+        android:adjustViewBounds="false"
+        android:background="#5A0606"
+        app:layout_constraintBottom_toTopOf="@+id/editAccountNickname"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.558" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
