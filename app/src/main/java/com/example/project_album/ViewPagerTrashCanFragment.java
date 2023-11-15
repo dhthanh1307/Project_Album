@@ -9,10 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ public class ViewPagerTrashCanFragment extends Fragment {
     ViewPager2 mViewPager;
     TextView txtTimeDelete;
     TextView txtNumberPerAll;
+    ImageView txtBack;
     TextView btnDeleteImmediately, btnRestore;
     MainActivity main;
     Context context = null;
@@ -52,14 +56,17 @@ public class ViewPagerTrashCanFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_pager_trash_can, container, false);
         txtTimeDelete = view.findViewById(R.id.edt_time_delete);
+        txtBack=view.findViewById(R.id.txt_back);
         txtNumberPerAll = view.findViewById(R.id.txt_number_per_all);
         btnDeleteImmediately = view.findViewById(R.id.btn_delete_immediately);
         btnRestore = view.findViewById(R.id.btn_restore);
         mViewPager = view.findViewById(R.id.viewpage_in_trashcan);
         mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
         mViewPager.setAdapter(mAdapter);
-        mViewPager.setCurrentItem(index,false);
+        mViewPager.setCurrentItem(index, false);
         txtNumberPerAll.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
+        main.mBottomNavigationView.setVisibility(View.GONE);
+
 
 
         mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -89,13 +96,13 @@ public class ViewPagerTrashCanFragment extends Fragment {
                         MainActivity.dataResource.deleteImage(images.get(index));
                         ////////////////////////
 //                        Log.e("Day la lo1","Anh index co id "+String.valueOf(images.get(index).getId())+" Voi index"+String.valueOf(index));
-                        if (index==images.size()-1){
+                        if (index == images.size() - 1) {
                             images.remove(index);
-                            index=images.size()-1;
-                        }else if (index==0){
-                           images.remove(0);
-                           index=0;
-                        }else{
+                            index = images.size() - 1;
+                        } else if (index == 0) {
+                            images.remove(0);
+                            index = 0;
+                        } else {
                             images.remove(index);
                         }
                         //Adapter cũ thì nó sai, tuy nhiên tạo adapter mới thì nó lại đúng, chả biết tại sao
@@ -104,10 +111,10 @@ public class ViewPagerTrashCanFragment extends Fragment {
 
                         mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
                         mViewPager.setAdapter(mAdapter);
-                        mViewPager.setCurrentItem(index,false);
+                        mViewPager.setCurrentItem(index, false);
                         txtNumberPerAll.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
+                        TrashCanLayout.mGridAdapter.notifyDataSetChanged();//xem xét thay doi cua Adapter ben TrashCan
                         //set mSelected  bên trashcan và bên image adapter
-                        TrashCanLayout.resetSelectedItemWhenReturnFromViewPager();
 
                     }
                 });
@@ -123,24 +130,33 @@ public class ViewPagerTrashCanFragment extends Fragment {
                 // Hiển thị AlertDialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
-    }
-});
-
+            }
+        });
+        txtBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
+                FragmentTransaction ft = fragmentmanager.beginTransaction();
+                ft.replace(R.id.replace_fragment_layout, TrashCanLayout.newInstance("TrashCanLayout"));
+                ft.commit();
+                main.mBottomNavigationView.setVisibility(View.VISIBLE);
+            }
+        });
         return view;
-        }
+    }
 
-@Override
-public void onConfigurationChanged(Configuration newConfig){
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        int newOrientation=newConfig.orientation;
+        int newOrientation = newConfig.orientation;
         doSthWithOrientation(newOrientation);
-        }
+    }
 
-private void doSthWithOrientation(int newOrientation){
-        if(newOrientation==Configuration.ORIENTATION_LANDSCAPE){
+    private void doSthWithOrientation(int newOrientation) {
+        if (newOrientation == Configuration.ORIENTATION_LANDSCAPE) {
 
-        }else if(newOrientation==Configuration.ORIENTATION_PORTRAIT){
+        } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
 
         }
-        }
-        }
+    }
+}

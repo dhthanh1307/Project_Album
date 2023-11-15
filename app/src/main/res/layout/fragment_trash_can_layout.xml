@@ -11,18 +11,19 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
         <Button
             android:id="@+id/btn_choose"
             android:layout_width="70dp"
             android:layout_height="25dp"
-            android:background="@color/blue_press"
             android:layout_alignParentRight="true"
             android:layout_marginRight="25dp"
-            android:textSize="8dp"
+            android:background="@color/blue_press"
             android:text="Choose"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8dp" />
 
         <TextView
             android:id="@+id/txt_delete_recently"
@@ -50,16 +51,14 @@
         android:orientation="vertical">
 
 
-        <GridView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/grid_view_trashcan"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginHorizontal="10dp"
             android:layout_weight="1"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:horizontalSpacing="2dp"
-            android:numColumns="3"
-            android:verticalSpacing="2dp" />
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3" />
 
         <TextView
             android:id="@+id/txt_display_total_picture_deleted"
@@ -70,8 +69,9 @@
             android:text="Total :94"
             android:textColor="@color/white"
             android:textSize="20dp"
-            android:visibility="visible"/>
+            android:visibility="visible" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/last_linear_in_trashcan"
         android:layout_width="match_parent"
@@ -84,10 +84,10 @@
             android:id="@+id/btn_delete_chosen_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
             android:layout_weight="1"
             android:text="Delete All"
-            android:layout_marginRight="50dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btn_restore_chosen_image"
@@ -95,6 +95,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Restore All"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

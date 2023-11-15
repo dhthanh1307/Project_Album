@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.FragmentActivity;
 
@@ -32,7 +33,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     ImageView txtInformation;
 
     ImageView txtDeleteIntoTrashCan;
-
+    ImageView imgBack;
     ImageView txtFavorite;
 
     ImageView txtShare;
@@ -73,6 +74,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         txtInformation=view.findViewById(R.id.txt_information);
         txtShare=view.findViewById(R.id.txt_share);
         txtEdit=view.findViewById(R.id.txt_edit);
+        imgBack=view.findViewById(R.id.img_back);
 
 
         mViewPager = view.findViewById(R.id.viewpager_in_all_layout);
@@ -81,13 +83,23 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(index,false);
         txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
-
+        main.mBottomNavigationView.setVisibility(View.GONE);
+        if (images.get(index).getFavorite().equals("T")){
+            txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
+        }else{
+            txtFavorite.setImageResource(R.drawable.icon_favorite_in_alllayout);
+        }
         mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 index = position;
                 txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
+                if (images.get(index).getFavorite().equals("T")){
+                    txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
+                }else{
+                    txtFavorite.setImageResource(R.drawable.icon_favorite_in_alllayout);
+                }
             }
         });
         txtShare.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +119,17 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         txtFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(main, "Favorite", Toast.LENGTH_SHORT).show();
+                if (images.get(index).getFavorite().equals("T")){
+                    images.get(index).setFavorite("F");
+                    txtFavorite.setImageResource(R.drawable.icon_favorite_in_alllayout);
+                    MainActivity.dataResource.unlikeImage(images.get(index).getId());
+//                    FavoriteLayout.mGridAdapter.setmSelectedArray();
+                }else{
+                    images.get(index).setFavorite("T");
+                    txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
+                    MainActivity.dataResource.likeImage(images.get(index).getId());
+//                    FavoriteLayout.mGridAdapter.setmSelectedArray();
+                }
             }
         });
 
@@ -124,6 +146,20 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.replace_fragment_layout, new EditFragment(images,index));
                 ft.commit();
+            }
+        });
+        imgBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
+                FragmentTransaction ft = fragmentmanager.beginTransaction();
+                if (main.getIDItemBottomNavigationView()==R.id.action_favorite){
+                    ft.replace(R.id.replace_fragment_layout, FavoriteLayout.newInstance("FavoriteLayout"));
+                }else if(main.getIDItemBottomNavigationView()==R.id.action_all_picture){
+                    ft.replace(R.id.replace_fragment_layout, AllLayout.newInstance("AllLayout"));
+                }
+                ft.commit();
+                main.mBottomNavigationView.setVisibility(View.VISIBLE);
             }
         });
         return view;

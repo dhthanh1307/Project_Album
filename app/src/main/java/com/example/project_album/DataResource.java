@@ -21,7 +21,7 @@ public class DataResource {
     private Context context;
     private String[] allColumns = {DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_USER, DatabaseHelper.COLUMN_IMAGE
             , DatabaseHelper.COLUMN_NAME, DatabaseHelper.COLUMN_SIZE, DatabaseHelper.COLUMN_DATE,
-            DatabaseHelper.COLUMN_TYPE, DatabaseHelper.COLUMN_DESCRIBE, DatabaseHelper.COLUMN_IS_DELETE};
+            DatabaseHelper.COLUMN_TYPE, DatabaseHelper.COLUMN_DESCRIBE, DatabaseHelper.COLUMN_IS_DELETE,DatabaseHelper.COLUMN_IS_FAVORITE};
 
     //    private String[] allColumns = {DatabaseHelper.COLUMN_ID,DatabaseHelper.COLUMN_IMAGE
 //        ,DatabaseHelper.COLUMN_DATE};
@@ -201,29 +201,42 @@ public class DataResource {
             values.put(DatabaseHelper.COLUMN_TYPE, image.getType());
             values.put(DatabaseHelper.COLUMN_DESCRIBE, image.getDescribe());
             values.put(DatabaseHelper.COLUMN_IS_DELETE, image.getDeleted());
+            values.put(DatabaseHelper.COLUMN_IS_FAVORITE, image.getFavorite());
 
             long insertId = database.insert(DatabaseHelper.TABLE_PICTURE, null, values);
 
             //luu image vao internal storage
-                ContextWrapper cw = new ContextWrapper(context);
-                File file = new File(helper.directory, image.getName());
-                if (!file.exists()) {
-                    Log.d("path", file.toString());
-                    FileOutputStream fos = null;
-                    try {
-                        fos = new FileOutputStream(file);
-                        image.getImgBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                        fos.flush();
-                        fos.close();
-                    } catch (java.io.IOException e) {
-                        e.printStackTrace();
-                    }
+            ContextWrapper cw = new ContextWrapper(context);
+            File file = new File(helper.directory, image.getName());
+            if (!file.exists()) {
+                Log.d("path", file.toString());
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(file);
+                    image.getImgBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    fos.flush();
+                    fos.close();
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
                 }
+            }
 
             return insertId;
         } catch (Exception ex) {
             return -1;
         }
+    }
+    public void unlikeImage(long id){
+        String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
+                +DatabaseHelper.COLUMN_IS_FAVORITE + " = 'F'" +
+                " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
+        database.execSQL(que);
+    }
+    public void likeImage(long id){
+        String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
+                +DatabaseHelper.COLUMN_IS_FAVORITE + " = 'T'" +
+                " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
+        database.execSQL(que);
     }
     public boolean deleteImage(Image image){
         long id = image.getId();
@@ -289,6 +302,7 @@ public class DataResource {
         image.setType(cursor.getString(6));
         image.setDescribe(cursor.getString(7));
         image.setDeleted(cursor.getString(8));
+        image.setFavorite(cursor.getString(9));
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         try {
             image.setDate(df.parse(cursor.getString(5)));

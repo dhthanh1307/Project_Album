@@ -108,6 +108,9 @@ public class AllLayout extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         debug("onCreateView");
+        for (int i1 = 0; i1 < AllLayout.images.size(); i1++) {
+            Log.e("fix loi","anh ="+String.valueOf(AllLayout.images.get(i1).getId()));
+        }
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_all_layout, container, false);
 
@@ -135,6 +138,9 @@ public class AllLayout extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                for (int i1 = 0; i1 < AllLayout.images.size(); i1++) {
+                    Log.e("fix loi1","anh ="+String.valueOf(AllLayout.images.get(i1).getId()));
+                }
                 showBigScreen(i);
             }
         });

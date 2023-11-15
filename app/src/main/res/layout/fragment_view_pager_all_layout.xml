@@ -7,20 +7,38 @@
     android:orientation="vertical"
     tools:context=".ViewPagerAllLayoutFragment">
 
-    <TextView
-        android:layout_marginTop="20dp"
-        android:id="@+id/edt_time_capture"
+    <LinearLayout
+        android:id="@+id/lll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Monday \n 16:11"
-        android:textColor="@color/white" />
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/icon_back"
+            android:gravity="center"
+            android:layout_gravity="center">
+        </ImageView>
+        <TextView
+            android:id="@+id/edt_time_capture"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_weight="7"
+            android:gravity="center"
+            android:text="Thứ Hai \n 16:11"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager_in_all_layout"
         android:layout_above="@+id/linear_layout"
         android:layout_width="match_parent"
-        android:layout_below="@+id/edt_time_capture"
+        android:layout_below="@+id/lll"
         android:layout_height="match_parent">
     </androidx.viewpager2.widget.ViewPager2>
     <LinearLayout

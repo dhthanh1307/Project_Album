@@ -17,6 +17,7 @@ public class Image {
     private String type;
     private String describe;
     private String is_deleted;
+    private String is_favorite;
     private Bitmap imgBitmap;
     public Image(){
 
@@ -35,6 +36,7 @@ public class Image {
         this.describe = "";
         this.imgBitmap = imgbitmap;
         this.is_deleted="T";
+        this.is_favorite="F";
     }
 
 
@@ -91,6 +93,15 @@ public class Image {
     public void setDeleted(String deleted) {
         this.is_deleted = deleted;
     }
+
+    public void setFavorite(String is_favorite) {
+        this.is_favorite = is_favorite;
+    }
+
+    public String getFavorite() {
+        return is_favorite;
+    }
+
     private Bitmap ChangeByteToBitmap(byte[] outImage ) {
         ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
         Bitmap theImage = BitmapFactory.decodeStream(imageStream);

@@ -43,6 +43,7 @@ public class MainActivity extends FragmentActivity {
 
     BottomNavigationView mBottomNavigationView;
     ConstraintLayout bottom_navigation_album;
+    int id_item=R.id.action_all_picture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +74,7 @@ public class MainActivity extends FragmentActivity {
         mBottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                id_item=item.getItemId();
                 if (item.getItemId() == R.id.action_all_picture) {
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.replace(R.id.replace_fragment_layout, allLayout);
@@ -189,5 +191,8 @@ public class MainActivity extends FragmentActivity {
     };
     public String GenerateName(){
         return System.currentTimeMillis() + ".jpeg";
+    }
+    public int getIDItemBottomNavigationView(){
+        return id_item;
     }
 }

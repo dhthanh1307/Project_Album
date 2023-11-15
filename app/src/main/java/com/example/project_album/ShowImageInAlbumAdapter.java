@@ -29,18 +29,19 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
     public int count = 0;
     private TextView tv_chose;
 
-    ShowImageInAlbumAdapter(MainActivity activity,int idLayout,ArrayList<Image>images){
+    ShowImageInAlbumAdapter(MainActivity activity, int idLayout, ArrayList<Image> images) {
         this.activity = activity;
         this.idLayout = idLayout;
         this.images = images;
-        for(int i = 0;i<images.size();i++){
+        for (int i = 0; i < images.size(); i++) {
             ischoose.add(false);
         }
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = activity.getLayoutInflater().inflate(idLayout,parent,false);
+        View view = activity.getLayoutInflater().inflate(idLayout, parent, false);
         tv_chose = activity.findViewById(R.id.tv1);
 
         return new ViewHolder(view);
@@ -54,23 +55,21 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
             debug("ok");
             RelativeLayout.LayoutParams layout = new RelativeLayout.LayoutParams
                     (MainActivity.Width / 3 - 40, MainActivity.Width / 3 - 40);
-            layout.setMargins(0,0,0,10);
+            layout.setMargins(0, 0, 0, 10);
             holder.img.setLayoutParams(layout);
 
-        }
-        else {
-            RelativeLayout.LayoutParams layout =new RelativeLayout.LayoutParams(
+        } else {
+            RelativeLayout.LayoutParams layout = new RelativeLayout.LayoutParams(
                     MainActivity.Height / 5 - 30, MainActivity.Height / 5 - 30);
-            layout.setMargins(0,0,0,10);
+            layout.setMargins(0, 0, 0, 10);
             holder.img.setLayoutParams(layout);
         }
 
-        if(!ischoose.get(position)){
+        if (!ischoose.get(position)) {
 
             holder.cb.setChecked(false);
             holder.cb.setVisibility(View.INVISIBLE);
-        }
-        else{
+        } else {
 
             holder.cb.setChecked(true);
             holder.cb.setVisibility(View.VISIBLE);
@@ -78,33 +77,30 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
         holder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(choose_selection){
-                    if(ischoose.get(position)){
-                        ischoose.set(position,false);
+                if (choose_selection) {
+                    if (ischoose.get(position)) {
+                        ischoose.set(position, false);
                         holder.cb.setChecked(false);
                         holder.cb.setVisibility(View.INVISIBLE);
-                        count --;
+                        count--;
                         image_chosen.remove(images.get(position));
-                    }
-                    else{
+                    } else {
                         image_chosen.add(images.get(position));
-                        ischoose.set(position,true);
+                        ischoose.set(position, true);
                         holder.cb.setChecked(true);
                         holder.cb.setVisibility(View.VISIBLE);
                         count++;
                     }
-                    if(count>0) {
+                    if (count > 0) {
                         tv_chose.setText("Đã chọn " + String.valueOf(count) + " ảnh");
-                    }
-                    else{
+                    } else {
                         tv_chose.setText("Chọn mục");
                     }
-                }
-                else{
+                } else {
                     FragmentManager fragmentmanager = activity.getSupportFragmentManager();
                     FragmentTransaction ft = fragmentmanager.beginTransaction();
-                    Fragment fragment = new ViewPagerAllLayoutFragment(images,position);
-                    ft.add(R.id.replace_fragment_layout,fragment);
+                    Fragment fragment = new ViewPagerAllLayoutFragment(images, position);
+                    ft.add(R.id.replace_fragment_layout, fragment);
                     ft.addToBackStack(fragment.getClass().getSimpleName());
                     ft.commit();
                 }
@@ -130,20 +126,22 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
         }
     }
 
-    private void debug(String s){
-        Log.e("Show image in album adapter: ",s);
+    private void debug(String s) {
+        Log.e("Show image in album adapter: ", s);
     }
-    public void setChooseSelection(boolean check){
+
+    public void setChooseSelection(boolean check) {
         choose_selection = check;
-        if(!check){
+        if (!check) {
             image_chosen.clear();
         }
     }
-    public void resetChooseSelection(){
+
+    public void resetChooseSelection() {
         count = 0;
         tv_chose.setText("Chọn mục");
-        for(int i=0;i<images.size();i++){
-            ischoose.set(i,false);
+        for (int i = 0; i < images.size(); i++) {
+            ischoose.set(i, false);
         }
         image_chosen.clear();
     }

@@ -27,17 +27,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_DESCRIBE = "describe";
-        public static final String COLUMN_USERNAME = "username";
-        public static final String COLUMN_PHONE = "phone";
-        public static final String COLUMN_PASSWORD = "password";
-        public static final String COLUMN_EMAIL = "email";
-        public static final String COLUMN_NICKNAME = "nickname";
+    public static final String COLUMN_USERNAME = "username";
+    public static final String COLUMN_PHONE = "phone";
+    public static final String COLUMN_PASSWORD = "password";
+    public static final String COLUMN_EMAIL = "email";
+    public static final String COLUMN_NICKNAME = "nickname";
     public static final String COLUMN_NAME_ALBUM = "name_album";
     public static final String COLUMN_ID_IMAGE = "id_image";
 
     public static final String COLUMN_IS_DELETE = "is_delete";// chỗ này nếu true thì sẽ k hiển thị ở all layout
     //mà chỉ hiển thị ở trash can, biến này kiểu trong SQL là text
 
+    public static final String COLUMN_IS_FAVORITE = "is_favorite";
 
     // cac cau lenh tao bang
     private static final String DATABASE_CREATE_USERS = "create table " + TABLE_USERS + "( " + COLUMN_USERNAME
@@ -67,6 +68,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + " text not null, "
             + COLUMN_IS_DELETE
             + " text not null, "
+            + COLUMN_IS_FAVORITE
+            + " text not null, "
             + COLUMN_DESCRIBE
             + " text);";
 
@@ -85,10 +88,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + " text not null);";
     public File directory;
     public static String PATH;
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        ContextWrapper cw =new ContextWrapper(context);
-        directory = cw.getDir("Picture",Context.MODE_PRIVATE);
+        ContextWrapper cw = new ContextWrapper(context);
+        directory = cw.getDir("Picture", Context.MODE_PRIVATE);
         PATH = directory.getPath();
     }
 
