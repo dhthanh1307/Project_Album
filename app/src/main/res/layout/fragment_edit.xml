@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#8E8484"
+    android:orientation="vertical"
+    tools:context=".ViewPagerAllLayoutFragment">
+
+    <LinearLayout
+        android:id="@+id/linear_layout1"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentTop="true">
+        <ImageView
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/close_24"
+            android:gravity="center"/>
+        <ImageView
+            android:id="@+id/save"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/check_24"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgview"
+        android:layout_above="@+id/linear_layout"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/linear_layout1"
+        android:layout_height="match_parent">
+    </ImageView>
+    <LinearLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentBottom="true">
+        <ImageView
+            android:id="@+id/txt_right"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/rotate_right_24"
+            android:gravity="center"/>
+        <ImageView
+            android:id="@+id/txt_flip"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/flip_24"
+            android:gravity="center"/>
+        <ImageView
+            android:id="@+id/txt_left"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/rotate_left_24"
+            android:gravity="center"/>
+
+
+
+
+    </LinearLayout>
+
+</RelativeLayout>

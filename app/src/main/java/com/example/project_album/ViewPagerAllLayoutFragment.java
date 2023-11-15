@@ -11,6 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.FragmentActivity;
+
 import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.ArrayList;
@@ -106,11 +109,13 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 Toast.makeText(main, "Information", Toast.LENGTH_SHORT).show();
             }
         });
-
+        //PHAN EDIT
         txtEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(main, "Edit", Toast.LENGTH_SHORT).show();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.replace_fragment_layout, new EditFragment(images,index));
+                ft.commit();
             }
         });
         return view;
