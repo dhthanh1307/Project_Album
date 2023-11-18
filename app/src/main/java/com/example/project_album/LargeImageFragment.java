@@ -62,8 +62,7 @@ public class LargeImageFragment extends Fragment {
                         Toast.makeText(main, "Double Click", Toast.LENGTH_SHORT).show();
 
 //                        Matrix matrix = new Matrix();
-//                        float x = event.getX();
-//                        float y = event.getY();
+
 //                        matrix.setScale(2.0f,2.0f,x,y);
 //                        Bitmap flipdBitmap = Bitmap.createBitmap(myImage.getImgBitmap(), 0, 0,
 //                                myImage.getImgBitmap().getWidth(), myImage.getImgBitmap().getHeight(), matrix, true);
@@ -71,21 +70,11 @@ public class LargeImageFragment extends Fragment {
 //                        myImage.setImgBitmap(flipdBitmap);
 //                        imgDelete.setImageBitmap(flipdBitmap);
 //                        imgDelete.setScaleType(ImageView.ScaleType.MATRIX);
-                        if (zoom==1){
-                            Matrix matrix = imgDelete.getImageMatrix();
-                            matrix.postScale(2.0f, 2.0f, event.getX(), event.getY());
-                            imgDelete.setImageMatrix(matrix);
-                            imgDelete.setScaleType(ImageView.ScaleType.MATRIX);
-                            zoom=zoom*-1;
-                        }
-                        else{
-                            imgDelete.setScaleX(1.0f);
-                            imgDelete.setScaleY(1.0f);
-                            imgDelete.setImageMatrix(new Matrix());
-                            imgDelete.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                            zoom=zoom*-1;
+                        float x = event.getX();
+                        float y = event.getY();
+                        zoomImage(zoom,x,y,imgDelete);
+                        zoom=zoom*-1;
 
-                        }
 
                     }
                     lastTapTimeMs = currentTime;
@@ -110,5 +99,22 @@ public class LargeImageFragment extends Fragment {
 
         }
     }
+    private void zoomImage(long zoom,float x, float y,ImageView imgView)
+    {
+        if (zoom==1){
+            Matrix matrix = imgView.getImageMatrix();
+            matrix.postScale(2.0f, 2.0f,x,y);
+            imgView.setImageMatrix(matrix);
+            imgView.setScaleType(ImageView.ScaleType.MATRIX);
+        }
+        else{
+            imgView.setScaleX(1.0f);
+            imgView.setScaleY(1.0f);
+            imgView.setImageMatrix(new Matrix());
+            imgView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+        }
+    }
+
 
 }
