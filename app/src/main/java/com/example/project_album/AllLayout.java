@@ -75,7 +75,9 @@ public class AllLayout extends Fragment {
         }
     }
 
-
+    public AllLayout(ArrayList<Image> imgs) {
+        this.images = imgs;
+    }
     public static AllLayout newInstance(String strArg) {
         AllLayout fragment = new AllLayout();
         Bundle args = new Bundle();

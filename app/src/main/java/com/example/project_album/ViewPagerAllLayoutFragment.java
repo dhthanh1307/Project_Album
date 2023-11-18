@@ -6,7 +6,9 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -44,6 +46,8 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     Context context = null;
     ViewPagerInTrashCanAdapter mAdapter;
     int index = 0;//Vị trí được chọn hiện tại
+
+
 
     public ViewPagerAllLayoutFragment(ArrayList<Image> imgs, int index) {
         this.images = imgs;
@@ -102,6 +106,16 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 }
             }
         });
+
+
+
+
+
+
+
+
+
+
         txtShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -154,9 +168,9 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
                 if (main.getIDItemBottomNavigationView()==R.id.action_favorite){
-                    ft.replace(R.id.replace_fragment_layout, FavoriteLayout.newInstance("FavoriteLayout"));
+                    ft.replace(R.id.replace_fragment_layout,new FavoriteLayout(images));
                 }else if(main.getIDItemBottomNavigationView()==R.id.action_all_picture){
-                    ft.replace(R.id.replace_fragment_layout, AllLayout.newInstance("AllLayout"));
+                    ft.replace(R.id.replace_fragment_layout, new AllLayout(images));
                 }
                 ft.commit();
                 main.mBottomNavigationView.setVisibility(View.VISIBLE);

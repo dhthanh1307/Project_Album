@@ -44,11 +44,10 @@ public class FavoriteLayout extends Fragment {
     Bundle myOriginalMemoryBundle;
     LinearLayout lastLinear;
 
-    public FavoriteLayout() {
-        Log.e("TrashCanLayout", "constructor");
-        // Required empty public constructor
+    public FavoriteLayout(ArrayList<Image> imgs) {
+        this.images=imgs;
     }
-
+    public  FavoriteLayout(){}
     public static FavoriteLayout newInstance(String strArg) {
         FavoriteLayout fragment = new FavoriteLayout();
         Bundle args = new Bundle();

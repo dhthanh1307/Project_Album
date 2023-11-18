@@ -2,8 +2,12 @@ package com.example.project_album;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,7 +29,7 @@ public class LargeImageFragment extends Fragment {
         this.myImage=myImage;
     }
 
-
+    long zoom=1;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +48,52 @@ public class LargeImageFragment extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_layout_solo_picture_in_trashcan, container, false);
         imgDelete=view.findViewById(R.id.img_delete);
+
         imgDelete.setImageBitmap(myImage.getImgBitmap());
+        imgDelete.setOnTouchListener(new View.OnTouchListener() {
+            private long lastTapTimeMs = 0;
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                long currentTime = System.currentTimeMillis();
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (currentTime - lastTapTimeMs < 400) {
+                        // Double-tap detected
+                        Toast.makeText(main, "Double Click", Toast.LENGTH_SHORT).show();
+
+//                        Matrix matrix = new Matrix();
+//                        float x = event.getX();
+//                        float y = event.getY();
+//                        matrix.setScale(2.0f,2.0f,x,y);
+//                        Bitmap flipdBitmap = Bitmap.createBitmap(myImage.getImgBitmap(), 0, 0,
+//                                myImage.getImgBitmap().getWidth(), myImage.getImgBitmap().getHeight(), matrix, true);
+//                        //image.setImgBitmap(rotatedBitmap);
+//                        myImage.setImgBitmap(flipdBitmap);
+//                        imgDelete.setImageBitmap(flipdBitmap);
+//                        imgDelete.setScaleType(ImageView.ScaleType.MATRIX);
+                        if (zoom==1){
+                            Matrix matrix = imgDelete.getImageMatrix();
+                            matrix.postScale(2.0f, 2.0f, event.getX(), event.getY());
+                            imgDelete.setImageMatrix(matrix);
+                            imgDelete.setScaleType(ImageView.ScaleType.MATRIX);
+                            zoom=zoom*-1;
+                        }
+                        else{
+                            imgDelete.setScaleX(1.0f);
+                            imgDelete.setScaleY(1.0f);
+                            imgDelete.setImageMatrix(new Matrix());
+                            imgDelete.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                            zoom=zoom*-1;
+
+                        }
+
+                    }
+                    lastTapTimeMs = currentTime;
+                }
+
+                return true;
+            }
+        });
         return view;
     }
     @Override
