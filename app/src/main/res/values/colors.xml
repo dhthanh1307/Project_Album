@@ -16,4 +16,5 @@
     <color name="black_1">#2F0F0101</color>
     <color name="blue_press">#612752EF</color>
     <color name="grey">#61FFFFFF</color>
+    <color name="darkGrey">#ff424242</color>
 </resources>

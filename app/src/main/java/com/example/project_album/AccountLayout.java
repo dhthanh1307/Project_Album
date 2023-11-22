@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,8 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
@@ -27,6 +31,10 @@ public class AccountLayout extends Fragment {
     Button btnSaveChange;
     Button btnLogout;
     ArrayList<String> accountInfo;
+    SwitchCompat themeSwitch;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+    boolean nightMode;
     public AccountLayout() {
     }
 
@@ -59,6 +67,10 @@ public class AccountLayout extends Fragment {
         editRetypeNewPassword = view.findViewById(R.id.editRetypeNewPassword);
         btnSaveChange = view.findViewById(R.id.btnEditAccount);
         btnLogout = view.findViewById(R.id.btnLogout);
+
+      /*  themeSwitch = view.findViewById(R.id.themeSwitch);
+        sharedPreferences = getActivity().getSharedPreferences("MODE", Context.MODE_PRIVATE);
+        nightMode = sharedPreferences.getBoolean("nightMode", false);*/
 
         accountInfo = MainActivity.dataResource.getAccountInfo(MainActivity.username);
 
@@ -116,6 +128,29 @@ public class AccountLayout extends Fragment {
                 main.finish();
             }
         });
+
+
+/*        if (nightMode) {
+            themeSwitch.setChecked(true);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+
+        themeSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (nightMode) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    editor = sharedPreferences.edit();
+                    editor.putBoolean("nightMode", false);
+                }
+                else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    editor = sharedPreferences.edit();
+                    editor.putBoolean("nightMode", true);
+                }
+                editor.apply();
+            }
+        });*/
 
         return view;
     }

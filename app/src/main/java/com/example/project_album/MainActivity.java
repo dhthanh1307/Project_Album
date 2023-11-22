@@ -25,6 +25,17 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 public class MainActivity extends FragmentActivity {
     public static DataResource dataResource;
@@ -70,7 +81,7 @@ public class MainActivity extends FragmentActivity {
         ft.commit();
 
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottom_navigation_album = findViewById(R.id.bottom_navigation_album);
+        // bottom_navigation_album = findViewById(R.id.bottom_navigation_album);
         mBottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -102,8 +113,19 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA, Manifest.permission.INTERNET}, 1);
     }
 
+    private void requestStoragePermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                    123);
+        }
+    }
 
     private void getSizeWindow(){
         DisplayMetrics dis = new DisplayMetrics();
@@ -130,6 +152,24 @@ public class MainActivity extends FragmentActivity {
         ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
         Bitmap theImage = BitmapFactory.decodeStream(imageStream);
         return theImage;
+    }
+
+    public Bitmap ChangePicassoToBitmap(String url) {
+        final Bitmap[] tempbmap = {null};
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                tempbmap[0] = bitmap;
+            }
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+            }
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        };
+        Picasso.get().load(url).into(target);
+        return tempbmap[0];
     }
 
     public Bitmap ChangeImageToBitmap(int id){

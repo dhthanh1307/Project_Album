@@ -1,5 +1,6 @@
 package com.example.project_album;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -7,13 +8,30 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+import android.text.Html;
 import android.util.Log;
+import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class DataResource {
     private SQLiteDatabase database,database1;
@@ -64,7 +82,7 @@ public class DataResource {
         return id;
     }
 
-    public long InsertAlbumImage(String album_name,long idImage){
+    public long InsertAlbumImage(String album_name, long idImage){
         SQLiteDatabase db = database;
         db.beginTransaction();
         long id = -1;
@@ -196,7 +214,7 @@ public class DataResource {
             values.put(DatabaseHelper.COLUMN_NAME, image.getName());
             values.put(DatabaseHelper.COLUMN_SIZE, image.getSize());
 
-            SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
             values.put(DatabaseHelper.COLUMN_DATE, ft.format(image.getDate()));
             values.put(DatabaseHelper.COLUMN_TYPE, image.getType());
             values.put(DatabaseHelper.COLUMN_DESCRIBE, image.getDescribe());
@@ -226,6 +244,7 @@ public class DataResource {
             return -1;
         }
     }
+
     public void unlikeImage(long id){
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
                 +DatabaseHelper.COLUMN_IS_FAVORITE + " = 'F'" +
@@ -282,10 +301,25 @@ public class DataResource {
     }
     public ArrayList<Image> getAllImage() {
         ArrayList<Image> list = new ArrayList<Image>();
-        Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns, null,
+/*      Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns, null,
                 null, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
+            list.add(cursorToImage(cursor));
+            cursor.moveToNext();
+        }*/
+
+        
+        Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns, null,
+                null, null, null, null);
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            uri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        }
+        cursor = context.getContentResolver().query(uri, projection,null,null,null);
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        while (!cursor.isAfterLast()){
             list.add(cursorToImage(cursor));
             cursor.moveToNext();
         }
@@ -293,7 +327,7 @@ public class DataResource {
     }
 
     private Image cursorToImage(Cursor cursor) {
-        ;
+
         Image image = new Image();
         image.setId(cursor.getLong(0));
         image.setName(cursor.getString(3));
@@ -302,7 +336,7 @@ public class DataResource {
         image.setType(cursor.getString(6));
         image.setDescribe(cursor.getString(7));
         image.setDeleted(cursor.getString(8));
-        image.setFavorite(cursor.getString(9));
+        //image.setFavorite(cursor.getString(9));
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         try {
             image.setDate(df.parse(cursor.getString(5)));

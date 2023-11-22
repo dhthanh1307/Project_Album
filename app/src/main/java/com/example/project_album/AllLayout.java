@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -16,6 +17,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
@@ -26,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -59,9 +63,15 @@ public class AllLayout extends Fragment {
     GridView gridView;
     Spinner spinner;
     ArrayAdapter<String> spinnerAdapter;
+    public static final int REQUEST_PERMISSION = 123;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
-    FloatingActionButton btnAddCamera;
+    FloatingActionButton btnAddPicture, btnAddCamera, btnAddUrl;
+    private boolean clicked = false;
+    private Animation rotateOpen;
+    private Animation rotateClose;
+    private Animation fromBottom;
+    private Animation toBottom;
     public AllLayout() {
         debug("constructor");
         images = MainActivity.dataResource.getAllImage();
@@ -94,7 +104,11 @@ public class AllLayout extends Fragment {
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
-            initDataResource();
+            if (checkPermission()) {
+                initDataResource();
+            } else {
+                requestPermission();
+            }
 
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
@@ -115,6 +129,11 @@ public class AllLayout extends Fragment {
         }
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_all_layout, container, false);
+
+        rotateOpen = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_open_anim);
+        rotateClose = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_close_anim);
+        fromBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.from_bottom_anim);
+        toBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.to_bottom_anim);
 
         if (copiedImages.size() == 0) {
             copiedImages.addAll(images);
@@ -157,7 +176,16 @@ public class AllLayout extends Fragment {
 
         spinner = view.findViewById(R.id.spinner);
         initSpinerView();
-        btnAddCamera = view.findViewById(R.id.btn_add_camera);
+        btnAddPicture = view.findViewById(R.id.btn_add_Picture);
+        btnAddCamera = view.findViewById(R.id.btn_add_Camera);
+        btnAddUrl = view.findViewById(R.id.btn_add_Url);
+
+        btnAddPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddButtonClicked();
+            }
+        });
         btnAddCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,8 +197,22 @@ public class AllLayout extends Fragment {
             }
         });
 
+        btnAddUrl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new UrlFragment().show(main.getSupportFragmentManager(), UrlFragment.Tag);
+            }
+        });
 
         return view;
+    }
+
+    public boolean checkPermission() {
+        return ContextCompat.checkSelfPermission(main, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public void requestPermission() {
+        ActivityCompat.requestPermissions(main, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
     }
 
     private void SetGridViewItemLongClick() {
@@ -251,6 +293,22 @@ public class AllLayout extends Fragment {
                 startCamera();
             }
         }
+
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initDataResource();
+            } else {
+                Toast.makeText(requireContext(), "Permission denied. Cannot load images.", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initDataResource();
+            } else {
+                Toast.makeText(requireContext(), "Permission denied. Cannot load images.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -271,6 +329,7 @@ public class AllLayout extends Fragment {
                 Log.i("Test", path.toString());
                 OutputStream fOut = null;
                 File file = new File(path, filename + ".jpg");
+
 
                 try {
                     fOut = new FileOutputStream(file);
@@ -372,4 +431,35 @@ public class AllLayout extends Fragment {
         }
         return b;
     }
+
+    private void onAddButtonClicked() {
+        setVisibility(clicked);
+        setAnimation(clicked);
+        clicked = !clicked;
+    }
+
+    private void setVisibility(boolean clicked) {
+        if (!clicked) {
+            btnAddCamera.setVisibility(View.VISIBLE);
+            btnAddUrl.setVisibility(View.VISIBLE);
+        }
+        else {
+            btnAddCamera.setVisibility(View.GONE);
+            btnAddUrl.setVisibility(View.GONE);
+        }
+    }
+
+    private void setAnimation(boolean clicked) {
+        if(!clicked) {
+            btnAddPicture.setAnimation(rotateOpen);
+            btnAddCamera.setAnimation(fromBottom);
+            btnAddUrl.setAnimation(fromBottom);
+        }
+        else {
+            btnAddPicture.setAnimation(rotateClose);
+            btnAddCamera.setAnimation(toBottom);
+            btnAddUrl.setAnimation(toBottom);
+        }
+    }
+
 }
