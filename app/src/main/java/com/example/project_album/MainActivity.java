@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.content.Intent;
@@ -25,6 +26,9 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class MainActivity extends FragmentActivity {
     public static DataResource dataResource;
@@ -121,7 +125,7 @@ public class MainActivity extends FragmentActivity {
     public byte[] ChangeImageToByte(int img){
         Bitmap image = BitmapFactory.decodeResource(getResources(), img);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 40, stream);
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte imageInByte[] = stream.toByteArray();
         return imageInByte;
     }
@@ -194,5 +198,23 @@ public class MainActivity extends FragmentActivity {
     }
     public int getIDItemBottomNavigationView(){
         return id_item;
+    }
+
+    public Bitmap getImageFromPath(String path) {
+        Bitmap b =null;
+        debug(path);
+        try {
+            File f = new File(path);
+            b = BitmapFactory.decodeStream(new FileInputStream(f));
+        }
+        catch (FileNotFoundException e)
+        {
+
+            e.printStackTrace();
+        }
+        return b;
+    }
+    private void debug(String t){
+        Log.e("MainActivity",t);
     }
 }

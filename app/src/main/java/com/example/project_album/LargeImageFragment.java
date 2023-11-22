@@ -3,7 +3,9 @@ package com.example.project_album;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -50,6 +52,7 @@ public class LargeImageFragment extends Fragment {
         imgDelete=view.findViewById(R.id.img_delete);
 
         imgDelete.setImageBitmap(myImage.getImgBitmap());
+
         imgDelete.setOnTouchListener(new View.OnTouchListener() {
             private long lastTapTimeMs = 0;
             @Override

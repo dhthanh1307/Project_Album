@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +12,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -27,19 +24,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class ShowImageInAlbumFragment extends Fragment implements View.OnClickListener {
-    private static Album album;
-    private static MainActivity main;
-    private static ShowImageInAlbumAdapter image_adapter;
+    private Album album;
+    private MainActivity main;
+    private ShowImageInAlbumAdapter image_adapter;
     private RecyclerView recyclerView;
-    private static TextView tv_back_to_album,tv_choose;
+    private TextView tv_back_to_album,tv_choose;
     private Button btn_extend;
     private ImageView img_all_info;
     private View v_allInfo;
-    private static TextView tv_add_to_album ;
+    private TextView tv_add_to_album ;
     private TextView tv_delete;
     private TextView tv_favorite;
     private TextView tv_copy;
     private TextView tv_blind;
+    private TextView tv_name;
     private Dialog dialog;
     public ShowImageInAlbumFragment(Album album){
         this.album = album;
@@ -75,6 +73,8 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
 
         tv_back_to_album.setOnClickListener(this);
         tv_choose.setOnClickListener(this);
+        tv_name = view.findViewById(R.id.tv_name);
+        tv_name.setText(album.getName());
         recyclerView.setAdapter(image_adapter);
 
         img_all_info = main.bottom_navigation_album.findViewById(R.id.img_all_info);
@@ -101,10 +101,11 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if(view.getId() == tv_back_to_album.getId()){
-            FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
-            FragmentTransaction ft = fragmentmanager.beginTransaction();
-            ft.replace(R.id.replace_fragment_layout,AlbumLayout.newInstance("album"));
-            ft.commit();
+            FragmentTransaction transaction = main.getSupportFragmentManager().beginTransaction();
+            main.getSupportFragmentManager().popBackStack();
+            transaction.remove(this);
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            transaction.commit();
         }
         else if(view.getId() == tv_choose.getId()){
             if(tv_choose.getText().equals("Chọn")){
@@ -137,7 +138,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     private void AddToAlbum() {
         FragmentManager fragmentmanager = main.getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        Fragment fragment = new MyAlbumFragment(true);
+        Fragment fragment = new MyAlbumFragment(this);
         ft.add(R.id.replace_fragment_layout,fragment);
         ft.addToBackStack(fragment.getClass().getSimpleName());
         ft.commit();
@@ -152,7 +153,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
         dialog.show();
     }
-    public static void AddToNewAlbum(String name){
+    public void AddToNewAlbum(String name){
         ArrayList<Image> imgs = new ArrayList<>();
         imgs.addAll(image_adapter.image_chosen);
         for(int j =2;j<AlbumLayout.albums.size();j++){
@@ -166,7 +167,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
             }
         }
 
-        for(int j =0;j<AlbumLayout.albums.size();j++){
+        for(int j =1;j<AlbumLayout.albums.size();j++){
             if (AlbumLayout.albums.get(j).getName().equals(name)){
                 for(int i = 0;i<imgs.size();i++) {
                     MainActivity.dataResource.InsertAlbumImage(name,imgs.get(i).getId());
@@ -182,6 +183,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         image_adapter.resetChooseSelection();
         tv_choose.setText("Chọn");
         image_adapter.notifyDataSetChanged();
+        main.albumLayout.update();
     }
 
 }

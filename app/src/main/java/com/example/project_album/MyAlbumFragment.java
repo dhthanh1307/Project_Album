@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,25 +14,28 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.color.utilities.TonalPalette;
-
 import java.util.ArrayList;
 
 
 public class MyAlbumFragment extends Fragment {
-    public static GridViewAlbumAdapter gridViewAlbumAdapter;
+    public GridViewAlbumAdapter gridViewAlbumAdapter;
     private TextView tvEdit;
     private TextView tvBack;
 
-    private static GridView gridViewMyAlbum;
+    private GridView gridViewMyAlbum;
     private MainActivity main;
     private LinearLayout linear1;
     private LinearLayout linear2;
     private TextView tv_cancel;
     private boolean isaddtoalbum = false;
-    private static ArrayList<Album> albums = new ArrayList<>();
-    public MyAlbumFragment(boolean isaddtoalbum){
-        this.isaddtoalbum = isaddtoalbum;
+    private ShowImageInAlbumFragment showImageInAlbumFragment;
+    public ArrayList<Album> albums = new ArrayList<>();
+    public MyAlbumFragment(){
+        this.isaddtoalbum = false;
+    }
+    public MyAlbumFragment(ShowImageInAlbumFragment showImageInAlbumFragment){
+        this.isaddtoalbum =true;
+        this.showImageInAlbumFragment = showImageInAlbumFragment;
     }
 
     @Override
@@ -65,36 +67,39 @@ public class MyAlbumFragment extends Fragment {
         tvBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
-                FragmentTransaction ft = fragmentmanager.beginTransaction();
-                ft.replace(R.id.replace_fragment_layout,AlbumLayout.newInstance("album"));
-                ft.commit();
+                closeFragment();
             }
         });
 
-        albums.addAll(AlbumLayout.albums);
+        //albums = null;
+
         if (isaddtoalbum){
+            for(int i = 1;i<AlbumLayout.albums.size();i++){
+                albums.add(AlbumLayout.albums.get(i));
+            }
             linear1.setVisibility(View.INVISIBLE);
             linear2.setVisibility(View.VISIBLE);
             main.bottom_navigation_album.setVisibility(View.INVISIBLE);
-            albums.remove(0);
         }
         else{
+            albums = AlbumLayout.albums;
             linear2.setVisibility(View.INVISIBLE);
             linear1.setVisibility(View.VISIBLE);
         }
-        gridViewAlbumAdapter = new GridViewAlbumAdapter(getActivity(),R.layout.item_album,albums);
+        gridViewAlbumAdapter = new GridViewAlbumAdapter(main,R.layout.item_album,albums);
         gridViewMyAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!isaddtoalbum) {
                     FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                     FragmentTransaction ft = fragmentmanager.beginTransaction();
-                    ft.replace(R.id.replace_fragment_layout, new ShowImageInAlbumFragment(AlbumLayout.albums.get(i)));
+                    Fragment fragment = new ShowImageInAlbumFragment(AlbumLayout.albums.get(i));
+                    ft.add(R.id.replace_fragment_layout, fragment);
+                    ft.addToBackStack(fragment.getClass().getSimpleName());
                     ft.commit();
                 }
                 else{
-                    ShowImageInAlbumFragment.AddToNewAlbum(albums.get(i).getName());
+                    showImageInAlbumFragment.AddToNewAlbum(albums.get(i).getName());
                     closeFragment();
                 }
             }
@@ -118,14 +123,19 @@ public class MyAlbumFragment extends Fragment {
         Toast.makeText(getContext(),"click", Toast.LENGTH_SHORT).show();
     }
     private void closeFragment() {
+
         FragmentTransaction transaction = main.getSupportFragmentManager().beginTransaction();
         main.getSupportFragmentManager().popBackStack();
         transaction.remove(this);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         transaction.commit();
     }
-    public static void DataChange(Album a){
+    public void DataChange(Album a){
         albums.add(a);
+        gridViewAlbumAdapter.notifyDataSetChanged();
+    }
+    public void update(){
+        albums = AlbumLayout.albums;
         gridViewAlbumAdapter.notifyDataSetChanged();
     }
 }

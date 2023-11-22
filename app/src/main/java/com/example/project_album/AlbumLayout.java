@@ -2,33 +2,16 @@ package com.example.project_album;
 
 
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -36,7 +19,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -44,9 +26,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class AlbumLayout extends Fragment {
@@ -68,10 +52,12 @@ public class AlbumLayout extends Fragment {
     private ScrollView sv;
     private RelativeLayout layout_icon;
     private boolean isInit = false;
+    private MyAlbumFragment myAlbumFragment;
 
     private AlbumLayout(){
         debug("constructor");
         albums = MainActivity.dataResource.getAllAlbum();
+        myAlbumFragment = new MyAlbumFragment();
     }
     public static AlbumLayout newInstance(String strArg){
         if (instance == null){
@@ -89,6 +75,12 @@ public class AlbumLayout extends Fragment {
         main = (MainActivity)getActivity() ;
         debug("onCreate "+String.valueOf(albums.size()));
         InitAlbums();
+        for(int i = 1;i<albums.size();i++){
+            int size = albums.get(i).getImages().size();
+            if(size!=0 && albums.get(i).get_image(size-1).getImgBitmap() == null)
+                albums.get(i).get_image(size-1).setImgBitmap(main.getImageFromPath
+                        (albums.get(i).get_image(size-1).getPath()));
+        }
         isInit = true;
 
     }
@@ -212,8 +204,9 @@ public class AlbumLayout extends Fragment {
             public void onClick(View view) {
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
-                ft.replace(R.id.replace_fragment_layout,new
-                        ShowImageInAlbumFragment(albums.get(position)));
+                Fragment fragment = new ShowImageInAlbumFragment(albums.get(position));
+                ft.add(R.id.replace_fragment_layout,fragment);
+                ft.addToBackStack(fragment.getClass().getSimpleName());
                 ft.commit();
                 //talk();
             }
@@ -325,15 +318,16 @@ public class AlbumLayout extends Fragment {
     private void AllMyAlbumClick(){
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ft.replace(R.id.replace_fragment_layout,new MyAlbumFragment(false));
-        //ft.addToBackStack(fragment.getClass().getSimpleName());
+        ft.add(R.id.replace_fragment_layout,myAlbumFragment);
+        ft.addToBackStack(myAlbumFragment.getClass().getSimpleName());
         ft.commit();
     }
 
     private void AddAlbumForm(){
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ft.replace(R.id.replace_fragment_layout,new MyAlbumFragment(false));
+        ft.add(R.id.replace_fragment_layout,myAlbumFragment);
+        ft.addToBackStack(myAlbumFragment.getClass().getSimpleName());
         ft.commit();
 
         Dialog dialog = new Dialog(getActivity());
@@ -396,7 +390,7 @@ public class AlbumLayout extends Fragment {
                 albums.add(album);
                 MainActivity.dataResource.InsertAlbum(album.getName());
                 dialog.cancel();
-                MyAlbumFragment.DataChange(album);
+                update();
                 //MyAlbumFragment.gridViewAlbumAdapter.notifyDataSetChanged();
             }
         });
@@ -409,5 +403,9 @@ public class AlbumLayout extends Fragment {
     }
     private void debug(String k){
         Log.e("Album Layout",k);
+    }
+    public void update(){
+        UpdateConfiguration(getResources().getConfiguration());
+        myAlbumFragment.update();
     }
 }

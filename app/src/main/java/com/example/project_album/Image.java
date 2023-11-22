@@ -20,7 +20,7 @@ public class Image {
     private String is_favorite;
     private Bitmap imgBitmap;
     public Image(){
-
+        imgBitmap = null;
     }
 
     public Image(Bitmap imgbitmap,String name) {
@@ -107,5 +107,7 @@ public class Image {
         Bitmap theImage = BitmapFactory.decodeStream(imageStream);
         return theImage;
     }
-
+    public String GenerateName(){
+        return System.currentTimeMillis() + ".jpeg";
+    }
 }

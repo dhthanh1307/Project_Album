@@ -129,12 +129,14 @@ public class DataResource {
         Log.e("SQLite","Person entry delete with id: "+id);
         try {
             database.delete(DatabaseHelper.TABLE_ALBUM_IMAGE,
-                    DatabaseHelper.COLUMN_ID_IMAGE + " = " + id + " and "+
-                            DatabaseHelper.COLUMN_NAME_ALBUM +" = " +name,
+                    DatabaseHelper.COLUMN_ID_IMAGE + " = " + String.valueOf(id) + " and "+
+                            DatabaseHelper.COLUMN_NAME_ALBUM +" = '" +name+"'",
                     null);
+            debug("Remove Successfull: "+name+" "+String.valueOf(image.getId()));
             return true;
         }
         catch (Exception ex){
+            debug("Exception while delete");
             return false;
         }
 

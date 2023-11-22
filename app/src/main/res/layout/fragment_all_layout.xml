@@ -5,30 +5,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AllLayout"
-    android:background="@color/black_1"
-    android:padding="10dp">
-    <LinearLayout
+    android:background="@color/black_1">
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
         <Spinner
+            android:layout_margin="10dp"
+            android:visibility="invisible"
             android:id="@+id/spinner"
             android:layout_width="match_parent"
             android:layout_height="66dp"
             android:padding="8dp"
             android:textColor="@color/white"
             android:textSize="15dp"/>
-        <GridView
-            android:gravity="center"
-            android:id="@+id/gridView"
+<!--        <GridView-->
+<!--            android:gravity="center"-->
+<!--            android:id="@+id/gridView"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:numColumns="3"-->
+<!--            android:horizontalSpacing="5dp"-->
+<!--            android:verticalSpacing="5dp"/>-->
+<!--        <include layout="@layout/view_heading"/>-->
+        <TextView
+            android:id="@+id/tv_bottom"
+            android:layout_margin="10dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:numColumns="3"
-            android:horizontalSpacing="5dp"
-            android:verticalSpacing="5dp"/>
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:text="so luong"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_image_in_all"
+            android:layout_marginHorizontal="10dp"
+            app:spanCount="3"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <include layout="@layout/view_heading"/>
+    </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_add_camera"
