@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.FragmentActivity;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class LoginFragment extends Fragment {
@@ -36,6 +39,7 @@ public class LoginFragment extends Fragment {
     Button btnLogin;
     TextView toSignUp;
     String username;
+    int userID;
 
     public static LoginFragment newInstance(String strArg) {
         LoginFragment fragment = new LoginFragment();
@@ -80,28 +84,29 @@ public class LoginFragment extends Fragment {
                 //Khi test
                 username = inputUsername.getText().toString();
                 //Khi sử dụng thật xóa 4 dòng trên, bỏ comment các dòng dưới này
-//                if (inputUsername.getText().toString().length() == 0) {
-//                    Toast.makeText(main, "Tên đăng nhập không thể để trống", Toast.LENGTH_SHORT).show();
-//                }
-//                else if (inputPassword.getText().toString().length() == 0) {
-//                    Toast.makeText(main, "Mật khẩu không thể để trống", Toast.LENGTH_SHORT).show();
-//                }
-//                else {
-//                    String username = inputUsername.getText().toString();
-//                    String password = inputPassword.getText().toString();
-//                    if (MainActivity.dataResource.checkLogin(username, password) == true) {
+                if (inputUsername.getText().toString().length() == 0) {
+                    Toast.makeText(main, "Tên đăng nhập không thể để trống", Toast.LENGTH_SHORT).show();
+                }
+                else if (inputPassword.getText().toString().length() == 0) {
+                    Toast.makeText(main, "Mật khẩu không thể để trống", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    String username = inputUsername.getText().toString();
+                    String password = inputPassword.getText().toString();
+                    userID = MainActivity.dataResource.checkLogin(username, password);
+                    if (userID != -1) {
 //                        Intent intent = new Intent(getActivity(), MainActivity.class);
 //                        intent.putExtra("username", username);
 //                        startActivity(intent);
-//                    }
-//                    else {
-//                        Toast.makeText(main, "Tên đăng nhập hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
+                        //doc database
+                        AllLayout.images = MainActivity.dataResource.getAllImage(userID);
+                        initDataResource();
+                    }
+                    else {
+                        Toast.makeText(main, "Tên đăng nhập hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
-                //doc database
-                AllLayout.images = MainActivity.dataResource.getAllImage();
-                initDataResource();
             }
         });
         return view;
@@ -115,18 +120,25 @@ public class LoginFragment extends Fragment {
             @Override
             public void run() {
                 if (AllLayout.images.size() == 0) {
-                    int img[] = {R.drawable.img, R.drawable.img_2,
-                            R.drawable.img_3,
-                            R.drawable.img_4, R.drawable.img_5, R.drawable.img_6};
+                    Log.e("LoginFragment","init All images");
+                    ArrayList<String> links = Link.AllLinks();
                     ArrayList<Bitmap> bitmaps = new ArrayList<>();
-                    for (int i = 0; i < 6; i++) {
-                        bitmaps.add(BitmapFactory.decodeResource(getResources(), img[i]));
+                    for (int i = 0; i < links.size(); i++) {
+                        //bitmaps.add(BitmapFactory.decodeResource(getResources(), img[i]));
+                        try {
+                            URL url = new URL(links.get(i));
+                            Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                            bitmaps.add(image);
+                            Log.e("LoginFragment",String.valueOf(i));
+                        } catch(IOException e) {
+                            Log.e("Loginfragment",e.toString());
+                        }
                     }
-                    for (int j = 0; j < 5; j++) {
-                        for (int i = 0; i < 6; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        for (int i = 0; i < bitmaps.size(); i++) {
                             AllLayout.images.add(new Image(bitmaps.get(i), GenerateName()));
-                            AllLayout.images.get(j * 6 + i).setId(MainActivity.dataResource.
-                                    InsertImage(AllLayout.images.get(j * 6 + i), 1));
+                            AllLayout.images.get(i).setId(MainActivity.dataResource.
+                                    InsertImage(AllLayout.images.get(i), userID));
                             //images.get(j*6+i).setImgBitmap(main.ChangeImageToBitmap(img[i]));
                             //debug(String.valueOf(j*6+i));
                         }
@@ -142,7 +154,7 @@ public class LoginFragment extends Fragment {
                 }
                 dialog.dismiss();
                 Intent intent = new Intent(getActivity(), MainActivity.class);
-                intent.putExtra("username", username);
+                intent.putExtra("userID", userID);
                 startActivity(intent);
                 main.finish();
             }

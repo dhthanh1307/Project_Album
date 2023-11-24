@@ -35,7 +35,7 @@ public class Image {
         this.date = new Date();
         this.describe = "";
         this.imgBitmap = imgbitmap;
-        this.is_deleted="T";
+        this.is_deleted="F";
         this.is_favorite="F";
     }
 

@@ -324,6 +324,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         txtFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                main.albumLayout.updateFavorite(images.get(index));
                 if (images.get(index).getFavorite().equals("T")){
                     images.get(index).setFavorite("F");
                     txtFavorite.setImageResource(R.drawable.icon_favorite_in_alllayout);
@@ -333,6 +334,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                     images.get(index).setFavorite("T");
                     txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
                     MainActivity.dataResource.likeImage(images.get(index).getId());
+
 //                    FavoriteLayout.mGridAdapter.setmSelectedArray();
                 }
             }
@@ -364,9 +366,9 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
                 if (main.getIDItemBottomNavigationView()==R.id.action_favorite){
-                    ft.replace(R.id.replace_fragment_layout,new FavoriteLayout(images));
+                    ft.replace(R.id.replace_fragment_layout,main.favoriteLayout);
                 }else if(main.getIDItemBottomNavigationView()==R.id.action_all_picture){
-                    ft.replace(R.id.replace_fragment_layout, new AllLayout(images));
+                    ft.replace(R.id.replace_fragment_layout, main.allLayout);
                 }
                 ft.commit();
                 main.mBottomNavigationView.setVisibility(View.VISIBLE);

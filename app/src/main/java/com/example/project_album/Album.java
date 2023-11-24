@@ -4,13 +4,20 @@ import java.util.ArrayList;
 
 public class Album {
     private String name;
+    private long id;
     private ArrayList<Image> images;
-    public Album(String name,ArrayList<Image> images){
+    public Album(long id,String name,ArrayList<Image> images){
         this.name= name;
         this.images = images;
-
+        this.id = id;
     }
 
+    public long getId(){
+        return id;
+    }
+    public void setId(long id){
+        this.id = id;
+    }
     public String getName(){
         return name;
     }
@@ -41,9 +48,10 @@ public class Album {
         }
     }
     public void clear(){
-        images.clear();
+        images = new ArrayList<>();
     }
     public int length(){
         return images.size();
     }
+
 }

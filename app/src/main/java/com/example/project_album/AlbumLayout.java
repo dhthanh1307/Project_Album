@@ -52,11 +52,20 @@ public class AlbumLayout extends Fragment {
     private ScrollView sv;
     private RelativeLayout layout_icon;
     private boolean isInit = false;
+    private EditText txtTitle;
+    private Button btnSave;
+    private Button btnCancel;
+    private TextView tv_heading;
+
     private MyAlbumFragment myAlbumFragment;
+
+    //view dialog
+    private Dialog dialog;
+
 
     private AlbumLayout(){
         debug("constructor");
-        albums = MainActivity.dataResource.getAllAlbum();
+        albums = MainActivity.dataResource.getAllAlbum(MainActivity.userID);
         myAlbumFragment = new MyAlbumFragment();
     }
     public static AlbumLayout newInstance(String strArg){
@@ -87,10 +96,16 @@ public class AlbumLayout extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         mainView = inflater.inflate(R.layout.fragment_album_layout, container, false);
         this.container = container;
         this.saveInstanceState = saveInstanceState;
+
+        //view for dialog
+        createDialogView();
+
+        //finish view for dialog
 
         view_album_top = (ViewGroup)mainView.findViewById(R.id.ln_image_view_top);
         view_album_bottom = (ViewGroup)mainView.findViewById(R.id.ln_image_view_bottom);
@@ -134,8 +149,55 @@ public class AlbumLayout extends Fragment {
         return mainView;
     }
 
+    private void createDialogView(){
+        dialog = new Dialog(main);
+        dialog.setCancelable(false);
 
 
+        View view  = getActivity().getLayoutInflater().inflate(R.layout.custom_add_album, null);
+        dialog.setContentView(view);
+        Window window = dialog.getWindow();
+        if(window == null){
+            return;
+        }
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        WindowManager.LayoutParams attribute = window.getAttributes();
+        attribute.gravity =Gravity.CENTER;
+        txtTitle = view.findViewById(R.id.txt_title);
+        btnSave = view.findViewById(R.id.btn_save);
+        btnCancel = view.findViewById(R.id.btn_cancel);
+        tv_heading = view.findViewById(R.id.tv_heading);
+        txtTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(txtTitle.length() != 0){
+                    btnSave.setTextColor(Color.BLUE);
+                    btnSave.setBackgroundResource(R.drawable.custtom_button);
+                    btnSave.setClickable(true);
+
+                }
+                else{
+                    btnSave.setTextColor(Color.GRAY);
+                    btnSave.setBackgroundResource(R.color.black);
+                    btnSave.setClickable(false);
+                }
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.cancel();
+            }
+        });
+    }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -214,53 +276,73 @@ public class AlbumLayout extends Fragment {
         img.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                View v = getActivity().getLayoutInflater().inflate(R.layout.custtom_edit_album, null);
-                ImageView img = v.findViewById(R.id.image);
-                try{
-                    img.setImageBitmap(albums.get(position).get_image(
-                            albums.get(position).length() - 1).getImgBitmap());
-                } catch(Exception e){
-                    img.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                }
+                if(position!=0 && position!=1) {
+                    View v = getActivity().getLayoutInflater().inflate(R.layout.custtom_edit_album, null);
+                    Dialog dialog1 = new Dialog(getActivity());
+                    dialog1.setContentView(v);
+                    Window window = dialog1.getWindow();
+                    window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                    WindowManager.LayoutParams attribute = window.getAttributes();
+                    attribute.gravity = Gravity.CENTER;
+                    ImageView img = v.findViewById(R.id.image);
+                    try {
+                        img.setImageBitmap(albums.get(position).get_image(
+                                albums.get(position).length() - 1).getImgBitmap());
+                    } catch (Exception e) {
+                        img.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    }
 
 
-                TextView tv_name = v.findViewById(R.id.tv_album_name);
-                tv_name.setText(albums.get(position).getName());
-                TextView tv_length = v.findViewById(R.id.tv_album_length);
-                tv_length.setText(String.valueOf(albums.get(position).length()));
+                    TextView tv_name = v.findViewById(R.id.tv_album_name);
+                    tv_name.setText(albums.get(position).getName());
+                    TextView tv_length = v.findViewById(R.id.tv_album_length);
+                    tv_length.setText(String.valueOf(albums.get(position).length()));
 //                LinearLayout ln = (LinearLayout) v.findViewById(R.id.ln_parent);
 //                ln.setBackgroundColor(getResources().getColor(R.color.black_n));
 
-                TextView tv_rename = v.findViewById(R.id.tv_rename);
-                TextView tv_delete = v.findViewById(R.id.tv_delete);
+                    TextView tv_rename = v.findViewById(R.id.tv_rename);
+                    TextView tv_delete = v.findViewById(R.id.tv_delete);
 
-                tv_rename.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                    tv_rename.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            dialog1.dismiss();
+                            FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
+                            FragmentTransaction ft = fragmentmanager.beginTransaction();
+                            ft.add(R.id.replace_fragment_layout, myAlbumFragment);
+                            ft.addToBackStack(myAlbumFragment.getClass().getSimpleName());
+                            ft.commit();
+                            tv_heading.setText("Đặt tên Album");
+                            dialog.show();
+                            btnSave.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    String name = txtTitle.getText().toString();
+                                    update();
+                                    dialog.cancel();
+                                    MainActivity.dataResource.updateName(albums.get(position).getName(),
+                                            name, MainActivity.userID);
+                                    albums.get(position).setName(name);
+                                    UpdateConfiguration(getResources().getConfiguration());
+                                }
+                            });
+                        }
+                    });
 
-                    }
-                });
-
-
-                Dialog dialog = new Dialog(getActivity());
-                dialog.setContentView(v);
-                Window window = dialog.getWindow();
-                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                WindowManager.LayoutParams attribute = window.getAttributes();
-                attribute.gravity = Gravity.CENTER;
 //                dialog.registerForContextMenu(getLayoutInflater().inflate(R.layout.item_image,null));
 //                dialog.openOptionsMenu();
-                dialog.show();
-                tv_delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        MainActivity.dataResource.deleteAlbum(albums.get(position).getName());
-                        albums.remove(position);
-                        dialog.cancel();
-                        UpdateConfiguration(getResources().getConfiguration());
-                    }
-                });
+                    dialog1.show();
+                    tv_delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            MainActivity.dataResource.deleteAlbum(albums.get(position).getId());
+                            albums.remove(position);
+                            dialog1.cancel();
+                            UpdateConfiguration(getResources().getConfiguration());
+                        }
+                    });
+                }
                 return true;
             }
         });
@@ -269,27 +351,32 @@ public class AlbumLayout extends Fragment {
     private void InitAlbums() {
         if(!isInit) {
             if (albums.size() == 0) {
-                long id = MainActivity.dataResource.InsertAlbum("Airplane");
-                id = MainActivity.dataResource.InsertAlbum("Fruit");
-//            MainActivity.dataResource.InsertAlbum("Holiday");
+                ArrayList<Integer> ids = new ArrayList<>();
+                long id = MainActivity.dataResource.InsertAlbum("Airplane",MainActivity.userID);
+//            MainActivity.dataResource.InsertAlbum("Holiday",MainActivity.userID);
                 debug(String.valueOf(id));
                 for (int i = 0; i < 4; i++) {
-                    id = MainActivity.dataResource.InsertAlbumImage("Airplane",
+                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
                             AllLayout.images.get(i).getId());
                 }
+                id = MainActivity.dataResource.InsertAlbum("Fruit",MainActivity.userID);
                 for (int i = 5; i < 7; i++) {
-                    id = MainActivity.dataResource.InsertAlbumImage("Fruit",
+                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
                             AllLayout.images.get(i).getId());
                 }
-
-                albums = MainActivity.dataResource.getAllAlbum();
+                albums = MainActivity.dataResource.getAllAlbum(MainActivity.userID);
             }
             ArrayList<Image> images3 = new ArrayList<Image>();
-            Album a2 = new Album("Mục yêu thích", images3);
+            Album a2 = new Album(-1,"Mục yêu thích", images3);
+            for(int i = 0;i<AllLayout.images.size();i++){
+                if(AllLayout.images.get(i).getFavorite().equals("T")){
+                    a2.addImage(AllLayout.images.get(i));
+                }
+            }
 
             ArrayList<Image> images4 = new ArrayList<Image>();
             images4.addAll(AllLayout.images);
-            Album a1 = new Album("Tất cả", images4);
+            Album a1 = new Album(-2,"Tất cả", images4);
             albums.add(0, a1);
             albums.add(1, a2);
             ConvertAlbum();
@@ -330,65 +417,14 @@ public class AlbumLayout extends Fragment {
         ft.addToBackStack(myAlbumFragment.getClass().getSimpleName());
         ft.commit();
 
-        Dialog dialog = new Dialog(getActivity());
-        dialog.setCancelable(false);
-
-
-        View view  = getActivity().getLayoutInflater().inflate(R.layout.custom_add_album, null);
-        dialog.setContentView(view);
-        Window window = dialog.getWindow();
-        if(window == null){
-            return;
-        }
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        WindowManager.LayoutParams attribute = window.getAttributes();
-        attribute.gravity =Gravity.CENTER;
-
-        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //dialog.getWindow().setBackgroundDrawable(getActivity().getDrawable(R.drawable.custom_dialog));
-        EditText txtTitle = view.findViewById(R.id.txt_title);
-        Button btnSave = view.findViewById(R.id.btn_save);
-        Button btnCancel = view.findViewById(R.id.btn_cancel);
-
-        txtTitle.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(txtTitle.length() != 0){
-                    btnSave.setTextColor(Color.BLUE);
-                    btnSave.setBackgroundResource(R.drawable.custtom_button);
-                    btnSave.setClickable(true);
-
-                }
-                else{
-                    btnSave.setTextColor(Color.GRAY);
-                    btnSave.setBackgroundResource(R.color.black);
-                    btnSave.setClickable(false);
-                }
-            }
-        });
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.cancel();
-            }
-        });
-
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ArrayList<Image> image = new ArrayList<Image>();
-                Album album = new Album(txtTitle.getText().toString(),image);
+                Album album = new Album(-3,txtTitle.getText().toString(),image);
                 albums.add(album);
-                MainActivity.dataResource.InsertAlbum(album.getName());
+                long id = MainActivity.dataResource.InsertAlbum(album.getName(),MainActivity.userID);
+                album.setId(id);
                 dialog.cancel();
                 update();
                 //MyAlbumFragment.gridViewAlbumAdapter.notifyDataSetChanged();
@@ -407,5 +443,21 @@ public class AlbumLayout extends Fragment {
     public void update(){
         UpdateConfiguration(getResources().getConfiguration());
         myAlbumFragment.update();
+    }
+    public void updateFavorite(Image img){
+        if(isInit) {
+            if (img.getFavorite().equals("F")) {
+                albums.get(1).getImages().add(img);
+            } else {
+                albums.get(1).removeImage(img);
+            }
+        }
+    }
+    public void updateArrayFavorite(ArrayList<Image> imgs){
+        for(int i = 0;i<imgs.size();i++){
+            if (imgs.get(i).getFavorite().equals("F")){
+                albums.get(1).getImages().add(imgs.get(i));
+            }
+        }
     }
 }

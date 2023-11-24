@@ -42,13 +42,14 @@ public class DataResource {
 
     //--------------------------- ALBUM SPACE----------------------------
 
-    public long InsertAlbum(String name){
+    public long InsertAlbum(String name,int idUser){
         SQLiteDatabase db = database;
         db.beginTransaction();
         long id = -1;
         try{
             ContentValues values = new ContentValues();
             values.put(DatabaseHelper.COLUMN_NAME_ALBUM,name);
+            values.put(DatabaseHelper.COLUMN_USER,idUser);
             id = database.insert(DatabaseHelper.TABLE_ALBUM,
                     null,values);
             db.setTransactionSuccessful();
@@ -64,14 +65,14 @@ public class DataResource {
         return id;
     }
 
-    public long InsertAlbumImage(String album_name,long idImage){
+    public long InsertAlbumImage(long idAlbum,long idImage){
         SQLiteDatabase db = database;
         db.beginTransaction();
         long id = -1;
         try{
             ContentValues values = new ContentValues();
             values.put(DatabaseHelper.COLUMN_ID_IMAGE, idImage);
-            values.put(DatabaseHelper.COLUMN_NAME_ALBUM,album_name);
+            values.put(DatabaseHelper.COLUMN_ID_ALBUM,idAlbum);
             id = database.insert(DatabaseHelper.TABLE_ALBUM_IMAGE,
                     null,values);
             db.setTransactionSuccessful();
@@ -86,10 +87,11 @@ public class DataResource {
         return id;
     }
 
-    public ArrayList<Album> getAllAlbum(){
+    public ArrayList<Album> getAllAlbum(int idUser){
         ArrayList<Album> albums = new ArrayList<>();
-        String columnAlbum[] = {DatabaseHelper.COLUMN_NAME_ALBUM};
-        Cursor cursor = database.query(DatabaseHelper.TABLE_ALBUM,columnAlbum, null,
+        String columnAlbum[] = {DatabaseHelper.COLUMN_NAME_ALBUM,DatabaseHelper.COLUMN_ID_ALBUM};
+        Cursor cursor = database.query(DatabaseHelper.TABLE_ALBUM,columnAlbum,
+                DatabaseHelper.COLUMN_USER+" = "+String.valueOf(idUser),
                 null, null, null, null);
         debug(String.valueOf(cursor.getCount()));
         cursor.moveToFirst();
@@ -102,16 +104,16 @@ public class DataResource {
     }
 
     private Album cursorToAlbum(Cursor cursor){
-        return getAlbum(cursor.getString(0));
+        return getAlbum(cursor.getLong(1),cursor.getString(0));
     }
 
-    public Album getAlbum(String name){
+    public Album getAlbum(long id,String name){
         debug(name);
         ArrayList<Image> images = new ArrayList<>();
         String columnImage_id[] = {DatabaseHelper.COLUMN_ID_IMAGE};
         Cursor cursor = database.rawQuery("select "+DatabaseHelper.COLUMN_ID_IMAGE+
                 " from "+DatabaseHelper.TABLE_ALBUM_IMAGE+" where "+
-                DatabaseHelper.COLUMN_NAME_ALBUM +" = '" + name+"'", null);
+                DatabaseHelper.COLUMN_ID_ALBUM +" = " + String.valueOf(id), null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Image i= new Image();
@@ -121,18 +123,18 @@ public class DataResource {
             cursor.moveToNext();
 
         }
-        return new Album(name,images);
+        return new Album(id,name,images);
     }
 
-    public boolean deleteImageInAlbum(Image image,String name){
+    public boolean deleteImageInAlbum(Image image,long idAlbum){
         long id = image.getId();
         Log.e("SQLite","Person entry delete with id: "+id);
         try {
             database.delete(DatabaseHelper.TABLE_ALBUM_IMAGE,
                     DatabaseHelper.COLUMN_ID_IMAGE + " = " + String.valueOf(id) + " and "+
-                            DatabaseHelper.COLUMN_NAME_ALBUM +" = '" +name+"'",
+                            DatabaseHelper.COLUMN_ID_ALBUM +" = " +String.valueOf(idAlbum),
                     null);
-            debug("Remove Successfull: "+name+" "+String.valueOf(image.getId()));
+            debug("Remove Successfull: "+String.valueOf(image.getId()));
             return true;
         }
         catch (Exception ex){
@@ -142,22 +144,22 @@ public class DataResource {
 
     }
 
-    public boolean deleteAlbum(String name){
+    public boolean deleteAlbum(long idAlbum){
         database.beginTransaction();
         try {
             database.delete(DatabaseHelper.TABLE_ALBUM,
-                    DatabaseHelper.COLUMN_NAME_ALBUM
-                            + " = '" + name+"'",
+                    DatabaseHelper.COLUMN_ID_ALBUM
+                            + " = " + String.valueOf(idAlbum),
                     null);
             database.delete(DatabaseHelper.TABLE_ALBUM_IMAGE,
-                    DatabaseHelper.COLUMN_NAME_ALBUM
-                            + " = '" + name+"'",
+                    DatabaseHelper.COLUMN_ID_ALBUM
+                            + " = " + String.valueOf(idAlbum),
                     null);
             database.setTransactionSuccessful();
             return true;
         }
         catch (Exception ex){
-            debug("Exception with album "+name);
+            debug("Exception with album "+String.valueOf(idAlbum));
             return false;
         }
         finally {
@@ -165,13 +167,13 @@ public class DataResource {
         }
 
     }
-    public void updateName(String oldName,String newName){
+    public void updateName(String oldName,String newName,int idUser){
         ContentValues key = new ContentValues();
         key.put(DatabaseHelper.COLUMN_NAME_ALBUM,newName);
         database.update(DatabaseHelper.TABLE_ALBUM,key,
-                DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'",null);
-        database.update(DatabaseHelper.TABLE_ALBUM_IMAGE,key,
-                DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'",null);
+                DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'"
+                +" and "+ DatabaseHelper.COLUMN_USER +" = "+String.valueOf(idUser),
+                null);
     }
     //-------------------------------finish album space------------------------------------
 
@@ -282,10 +284,12 @@ public class DataResource {
         Log.e("Err","Loi o day3");
         return list;
     }
-    public ArrayList<Image> getAllImage() {
+    public ArrayList<Image> getAllImage(int userID) {
         ArrayList<Image> list = new ArrayList<Image>();
-        Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns, null,
+        Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns,
+                DatabaseHelper.COLUMN_USER+" = "+String.valueOf(userID),
                 null, null, null, null);
+//        Cursor c = database.rawQuery("select ")
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             list.add(cursorToImage(cursor));
@@ -319,18 +323,24 @@ public class DataResource {
         return cursor.getCount();
     }
 
-    public boolean checkLogin(String username, String password) {
+    public int checkLogin(String username, String password) {
         Cursor cursor = database.query(DatabaseHelper.TABLE_USERS,
-                new String[]{DatabaseHelper.COLUMN_USERNAME},
+                new String[]{DatabaseHelper.COLUMN_USER},
                 DatabaseHelper.COLUMN_USERNAME + "=? AND " + DatabaseHelper.COLUMN_PASSWORD + "=?",
                 new String[]{username, password},
                 null, null, null);
         int cursorCount = cursor.getCount();
-        cursor.close();
         if (cursorCount > 0) {
-            return true;
+            cursor.moveToFirst();
+            int userIDColumnIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_USER);
+            if (userIDColumnIndex != -1) {
+                int userID = cursor.getInt(userIDColumnIndex);
+                cursor.close();
+                return userID;
+            }
         }
-        return false;
+        cursor.close();
+        return -1;
     }
 
     public boolean checkSignUp(String name) {
@@ -344,9 +354,9 @@ public class DataResource {
         return false;
     }
 
-    public ArrayList<String> getAccountInfo(String username) {
+    public ArrayList<String> getAccountInfo(int userID) {
         ArrayList<String> userInfo = new ArrayList<>();
-        Cursor cursor = database.query(DatabaseHelper.TABLE_USERS, new String[] { DatabaseHelper.COLUMN_NICKNAME, DatabaseHelper.COLUMN_PASSWORD }, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username }, null, null, null, null);
+        Cursor cursor = database.query(DatabaseHelper.TABLE_USERS, new String[] { DatabaseHelper.COLUMN_NICKNAME, DatabaseHelper.COLUMN_PASSWORD }, DatabaseHelper.COLUMN_USER + "=?", new String[] { String.valueOf(userID) }, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             userInfo.add(cursor.getString(0));
             userInfo.add(cursor.getString(1));
@@ -355,11 +365,11 @@ public class DataResource {
         return userInfo;
     }
 
-    public void updateAccountInfo(String username, String newNickname, String newPassword) {
+    public void updateAccountInfo(int userID, String newNickname, String newPassword) {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_NICKNAME, newNickname);
         values.put(DatabaseHelper.COLUMN_PASSWORD, newPassword);
-        database1.update(DatabaseHelper.TABLE_USERS, values, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username });
+        database1.update(DatabaseHelper.TABLE_USERS, values, DatabaseHelper.COLUMN_USER + "=?", new String[] { String.valueOf(userID) });
     }
 
     private void debug(String str) {

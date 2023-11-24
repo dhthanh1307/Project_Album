@@ -1,6 +1,7 @@
 package com.example.project_album;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class MyAlbumFragment extends Fragment {
     private boolean isaddtoalbum = false;
     private ShowImageInAlbumFragment showImageInAlbumFragment;
     public ArrayList<Album> albums = new ArrayList<>();
+    private boolean isInit = false;
     public MyAlbumFragment(){
         this.isaddtoalbum = false;
     }
@@ -47,6 +49,7 @@ public class MyAlbumFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        isInit = true;
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_my_album, container, false);
         tvBack = view.findViewById(R.id.tv_back);
@@ -99,7 +102,7 @@ public class MyAlbumFragment extends Fragment {
                     ft.commit();
                 }
                 else{
-                    showImageInAlbumFragment.AddToNewAlbum(albums.get(i).getName());
+                    showImageInAlbumFragment.AddToNewAlbum(albums.get(i).getId(),albums.get(i).getName());
                     closeFragment();
                 }
             }
@@ -135,7 +138,10 @@ public class MyAlbumFragment extends Fragment {
         gridViewAlbumAdapter.notifyDataSetChanged();
     }
     public void update(){
-        albums = AlbumLayout.albums;
-        gridViewAlbumAdapter.notifyDataSetChanged();
+        if(isInit) {
+            albums = AlbumLayout.albums;
+            gridViewAlbumAdapter.notifyDataSetChanged();
+        }
     }
+
 }

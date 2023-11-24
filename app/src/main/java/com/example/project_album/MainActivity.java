@@ -10,10 +10,12 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -36,7 +38,7 @@ public class MainActivity extends FragmentActivity {
     private byte[] wallpaperImage;
     public static int Width;
     public static int Height;
-    public static String username;
+    public static int userID;
     NavigationView navigationView;
     FragmentTransaction ft;
     AllLayout allLayout;
@@ -55,7 +57,7 @@ public class MainActivity extends FragmentActivity {
 
         Intent data = getIntent();
         Bundle bundle = data.getExtras();
-        username = bundle.getString("username");
+        userID = bundle.getInt("username");
 
 //        dataResource = new DataResource(this);
 //        dataResource.open();
@@ -217,4 +219,21 @@ public class MainActivity extends FragmentActivity {
     private void debug(String t){
         Log.e("MainActivity",t);
     }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+        {
+            Toast.makeText(this,"back",Toast.LENGTH_SHORT).show();
+            try {
+                albumLayout.update();
+            }
+            catch (Exception e){
+
+            }
+            //I have tried here true also
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 }

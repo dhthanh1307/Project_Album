@@ -14,6 +14,7 @@
         android:paddingTop="20dp"
         android:orientation="vertical">
     <TextView
+        android:id="@+id/tv_heading"
         android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

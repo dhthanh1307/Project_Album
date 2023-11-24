@@ -21,6 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_USER = "user";
 
     public static final String COLUMN_ID = "id";
+    public static final String COLUMN_ID_ALBUM = "id_album";
     public static final String COLUMN_IMAGE = "image";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_SIZE = "size";
@@ -41,8 +42,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_IS_FAVORITE = "is_favorite";
 
     // cac cau lenh tao bang
-    private static final String DATABASE_CREATE_USERS = "create table " + TABLE_USERS + "( " + COLUMN_USERNAME
-            + " text primary key, "
+    private static final String DATABASE_CREATE_USERS = "create table " + TABLE_USERS + "( "
+            + COLUMN_USER
+            + " integer primary key autoincrement, "
+            + COLUMN_USERNAME
+            + " text, "
             + COLUMN_PHONE
             + " text, "
             + COLUMN_EMAIL
@@ -74,8 +78,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + " text);";
 
     private static final String DATABASE_CREATE_ALBUM = "create table " + TABLE_ALBUM + "( "
-            + COLUMN_ID
+            + COLUMN_ID_ALBUM
             + " integer primary key autoincrement, "
+            + COLUMN_USER
+            + " integer, "
             + COLUMN_NAME_ALBUM
             + " text not null);";
     private static final String DATABASE_CREATE_ALBUM_IMAGE = "create table " +
@@ -84,8 +90,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + " integer primary key autoincrement, "
             + COLUMN_ID_IMAGE
             + " integer, "
-            + COLUMN_NAME_ALBUM
-            + " text not null);";
+            + COLUMN_ID_ALBUM
+            + " integer);";
     public File directory;
     public static String PATH;
 

@@ -10,6 +10,7 @@
         android:layout_height="200dp"
         android:id="@+id/img"
         android:src="@drawable/image_default"
+        android:foreground="@drawable/custom_album_image"
         android:background="@color/black_1"
         android:scaleType="centerCrop"/>
 

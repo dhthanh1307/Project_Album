@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -38,6 +39,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     private TextView tv_copy;
     private TextView tv_blind;
     private TextView tv_name;
+    private TextView tv_move;
     private Dialog dialog;
     public ShowImageInAlbumFragment(Album album){
         this.album = album;
@@ -60,6 +62,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         tv_copy = v_allInfo.findViewById(R.id.coppy);
         tv_blind = v_allInfo.findViewById(R.id.blind);
         tv_add_to_album.setOnClickListener(this);
+        tv_move = v_allInfo.findViewById(R.id.move);
         dialog = new Dialog(main);
         dialog.setContentView(v_allInfo);
         // finish view for all info dialog
@@ -73,6 +76,11 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
 
         tv_back_to_album.setOnClickListener(this);
         tv_choose.setOnClickListener(this);
+        tv_move.setOnClickListener(this);
+        tv_favorite.setOnClickListener(this);
+        tv_blind.setOnClickListener(this);
+        tv_delete.setOnClickListener(this);
+        tv_copy.setOnClickListener(this);
         tv_name = view.findViewById(R.id.tv_name);
         tv_name.setText(album.getName());
         recyclerView.setAdapter(image_adapter);
@@ -131,7 +139,32 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         }
         else if (view.getId() == tv_add_to_album.getId()){
             dialog.cancel();
+            Toast.makeText(main,"Đã thêm vào album",Toast.LENGTH_SHORT).show();
+        }
+        else if(view.getId() == tv_move.getId()){
+            dialog.cancel();
             AddToAlbum();
+        }
+        else if (view.getId() == tv_copy.getId()){
+            dialog.cancel();
+        }
+        else if (view.getId() == tv_blind.getId()){
+            dialog.cancel();
+            Toast.makeText(main,"Đã ẩn hình ảnh",Toast.LENGTH_SHORT).show();
+        }
+        else if (view.getId() == tv_delete.getId()){
+            dialog.cancel();
+            Toast.makeText(main,"Đã xóa hình ảnh",Toast.LENGTH_SHORT).show();
+        }
+        else if (view.getId() == tv_favorite.getId()){
+            dialog.cancel();
+            if (album.getName().equals("Mục yêu thích")){
+                Toast.makeText(main,"Đã bỏ yêu thích",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                updateFavorite(image_adapter.image_chosen);
+                Toast.makeText(main,"Đã thêm vào mục yêu thích",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -153,13 +186,13 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
         dialog.show();
     }
-    public void AddToNewAlbum(String name){
+    public void AddToNewAlbum(long idAlbum,String name){
         ArrayList<Image> imgs = new ArrayList<>();
         imgs.addAll(image_adapter.image_chosen);
         for(int j =2;j<AlbumLayout.albums.size();j++){
             if (AlbumLayout.albums.get(j).getName().equals(album.getName())){
                 for(int i = 0;i<imgs.size();i++) {
-                    MainActivity.dataResource.deleteImageInAlbum(imgs.get(i),album.getName());
+                    MainActivity.dataResource.deleteImageInAlbum(imgs.get(i),album.getId());
                     AlbumLayout.albums.get(j).removeImage(imgs.get(i));
                 }
                 album = AlbumLayout.albums.get(j);
@@ -170,7 +203,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         for(int j =1;j<AlbumLayout.albums.size();j++){
             if (AlbumLayout.albums.get(j).getName().equals(name)){
                 for(int i = 0;i<imgs.size();i++) {
-                    MainActivity.dataResource.InsertAlbumImage(name,imgs.get(i).getId());
+                    MainActivity.dataResource.InsertAlbumImage(idAlbum,imgs.get(i).getId());
                     AlbumLayout.albums.get(j).addImage(imgs.get(i));
                 }
                 break;
@@ -184,6 +217,15 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         tv_choose.setText("Chọn");
         image_adapter.notifyDataSetChanged();
         main.albumLayout.update();
+    }
+
+    private void updateFavorite(ArrayList<Image> imgs){
+        for(int i = 0;i<imgs.size();i++){
+            if(imgs.get(i).getFavorite().equals("F")){
+                main.albumLayout.updateFavorite(imgs.get(i));
+                MainActivity.dataResource.likeImage(imgs.get(i).getId());
+            }
+        }
     }
 
 }

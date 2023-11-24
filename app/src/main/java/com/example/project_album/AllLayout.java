@@ -198,24 +198,6 @@ public class AllLayout extends Fragment {
         recyclerView.scrollToPosition(copiedImages.size() - 1);
 
 
-        //Khi click vào ảnh bất kì
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                for (int i1 = 0; i1 < AllLayout.images.size(); i1++) {
-//                    Log.e("fix loi1","anh ="+String.valueOf(AllLayout.images.get(i1).getId()));
-//                }
-//                showBigScreen(i);
-//            }
-//        });
-//        SetGridViewItemLongClick();
-//        gridView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-//            @Override
-//            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-////                debug("scroll");
-////                adapter.notifyDataSetChanged();
-//            }
-//        });
 
         spinner = view.findViewById(R.id.spinner);
         initSpinerView();
