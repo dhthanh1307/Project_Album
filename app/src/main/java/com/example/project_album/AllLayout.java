@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 
 import android.hardware.Camera;
@@ -47,17 +48,23 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 
 public class AllLayout extends Fragment {
@@ -99,6 +106,12 @@ public class AllLayout extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
     FloatingActionButton btnAddCamera;
+
+    //Zip
+    Button btnOkZip,btnCancelZip;
+    TextView txtTitleZip,txtDetailZip;
+    EditText edtNameZip;
+    //Xong zip
     public AllLayout() {
         debug("constructor");
         //images = MainActivity.dataResource.getAllImage();
@@ -179,6 +192,15 @@ public class AllLayout extends Fragment {
         tv_info = view.findViewById(R.id.tv_info);
         tv_choose = view.findViewById(R.id.tv_choose);
         btn_extend = view.findViewById(R.id.btn_many);
+        btn_extend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Chỗ này đang thử cho unzip sau Huy thêm dialog mới dô sau đó đổi là được
+                Toast.makeText(main, "UnZip", Toast.LENGTH_SHORT).show();
+                doUnzipImage();
+            }
+        });
+
         EventViewHeader();
         //finish
 
@@ -231,6 +253,24 @@ public class AllLayout extends Fragment {
                 ft.add(R.id.replace_fragment_layout,fragment);
                 ft.addToBackStack(fragment.getClass().getSimpleName());
                 ft.commit();
+                dialog.dismiss();
+                adapter.resetChooseSelection();
+                tv_choose.callOnClick();
+            }
+        });
+
+        tv_zip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for(int i=0;i<copiedImages.size();i++){
+                    Log.e("pathImage","Path="+copiedImages.get(i).getPath());
+                }
+                Toast.makeText(main, "Zip", Toast.LENGTH_SHORT).show();
+                ArrayList<String> folder=new ArrayList<>();
+                for (int i=0;i<adapter.image_chosen.size();i++){
+                    folder.add(adapter.image_chosen.get(i).getPath());
+                }
+                doZipImage(folder);
                 dialog.dismiss();
                 adapter.resetChooseSelection();
                 tv_choose.callOnClick();
@@ -457,4 +497,212 @@ public class AllLayout extends Fragment {
         }
         return b;
     }
+    //=================== Quá trình zip =======================
+    public void doZipImage(ArrayList<String> folder){
+        Dialog mDialog=new Dialog(main);
+        mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mDialog.setContentView(R.layout.dialog_zip);
+        txtTitleZip=mDialog.findViewById(R.id.txt_title_zip);
+        txtDetailZip=mDialog.findViewById(R.id.txt_detail_zip);
+        edtNameZip=mDialog.findViewById(R.id.edt_name_zip);
+        btnOkZip=mDialog.findViewById(R.id.btn_ok_zip);
+        btnCancelZip=mDialog.findViewById(R.id.btn_cancel_zip);
+        btnCancelZip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDialog.dismiss();
+            }
+        });
+        btnOkZip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (edtNameZip.getText().toString().length()==0){
+                    Toast.makeText(main, "Nhập tên file zip", Toast.LENGTH_SHORT).show();
+                }else{
+                    for (int i=0;i<folder.size();i++){
+                        Log.e("Path_file","Loi*" +folder.get(i));
+                    }
+                    //Lấy đường dẫn thử mục Document
+                    File externalDir = Environment.getExternalStorageDirectory();
+                    String parentDirPath = externalDir.getPath() + "/Documents";
+                    //Tạo thư mục ImageZips nếu chưa có
+                    Log.e("ABC",parentDirPath);
+                    File dir = new File(parentDirPath, "ImageZips");
+                    if (!dir.exists()) {
+                        dir.mkdir();
+                    }
+                    ArrayList<String> fileList = getListOfFilesInDirectory(dir.getPath());
+                    if (fileList.contains(edtNameZip.getText().toString())){
+                        Toast.makeText(main, "Ten file da ton tai", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    //Lâ đường dẫn tên file cần zip
+                    Log.e("Loi", "Loi" + dir.getPath() + "   " + dir.getName());
+                    String fileNameZip = dir.getPath() + "/" + edtNameZip.getText().toString();
+                    try {
+                        zip(folder,fileNameZip);
+                        Toast.makeText(main, "Zip thành công", Toast.LENGTH_SHORT).show();
+                        mDialog.dismiss();
+                    } catch (IOException e) {
+                        Toast.makeText(main, "Zip lỗi", Toast.LENGTH_SHORT).show();
+                        mDialog.dismiss();
+                        Log.e("Path_file","Loi roi nhe");
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        mDialog.show();
+    }
+    public void zip(ArrayList<String> folder, String fileNameZip) throws IOException {
+        BufferedInputStream origin = null;
+        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileNameZip)));
+        try {
+            int BUFFER_SIZE = 1024;//đơn vị là byte// mỗi lần nó ghi là 4096 byte vào
+            byte data[] = new byte[BUFFER_SIZE];
+            for (int i = 0; i < folder.size(); i++) {
+                FileInputStream fi = new FileInputStream(folder.get(i));
+                origin = new BufferedInputStream(fi, BUFFER_SIZE);
+                try {
+                    ZipEntry entry = new ZipEntry(folder.get(i).substring(folder.get(i).lastIndexOf("/") + 1));
+                    out.putNextEntry(entry);
+                    int count;
+                    while ((count = origin.read(data, 0, BUFFER_SIZE)) != -1) {
+                        out.write(data, 0, count);
+                    }
+                } finally {
+                    origin.close();
+                }
+            }
+        } finally {
+            out.close();
+        }
+    }
+
+    //===================Kết thúc zip=======================
+
+
+
+    //=================== Quá trình unzip =======================
+    // list ds đã zip bên trong thư mục ImagesZip
+    public ArrayList<String> getListOfFilesInDirectory(String directoryPath) {
+        ArrayList<String> fileList = new ArrayList<>();
+        File directory = new File(directoryPath);
+
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        fileList.add(file.getName());
+                    }
+                }
+            }
+        } else {
+            Log.e("Loi","Thư mục không tồn tại hoặc không phải là thư mục.");
+        }
+
+        return fileList;
+    }
+    public  void doUnzipImage(){
+        Dialog mDialog=new Dialog(main);
+        mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mDialog.setContentView(R.layout.dialog_zip);
+        txtTitleZip=mDialog.findViewById(R.id.txt_title_zip);
+        txtDetailZip=mDialog.findViewById(R.id.txt_detail_zip);
+        edtNameZip=mDialog.findViewById(R.id.edt_name_zip);
+        btnOkZip=mDialog.findViewById(R.id.btn_ok_zip);
+        btnCancelZip=mDialog.findViewById(R.id.btn_cancel_zip);
+
+        txtTitleZip.setText("Unzip");
+        txtDetailZip.setText("Sau khi unzip tệp sẽ hiển thị ở theo đường dẫn \n Documents/ImageUnZips/TênFileZip");
+        edtNameZip.setHint("Nhập tên file cần unzip trong thư mục Documents/ImagesZips");
+        btnCancelZip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDialog.dismiss();
+            }
+        });
+        btnOkZip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (edtNameZip.getText().toString().length()==0){
+                    Toast.makeText(main, "Nhập tên file cần unzip", Toast.LENGTH_SHORT).show();
+                }else{
+                    //Lấy đường dẫn Zip truyền vào để UnZip
+                    File externalDir1 = Environment.getExternalStorageDirectory();
+                    String parentDirPath1 = externalDir1.getPath() + "/Documents/ImageZips";
+                    String zipFile=parentDirPath1+"/"+edtNameZip.getText().toString();
+                    ArrayList<String> fileList = getListOfFilesInDirectory(parentDirPath1);
+                    if (!fileList.contains(edtNameZip.getText().toString())){
+                        Toast.makeText(main, "Không tồn tại file đã zip", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    //Tạo thư mục UnZips
+                    File externalDir = Environment.getExternalStorageDirectory();
+                    String parentDirPath = externalDir.getPath() + "/Documents";
+                    File dir = new File(parentDirPath, "ImageUnZips");
+                    if (!dir.exists()) {
+                        dir.mkdir();
+                    }
+                    //Tạo thư mục chứa ảnh UnZip
+                    File dirChildNameZip=new File(dir, edtNameZip.getText().toString());
+                    if (!dirChildNameZip.exists()) {
+                        dirChildNameZip.mkdir();
+                    }
+
+                    try {
+                        unzip(zipFile,dirChildNameZip.getPath());
+                        Toast.makeText(main, "UnZip thành công", Toast.LENGTH_SHORT).show();
+                        mDialog.dismiss();
+                    } catch (IOException e) {
+                        Toast.makeText(main, "UnZip Lỗi", Toast.LENGTH_SHORT).show();
+                        mDialog.dismiss();
+                        throw new RuntimeException(e);
+                    }
+
+                }
+            }
+        });
+        mDialog.show();
+    }
+
+    public void unzip(String zipFile, String location) throws IOException {
+        int size;
+        byte[] buffer = new byte[1024];
+
+        try {
+            if (!location.endsWith("/")) {
+                location += "/";
+            }
+            File f = new File(location);
+            if (!f.isDirectory()) {
+                f.mkdirs();
+            }
+            FileInputStream fin = new FileInputStream(zipFile);
+            ZipInputStream zin = new ZipInputStream(fin);
+            ZipEntry ze;//này kiểu từng hình ảnh trong file zip
+
+            while ((ze = zin.getNextEntry()) != null) {
+                if (!ze.isDirectory()) {
+                    String fileName = ze.getName();
+                    File newFile = new File(location + fileName);
+                    FileOutputStream fout = new FileOutputStream(newFile);
+
+                    while ((size = zin.read(buffer, 0, buffer.length)) != -1) {
+                        fout.write(buffer, 0, size);
+                    }
+                    zin.closeEntry();
+                    fout.close();
+                }
+            }
+            zin.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //=======================Kết thúc unzip
+
 }
