@@ -16,6 +16,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_image_in_album"
             android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="10dp"
             app:spanCount="3"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             android:layout_width="match_parent"
