@@ -69,30 +69,32 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 //Khi test
-                String username = inputUsername.getText().toString();
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                intent.putExtra("username", username);
-                startActivity(intent);
-                main.finish();
+//                String username = inputUsername.getText().toString();
+//                Intent intent = new Intent(getActivity(), MainActivity.class);
+//                intent.putExtra("username", username);
+//                startActivity(intent);
+//                main.finish();
                 //Khi sử dụng thật xóa 4 dòng trên, bỏ comment các dòng dưới này
-//                if (inputUsername.getText().toString().length() == 0) {
-//                    Toast.makeText(main, "Tên đăng nhập không thể để trống", Toast.LENGTH_SHORT).show();
-//                }
-//                else if (inputPassword.getText().toString().length() == 0) {
-//                    Toast.makeText(main, "Mật khẩu không thể để trống", Toast.LENGTH_SHORT).show();
-//                }
-//                else {
-//                    String username = inputUsername.getText().toString();
-//                    String password = inputPassword.getText().toString();
-//                    if (MainActivity.dataResource.checkLogin(username, password) == true) {
-//                        Intent intent = new Intent(getActivity(), MainActivity.class);
-//                        intent.putExtra("username", username);
-//                        startActivity(intent);
-//                    }
-//                    else {
-//                        Toast.makeText(main, "Tên đăng nhập hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
+                if (inputUsername.getText().toString().length() == 0) {
+                    Toast.makeText(main, "Tên đăng nhập không thể để trống", Toast.LENGTH_SHORT).show();
+                }
+                else if (inputPassword.getText().toString().length() == 0) {
+                    Toast.makeText(main, "Mật khẩu không thể để trống", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    String username = inputUsername.getText().toString();
+                    String password = inputPassword.getText().toString();
+                    Integer userID = MainActivity.dataResource.checkLogin(username, password);
+                    if (userID != -1) {
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.putExtra("userID", userID);
+                        startActivity(intent);
+                        main.finish();
+                    }
+                    else {
+                        Toast.makeText(main, "Tên đăng nhập hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
         return view;

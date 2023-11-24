@@ -303,18 +303,24 @@ public class DataResource {
         return cursor.getCount();
     }
 
-    public boolean checkLogin(String username, String password) {
+    public int checkLogin(String username, String password) {
         Cursor cursor = database.query(DatabaseHelper.TABLE_USERS,
-                new String[]{DatabaseHelper.COLUMN_USERNAME},
+                new String[]{DatabaseHelper.COLUMN_USER},
                 DatabaseHelper.COLUMN_USERNAME + "=? AND " + DatabaseHelper.COLUMN_PASSWORD + "=?",
                 new String[]{username, password},
                 null, null, null);
         int cursorCount = cursor.getCount();
-        cursor.close();
         if (cursorCount > 0) {
-            return true;
+            cursor.moveToFirst();
+            int userIDColumnIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_USER);
+            if (userIDColumnIndex != -1) {
+                int userID = cursor.getInt(userIDColumnIndex);
+                cursor.close();
+                return userID;
+            }
         }
-        return false;
+        cursor.close();
+        return -1;
     }
 
     public boolean checkSignUp(String name) {
@@ -328,9 +334,9 @@ public class DataResource {
         return false;
     }
 
-    public ArrayList<String> getAccountInfo(String username) {
+    public ArrayList<String> getAccountInfo(int userID) {
         ArrayList<String> userInfo = new ArrayList<>();
-        Cursor cursor = database.query(DatabaseHelper.TABLE_USERS, new String[] { DatabaseHelper.COLUMN_NICKNAME, DatabaseHelper.COLUMN_PASSWORD }, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username }, null, null, null, null);
+        Cursor cursor = database.query(DatabaseHelper.TABLE_USERS, new String[] { DatabaseHelper.COLUMN_NICKNAME, DatabaseHelper.COLUMN_PASSWORD }, DatabaseHelper.COLUMN_USER + "=?", new String[] { String.valueOf(userID) }, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             userInfo.add(cursor.getString(0));
             userInfo.add(cursor.getString(1));
@@ -339,12 +345,30 @@ public class DataResource {
         return userInfo;
     }
 
-    public void updateAccountInfo(String username, String newNickname, String newPassword) {
+    public void updateAccountInfo(int userID, String newNickname, String newPassword) {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_NICKNAME, newNickname);
         values.put(DatabaseHelper.COLUMN_PASSWORD, newPassword);
-        database1.update(DatabaseHelper.TABLE_USERS, values, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username });
+        database1.update(DatabaseHelper.TABLE_USERS, values, DatabaseHelper.COLUMN_USER + "=?", new String[] { String.valueOf(userID) });
     }
+
+//    public ArrayList<String> getAccountInfo(String username) {
+//        ArrayList<String> userInfo = new ArrayList<>();
+//        Cursor cursor = database.query(DatabaseHelper.TABLE_USERS, new String[] { DatabaseHelper.COLUMN_NICKNAME, DatabaseHelper.COLUMN_PASSWORD }, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username }, null, null, null, null);
+//        if (cursor != null && cursor.moveToFirst()) {
+//            userInfo.add(cursor.getString(0));
+//            userInfo.add(cursor.getString(1));
+//            cursor.close();
+//        }
+//        return userInfo;
+//    }
+//
+//    public void updateAccountInfo(String username, String newNickname, String newPassword) {
+//        ContentValues values = new ContentValues();
+//        values.put(DatabaseHelper.COLUMN_NICKNAME, newNickname);
+//        values.put(DatabaseHelper.COLUMN_PASSWORD, newPassword);
+//        database1.update(DatabaseHelper.TABLE_USERS, values, DatabaseHelper.COLUMN_USERNAME + "=?", new String[] { username });
+//    }
 
     private void debug(String str) {
         Log.e("DataResource", str);

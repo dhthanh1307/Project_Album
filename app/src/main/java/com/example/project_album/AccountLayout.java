@@ -60,7 +60,7 @@ public class AccountLayout extends Fragment {
         btnSaveChange = view.findViewById(R.id.btnEditAccount);
         btnLogout = view.findViewById(R.id.btnLogout);
 
-        accountInfo = MainActivity.dataResource.getAccountInfo(MainActivity.username);
+        accountInfo = MainActivity.dataResource.getAccountInfo(MainActivity.userID);
 
         editNickname.setText(accountInfo.get(0));
         editPassword.setText("");
@@ -87,9 +87,10 @@ public class AccountLayout extends Fragment {
                             if (newPassword.length() == 0) {
                                 newPassword = accountInfo.get(1);
                             }
-                            MainActivity.dataResource.updateAccountInfo(MainActivity.username, newNickname, newPassword);
-                            accountInfo = MainActivity.dataResource.getAccountInfo(MainActivity.username);
+                            MainActivity.dataResource.updateAccountInfo(MainActivity.userID, newNickname, newPassword);
+                            accountInfo = MainActivity.dataResource.getAccountInfo(MainActivity.userID);
                             editPassword.setText(accountInfo.get(1));
+                            editPassword.setText("");
                             editNewPassword.setText("");
                             editRetypeNewPassword.setText("");
                             Toast.makeText(main, "Update successfully!", Toast.LENGTH_SHORT).show();

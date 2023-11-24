@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.content.Intent;
@@ -32,7 +33,7 @@ public class MainActivity extends FragmentActivity {
     private byte[] wallpaperImage;
     public static int Width;
     public static int Height;
-    public static String username;
+    public static int userID;
     NavigationView navigationView;
     FragmentTransaction ft;
     AllLayout allLayout;
@@ -50,7 +51,8 @@ public class MainActivity extends FragmentActivity {
 
         Intent data = getIntent();
         Bundle bundle = data.getExtras();
-        username = bundle.getString("username");
+        userID = bundle.getInt("userID");
+        Log.e("userID", Integer.toString(userID));
 
 //        dataResource = new DataResource(this);
 //        dataResource.open();

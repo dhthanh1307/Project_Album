@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +44,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -158,11 +161,46 @@ public class AllLayout extends Fragment {
                     return;
                 }
                 startCamera();
+//                int count = 0;
+//                int temp1 = 0;
+//                int temp2 = 0;
+//                for (int i = images.size() - 1; i >= images.size() - 15; i--) {
+//                    temp1++;
+//                    if (images.get(i).getDeleted().equals("T")) {
+//                        continue;
+//                    }
+//                    for (int j = i - 1; j >= images.size() - 15; j--) {
+//                        temp2++;
+//                        if (images.get(j).getDeleted().equals("T")) {
+//                            continue;
+//                        }
+//                        if (compareBitmap(images.get(i).getImgBitmap(),images.get(j).getImgBitmap())) {
+//                            images.get(j).setDeleted("T");
+//                            count++;
+//                        }
+//                    }
+//                    Log.e("Temp 2", Integer.toString(temp2));
+//                }
+//                Log.e("Temp 1", Integer.toString(temp1));
+//                Toast.makeText(main, "Found " + count + " duplicate image(s)", Toast.LENGTH_SHORT).show();
             }
         });
 
-
         return view;
+    }
+
+    private boolean compareBitmap(Bitmap b1, Bitmap b2) {
+        if (b1.getWidth() == b2.getWidth() && b1.getHeight() == b2.getHeight()) {
+            int[] pixels1 = new int[b1.getWidth() * b1.getHeight()];
+            int[] pixels2 = new int[b2.getWidth() * b2.getHeight()];
+
+            b1.getPixels(pixels1, 0, b1.getWidth(), 0, 0, b1.getWidth(), b1.getHeight());
+            b2.getPixels(pixels2, 0, b2.getWidth(), 0, 0, b2.getWidth(), b2.getHeight());
+
+            return Arrays.equals(pixels1, pixels2);
+        } else {
+            return false;
+        }
     }
 
     private void SetGridViewItemLongClick() {

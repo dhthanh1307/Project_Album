@@ -40,8 +40,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // cac cau lenh tao bang
-    private static final String DATABASE_CREATE_USERS = "create table " + TABLE_USERS + "( " + COLUMN_USERNAME
-            + " text primary key, "
+    private static final String DATABASE_CREATE_USERS = "create table " + TABLE_USERS + "( " + COLUMN_USER
+            + " integer primary key autoincrement, "
+            + COLUMN_USERNAME
+            + " text, "
             + COLUMN_PHONE
             + " text, "
             + COLUMN_EMAIL
