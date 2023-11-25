@@ -325,6 +325,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 main.albumLayout.updateFavorite(images.get(index));
+                main.favoriteLayout.updateFavorite(images.get(index));
                 if (images.get(index).getFavorite().equals("T")){
                     images.get(index).setFavorite("F");
                     txtFavorite.setImageResource(R.drawable.icon_favorite_in_alllayout);

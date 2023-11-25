@@ -31,9 +31,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity {
     public static DataResource dataResource;
+    public static ArrayList<Image> images = new ArrayList<>();
     private WallpaperManager wallpaperManager;
     private byte[] wallpaperImage;
     public static int Width;
@@ -52,9 +55,14 @@ public class MainActivity extends FragmentActivity {
     int id_item=R.id.action_all_picture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e("MainActivity","onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ver2);
 
+        if(images.get(0).getImgBitmap() == null) {
+            Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
+            myBackgroundThread.start();
+        }
         Intent data = getIntent();
         Bundle bundle = data.getExtras();
         userID = bundle.getInt("username");
@@ -235,5 +243,23 @@ public class MainActivity extends FragmentActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+    private Runnable image_bitmap_backgroundTask = new Runnable() {
+        @Override
+        public void run() { // busy work goes here...
+            try {
+                for(int i = images.size() -16;i >=0;i--) {
+                    Thread.sleep(1);
+                    images.get(i).setImgBitmap(
+                            getImageFromPath(images.get(i).getPath()));
+                    debug(String.valueOf(i));
+//                    allLayout.update();
+//                    favoriteLayout.update();
+//                    trashCanLayout.update();
+                }
+                //adapter.notifyDataSetChanged();
+            }
+            catch (InterruptedException e) { }
+        }
+    };
 
 }

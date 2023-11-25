@@ -67,23 +67,23 @@ public class TrashCanLayout extends Fragment {
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
-            if (images.size() == 0) {// cần if chỗ này để xử lí ấn từ all->trash->all->trash
-                // Đọc dữ liệu thì đã có bên Allayout đọc rồi
-                //Không cần đọc lại, chỉ cần lấy ra những biến là "T" thôi
-
-                for (int i = 0; i < AllLayout.images.size(); i++) {
-                    if (AllLayout.images.get(i).getDeleted().equals("T")) {
-                        images.add(AllLayout.images.get(i));
-                        Log.e("TrashCanLayout", String.valueOf(i));
-                    }
-                }
-            } else {
-                Log.e("Day la loi", "-------------ELSE------------");
-                for (int i = 0; i < images.size(); i++) {
-                    Log.e("Day la loi", "ID Anh=" + String.valueOf(images.get(i).getId()));
-                }
-
-            }
+//            if (images.size() == 0) {// cần if chỗ này để xử lí ấn từ all->trash->all->trash
+//                // Đọc dữ liệu thì đã có bên Allayout đọc rồi
+//                //Không cần đọc lại, chỉ cần lấy ra những biến là "T" thôi
+//
+////                for (int i = 0; i < AllLayout.images.size(); i++) {
+////                    if (AllLayout.images.get(i).getDeleted().equals("T")) {
+////                        images.add(AllLayout.images.get(i));
+////                        Log.e("TrashCanLayout", String.valueOf(i));
+////                    }
+////                }
+//            } else {
+//                Log.e("Day la loi", "-------------ELSE------------");
+//                for (int i = 0; i < images.size(); i++) {
+//                    Log.e("Day la loi", "ID Anh=" + String.valueOf(images.get(i).getId()));
+//                }
+//
+//            }
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -253,6 +253,13 @@ public class TrashCanLayout extends Fragment {
             mGridView.setLayoutManager(new GridLayoutManager(getContext(),3));
         }
     }
+    public void update(){
+        try {
+            mGridAdapter.notifyDataSetChanged();
+        }
+        catch(Exception e){
 
+        }
+    }
 
 }

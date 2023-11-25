@@ -79,13 +79,12 @@ public class FavoriteLayout extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         //Khởi tạo lại danh sách ưa thích
-        images.clear();
-        for (int i = 0; i < AllLayout.images.size(); i++) {
-            if (AllLayout.images.get(i).getFavorite().equals("T")) {
-                Log.e("fix loi","anh ="+String.valueOf(AllLayout.images.get(i).getId()));
-                images.add(AllLayout.images.get(i));
-            }
-        }
+//        for (int i = 0; i < AllLayout.images.size(); i++) {
+//            if (AllLayout.images.get(i).getFavorite().equals("T")) {
+//                Log.e("fix loi","anh ="+String.valueOf(AllLayout.images.get(i).getId()));
+//                images.add(AllLayout.images.get(i));
+//            }
+//        }
         Log.e("DEBUG", "onCreateView of TrashCan");
         View mView = inflater.inflate(R.layout.fragment_favorite_layout, container, false);
         mGridView = mView.findViewById(R.id.grid_view_favorite);
@@ -265,6 +264,26 @@ public class FavoriteLayout extends Fragment {
             mGridView.setLayoutManager(new GridLayoutManager(getContext(),3));
         }
     }
+    public void update(){
+        try {
+            mGridAdapter.notifyDataSetChanged();
+        }
+        catch(Exception e){
 
-
+        }
+    }
+    public void updateFavorite(Image img){
+        if (img.getFavorite().equals("F")) {
+            images.add(img);
+        } else {
+            images.remove(img);
+        }
+    }
+    public void updateArrayFavorite(ArrayList<Image> imgs){
+        for(int i = 0;i<imgs.size();i++){
+            if (imgs.get(i).getFavorite().equals("F")){
+                images.add(imgs.get(i));
+            }
+        }
+    }
 }

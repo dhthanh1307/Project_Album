@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.FragmentActivity;
 
+import android.os.Trace;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,7 +100,7 @@ public class LoginFragment extends Fragment {
 //                        intent.putExtra("username", username);
 //                        startActivity(intent);
                         //doc database
-                        AllLayout.images = MainActivity.dataResource.getAllImage(userID);
+                        MainActivity.images = MainActivity.dataResource.getAllImage(userID);
                         initDataResource();
                     }
                     else {
@@ -119,7 +120,7 @@ public class LoginFragment extends Fragment {
         Thread my = new Thread(new Runnable() {
             @Override
             public void run() {
-                if (AllLayout.images.size() == 0) {
+                if (MainActivity.images.size() == 0) {
                     Log.e("LoginFragment","init All images");
                     ArrayList<String> links = Link.AllLinks();
                     ArrayList<Bitmap> bitmaps = new ArrayList<>();
@@ -136,15 +137,16 @@ public class LoginFragment extends Fragment {
                     }
                     for (int j = 0; j < 3; j++) {
                         for (int i = 0; i < bitmaps.size(); i++) {
-                            AllLayout.images.add(new Image(bitmaps.get(i), GenerateName()));
-                            AllLayout.images.get(i).setId(MainActivity.dataResource.
-                                    InsertImage(AllLayout.images.get(i), userID));
-                            //images.get(j*6+i).setImgBitmap(main.ChangeImageToBitmap(img[i]));
-                            //debug(String.valueOf(j*6+i));
+                            MainActivity.images.add(new Image(bitmaps.get(i), GenerateName()));
+                            MainActivity.images.get(i).setId(MainActivity.dataResource.
+                                    InsertImage(MainActivity.images.get(i), userID));
                         }
                     }
+                    getImageForLayouts();
                 }
                 else{
+                    getImageForLayouts();
+                    //Change path to bitmap
                     for (int i = AllLayout.images.size() - 1; i >= AllLayout.images.size()
                             - 15 && i >=0; i--) {
                         if(AllLayout.images.get(i).getImgBitmap() == null)
@@ -181,5 +183,22 @@ public class LoginFragment extends Fragment {
             e.printStackTrace();
         }
         return b;
+    }
+    private void getImageForLayouts(){
+        for (int i = 0;i<MainActivity.images.size();i++){
+            if(MainActivity.images.get(i).getDeleted().equals("F")){
+                AllLayout.images.add(MainActivity.images.get(i));
+                if(MainActivity.images.get(i).getFavorite().equals("T")){
+                    FavoriteLayout.images.add(MainActivity.images.get(i));
+                }
+            }
+            else{
+                TrashCanLayout.images.add(MainActivity.images.get(i));
+            }
+        }
+        Log.e("LoginFragment","AllLayout: "+String.valueOf(AllLayout
+                .images.size())
+        +", FavoriteLayout: "+String.valueOf(FavoriteLayout.images.size())
+        +", TrashCanLayout: "+String.valueOf(TrashCanLayout.images.size()));
     }
 }

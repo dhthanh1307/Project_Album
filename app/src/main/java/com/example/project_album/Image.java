@@ -19,6 +19,7 @@ public class Image {
     private String is_deleted;
     private String is_favorite;
     private Bitmap imgBitmap;
+    private String is_hide;
     public Image(){
         imgBitmap = null;
     }
@@ -37,6 +38,7 @@ public class Image {
         this.imgBitmap = imgbitmap;
         this.is_deleted="F";
         this.is_favorite="F";
+        this.is_hide = "F";
     }
 
 

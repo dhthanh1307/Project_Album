@@ -23,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -79,6 +81,7 @@ public class AllLayout extends Fragment {
     private TextView tv_slider;
     private TextView tv_zip;
     private View v_allInfo;
+    private boolean clicked = false;
 
 
     //finish
@@ -95,8 +98,14 @@ public class AllLayout extends Fragment {
     private TextView tv_bottom;
     MainActivity main;
     Context context = null;
-    public static ArrayList<Image> images= new ArrayList<Image>();
-    private ArrayList<Image> copiedImages = new ArrayList<Image>();
+
+    //khai báo của TA
+    FloatingActionButton btnAddPicture, btnAddCamera, btnAddUrl;
+    private Animation rotateOpen;
+    private Animation rotateClose;
+    private Animation fromBottom;
+    private Animation toBottom;
+    public static ArrayList<Image> images = new ArrayList<>();
 //    ImageAdapter adapter;
     //GridView gridView;
     ShowImageInAllAdapter adapter;
@@ -105,7 +114,6 @@ public class AllLayout extends Fragment {
     ArrayAdapter<String> spinnerAdapter;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
-    FloatingActionButton btnAddCamera;
 
     //Zip
     Button btnOkZip,btnCancelZip;
@@ -113,23 +121,10 @@ public class AllLayout extends Fragment {
     EditText edtNameZip;
     //Xong zip
     public AllLayout() {
-        debug("constructor");
+        debug("constructor, images.count = "+String.valueOf(images.size()));
         //images = MainActivity.dataResource.getAllImage();
-        if(images.get(0).getImgBitmap() == null) {
-//            for (int i = images.size() - 1; i >= images.size() - 15 && i >=0; i--) {
-//                debug(String.valueOf(i));
-//                if(images.get(i).getImgBitmap() == null)
-//                    images.get(i).setImgBitmap(getImageFromPath
-//                            (images.get(i).getPath()));
-//            }
-            Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
-            myBackgroundThread.start();
-        }
     }
 
-    public AllLayout(ArrayList<Image> imgs) {
-        this.images = imgs;
-    }
     public static AllLayout newInstance(String strArg) {
         AllLayout fragment = new AllLayout();
         Bundle args = new Bundle();
@@ -141,7 +136,7 @@ public class AllLayout extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        debug("onCreate");
+        debug("onCreate, images.size = "+String.valueOf(MainActivity.images.size()));
         super.onCreate(savedInstanceState);
         try {
             context = getActivity();
@@ -156,13 +151,15 @@ public class AllLayout extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        debug("onResume");
+        debug("onResume"+String.valueOf(images.size()));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         debug("onCreateView");
+        // Inflate the layout for this fragment
+        View view=inflater.inflate(R.layout.fragment_all_layout, container, false);
 
         // view for all info dialog
         v_allInfo = main.getLayoutInflater().inflate(R.layout.all_info_alllayout, null);
@@ -175,65 +172,47 @@ public class AllLayout extends Fragment {
         dialog = new Dialog(main);
         dialog.setContentView(v_allInfo);
         EventViewDialog();
-        // finish view for all info dialog
-
-        for (int i1 = 0; i1 < AllLayout.images.size(); i1++) {
-            Log.e("fix loi","anh ="+String.valueOf(AllLayout.images.get(i1).getId()));
-        }
-        // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_all_layout, container, false);
-
-        if (copiedImages.size() == 0) {
-            copiedImages.addAll(images);
-        }
-
+        // finish view for all info dialog======================================
 
         //view header
         tv_info = view.findViewById(R.id.tv_info);
         tv_choose = view.findViewById(R.id.tv_choose);
         btn_extend = view.findViewById(R.id.btn_many);
-        btn_extend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Chỗ này đang thử cho unzip sau Huy thêm dialog mới dô sau đó đổi là được
-                Toast.makeText(main, "UnZip", Toast.LENGTH_SHORT).show();
-                doUnzipImage();
-            }
-        });
 
         EventViewHeader();
-        //finish
+        //finish===================================================
 
         //view footer
         img_all_info = main.bottom_navigation_album.findViewById(R.id.img_all_info);
         tv_numSelect = main.bottom_navigation_album.findViewById(R.id.tv1);
         EventViewFooter();
-        //finish
-        debug(String.valueOf(copiedImages.size()));
+        //finish====================================================
 
+        //view TA ==============================================
+        rotateOpen = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_open_anim);
+        rotateClose = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_close_anim);
+        fromBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.from_bottom_anim);
+        toBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.to_bottom_anim);
+
+        btnAddPicture = view.findViewById(R.id.btn_add_Picture);
+        btnAddCamera = view.findViewById(R.id.btn_add_Camera);
+        btnAddUrl = view.findViewById(R.id.btn_add_Url);
+        EventViewAddPicture();
+
+
+        //finish=====================================================
         tv_bottom = view.findViewById(R.id.tv_bottom);
-        tv_bottom.setText(String.valueOf(copiedImages.size()) + " ảnh");
-        adapter=new ShowImageInAllAdapter(main,R.layout.item_image,copiedImages);
+        tv_bottom.setText(String.valueOf(images.size()) + " ảnh");
+        adapter=new ShowImageInAllAdapter(main,R.layout.item_image,images);
         recyclerView = view.findViewById(R.id.rv_image_in_all);
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         recyclerView.setAdapter(adapter);
-        recyclerView.scrollToPosition(copiedImages.size() - 1);
+        recyclerView.scrollToPosition(images.size() - 1);
 
 
 
         spinner = view.findViewById(R.id.spinner);
         initSpinerView();
-        btnAddCamera = view.findViewById(R.id.btn_add_camera);
-        btnAddCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ActivityCompat.checkSelfPermission(main, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(main, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
-                    return;
-                }
-                startCamera();
-            }
-        });
 
 
         return view;
@@ -262,8 +241,8 @@ public class AllLayout extends Fragment {
         tv_zip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for(int i=0;i<copiedImages.size();i++){
-                    Log.e("pathImage","Path="+copiedImages.get(i).getPath());
+                for(int i=0;i<images.size();i++){
+                    Log.e("pathImage","Path="+images.get(i).getPath());
                 }
                 Toast.makeText(main, "Zip", Toast.LENGTH_SHORT).show();
                 ArrayList<String> folder=new ArrayList<>();
@@ -276,12 +255,29 @@ public class AllLayout extends Fragment {
                 tv_choose.callOnClick();
             }
         });
+        tv_favorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (int i = 0;i<adapter.image_chosen.size();i++){
+                    if(adapter.image_chosen.get(i).getFavorite().equals("F")){
+                        main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
+                        main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
+                        adapter.image_chosen.get(i).setFavorite("T");
+                        MainActivity.dataResource.likeImage(adapter.image_chosen
+                                .get(i).getId());
+                    }
+                }
+                dialog.dismiss();
+                adapter.resetChooseSelection();
+                tv_choose.callOnClick();
+            }
+        });
 
     }
 
-
     //========================kết thúc bắt các sự kiện từ dialog
 
+    //bắt sự kiện tự view header
     private void EventViewHeader() {
         tv_choose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -309,7 +305,19 @@ public class AllLayout extends Fragment {
                 }
             }
         });
+        btn_extend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Chỗ này đang thử cho unzip sau Huy thêm dialog mới dô sau đó đổi là được
+                Toast.makeText(main, "UnZip", Toast.LENGTH_SHORT).show();
+                doUnzipImage();
+            }
+        });
     }
+
+    //kết thúc bắt sự kiện từ view header ===============================
+
+    //bắt sự kiện từ view footer
     private void EventViewFooter() {
         img_all_info.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -323,6 +331,34 @@ public class AllLayout extends Fragment {
             }
         });
     }
+    //kết thúc bắt sự kiện từ view footer=============================
+
+    //bắt sự kiện view addPicture của TA
+    private void EventViewAddPicture(){
+        btnAddPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddButtonClicked();
+            }
+        });
+        btnAddCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ActivityCompat.checkSelfPermission(main, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(main, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
+                    return;
+                }
+                startCamera();
+            }
+        });
+        btnAddUrl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new UrlFragment().show(main.getSupportFragmentManager(), UrlFragment.Tag);
+            }
+        });
+    }
+
 
 
     private void initSpinerView() {
@@ -339,31 +375,35 @@ public class AllLayout extends Fragment {
                 if (selectedItem.equals("Date")) {
                     debug("date");
                     // Xử lý sự kiện khi chọn mục "Date"
-                    for (int i = 0; i < copiedImages.size() - 1; i++) {
-                        for (int j = i + 1; j < copiedImages.size(); j++) {
-                            if (copiedImages.get(i).getDate().compareTo(copiedImages.get(j).getDate()) < 0) {
-                                Image temp = copiedImages.get(i);
-                                copiedImages.set(i, copiedImages.get(j));
-                                copiedImages.set(j, temp);
+                    for (int i = 0; i < images.size() - 1; i++) {
+                        for (int j = i + 1; j < images.size(); j++) {
+                            if (images.get(i).getDate().compareTo(images.get(j).getDate()) < 0) {
+                                Image temp = images.get(i);
+                                images.set(i, images.get(j));
+                                images.set(j, temp);
                             }
                         }
                     }
                     adapter.notifyDataSetChanged();
                 } else if (selectedItem.equals("ID")) {
                     debug("12");
-                    for (int i = 0; i < copiedImages.size() - 1; i++) {
-                        for (int j = i + 1; j < copiedImages.size(); j++) {
-                            if (copiedImages.get(i).getId() < copiedImages.get(j).getId()) {
-                                Image temp = copiedImages.get(i);
-                                copiedImages.set(i, copiedImages.get(j));
-                                copiedImages.set(j, temp);
+                    for (int i = 0; i < images.size() - 1; i++) {
+                        for (int j = i + 1; j < images.size(); j++) {
+                            if (images.get(i).getId() < images.get(j).getId()) {
+                                Image temp = images.get(i);
+                                images.set(i, images.get(j));
+                                images.set(j, temp);
                             }
                         }
                     }
                     adapter.notifyDataSetChanged();
                 }else if(selectedItem.equals("Default")){
-                    copiedImages.clear();
-                    copiedImages.addAll(images);
+                    images = new ArrayList<>();
+                    for (int i = 0;i<MainActivity.images.size();i++){
+                        if(MainActivity.images.get(i).getDeleted().equals("F")){
+                            images.add(MainActivity.images.get(i));
+                        }
+                    }
                     adapter.notifyDataSetChanged();
                     debug1();
                 }
@@ -446,21 +486,35 @@ public class AllLayout extends Fragment {
         //Toast.makeText(getContext(),"oke",Toast.LENGTH_SHORT).show();
     }
 
-    private Runnable image_bitmap_backgroundTask = new Runnable() {
-        @Override
-        public void run() { // busy work goes here...
-            try {
-                for(int i = images.size() -16;i >=0;i--) {
-                    Thread.sleep(1);
-                    images.get(i).setImgBitmap(
-                            getImageFromPath(images.get(i).getPath()));
-                    debug(String.valueOf(i));
-                }
-                //adapter.notifyDataSetChanged();
-            }
-            catch (InterruptedException e) { }
+    private void onAddButtonClicked() {
+        setVisibility(clicked);
+        setAnimation(clicked);
+        clicked = !clicked;
+    }
+    private void setVisibility(boolean clicked) {
+        if (!clicked) {
+            btnAddCamera.setVisibility(View.VISIBLE);
+            btnAddUrl.setVisibility(View.VISIBLE);
         }
-    };
+        else {
+            btnAddCamera.setVisibility(View.GONE);
+            btnAddUrl.setVisibility(View.GONE);
+        }
+    }
+
+    private void setAnimation(boolean clicked) {
+        if(!clicked) {
+            btnAddPicture.setAnimation(rotateOpen);
+            btnAddCamera.setAnimation(fromBottom);
+            btnAddUrl.setAnimation(fromBottom);
+        }
+        else {
+            btnAddPicture.setAnimation(rotateClose);
+            btnAddCamera.setAnimation(toBottom);
+            btnAddUrl.setAnimation(toBottom);
+        }
+    }
+
 
     @Override
     public void onStart(){
@@ -468,14 +522,14 @@ public class AllLayout extends Fragment {
     }
 
     public void debug1(){
-        for(int i =0;i<copiedImages.size();i++){
-            debug(String.valueOf(copiedImages.get(i).getId()));
+        for(int i =0;i<images.size();i++){
+            debug(String.valueOf(images.get(i).getId()));
         }
     }
     public void showBigScreen(int position){
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ViewPagerAllLayoutFragment newFragment=new ViewPagerAllLayoutFragment(copiedImages,position);
+        ViewPagerAllLayoutFragment newFragment=new ViewPagerAllLayoutFragment(images,position);
         ft.replace(R.id.replace_fragment_layout, newFragment);
         ft.commit();
 
@@ -704,5 +758,22 @@ public class AllLayout extends Fragment {
     }
 
     //=======================Kết thúc unzip
+    public void update(){
+        try {
+            adapter.notifyDataSetChanged();
+        }
+        catch(Exception e){
 
+        }
+    }
+    @Override
+    public void onPause(){
+        super.onPause();
+        debug("onPause " + String.valueOf(images.size()));
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        debug("onStop " + String.valueOf(images.size()));
+    }
 }
