@@ -16,6 +16,7 @@ public class Image {
     private String describe;
     private String is_deleted;
     private Bitmap imgBitmap;
+    private String is_hide;
     public Image(){
 
     }
@@ -28,8 +29,15 @@ public class Image {
         this.id=0;
         this.date = new Date();
         this.describe = "";
+<<<<<<< Updated upstream
         this.imgBitmap = ChangeByteToBitmap(imgView);
         this.is_deleted="T";
+=======
+        this.imgBitmap = imgbitmap;
+        this.is_deleted="F";
+        this.is_favorite="F";
+        this.is_hide = "F";
+>>>>>>> Stashed changes
     }
 
 

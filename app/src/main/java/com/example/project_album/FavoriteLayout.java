@@ -62,12 +62,31 @@ public class FavoriteLayout extends Fragment {
                              Bundle savedInstanceState) {
         debug("onCreateView");
         // Inflate the layout for this fragment
+<<<<<<< Updated upstream
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_favorite_layout, container, false);
         gridviewImage = (GridView)view.findViewById(R.id.gridView);
         image_adapter = new ImageAdapter(main,R.layout.item_image,images);
 
 
+=======
+        //Khởi tạo lại danh sách ưa thích
+//        for (int i = 0; i < AllLayout.images.size(); i++) {
+//            if (AllLayout.images.get(i).getFavorite().equals("T")) {
+//                Log.e("fix loi","anh ="+String.valueOf(AllLayout.images.get(i).getId()));
+//                images.add(AllLayout.images.get(i));
+//            }
+//        }
+        Log.e("DEBUG", "onCreateView of TrashCan");
+        View mView = inflater.inflate(R.layout.fragment_favorite_layout, container, false);
+        mGridView = mView.findViewById(R.id.grid_view_favorite);
+        txtTotal = mView.findViewById(R.id.txt_display_total_picture_favorite);
+        btnChoose = mView.findViewById(R.id.btn_choose_in_favorite);
+        btnUnFavoriteChosenImages = mView.findViewById(R.id.btn_no_favorite);
+        btnShareChosenImages = mView.findViewById(R.id.btn_share_in_favorite_layout);
+        lastLinear = mView.findViewById(R.id.last_linear_in_favorite);
+        txtFavoriteRecently = mView.findViewById(R.id.txt_favorite_recently);
+>>>>>>> Stashed changes
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         gridviewImage.setAdapter(image_adapter);
         gridviewImage.setSelection(images.size()-1) ;
@@ -93,4 +112,29 @@ public class FavoriteLayout extends Fragment {
     private void debug(String str){
         Log.e("FavoriteLayout",str);
     }
+<<<<<<< Updated upstream
+=======
+    public void update(){
+        try {
+            mGridAdapter.notifyDataSetChanged();
+        }
+        catch(Exception e){
+
+        }
+    }
+    public void updateFavorite(Image img){
+        if (img.getFavorite().equals("F")) {
+            images.add(img);
+        } else {
+            images.remove(img);
+        }
+    }
+    public void updateArrayFavorite(ArrayList<Image> imgs){
+        for(int i = 0;i<imgs.size();i++){
+            if (imgs.get(i).getFavorite().equals("F")){
+                images.add(imgs.get(i));
+            }
+        }
+    }
+>>>>>>> Stashed changes
 }

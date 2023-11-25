@@ -23,9 +23,23 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+<<<<<<< Updated upstream
 
 public class MainActivity extends FragmentActivity {
     public static DataResource dataResource;
+=======
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+
+public class MainActivity extends FragmentActivity {
+    public static DataResource dataResource;
+    public static ArrayList<Image> images = new ArrayList<>();
+    private WallpaperManager wallpaperManager;
+    private byte[] wallpaperImage;
+>>>>>>> Stashed changes
     public static int Width;
     public static int Height;
     private WallpaperManager wallpaperManager;
@@ -41,12 +55,29 @@ public class MainActivity extends FragmentActivity {
     BottomNavigationView mBottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+<<<<<<< Updated upstream
         Log.e("MainActivity:","onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ver2);
 
         dataResource = new DataResource(this);
         dataResource.open();
+=======
+        Log.e("MainActivity","onCreate");
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main_ver2);
+
+        if(images.get(0).getImgBitmap() == null) {
+            Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
+            myBackgroundThread.start();
+        }
+        Intent data = getIntent();
+        Bundle bundle = data.getExtras();
+        userID = bundle.getInt("username");
+
+//        dataResource = new DataResource(this);
+//        dataResource.open();
+>>>>>>> Stashed changes
         wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
         getSizeWindow();
 
@@ -178,4 +209,26 @@ public class MainActivity extends FragmentActivity {
         dataResource.cloe();
         super.onPause();
     }
+<<<<<<< Updated upstream
+=======
+    private Runnable image_bitmap_backgroundTask = new Runnable() {
+        @Override
+        public void run() { // busy work goes here...
+            try {
+                for(int i = images.size() -16;i >=0;i--) {
+                    Thread.sleep(1);
+                    images.get(i).setImgBitmap(
+                            getImageFromPath(images.get(i).getPath()));
+                    debug(String.valueOf(i));
+//                    allLayout.update();
+//                    favoriteLayout.update();
+//                    trashCanLayout.update();
+                }
+                //adapter.notifyDataSetChanged();
+            }
+            catch (InterruptedException e) { }
+        }
+    };
+
+>>>>>>> Stashed changes
 }
