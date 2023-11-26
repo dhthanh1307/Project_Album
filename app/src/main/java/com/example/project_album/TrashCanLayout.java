@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 
 public class TrashCanLayout extends Fragment {
-    public static ShowImageAdapter mGridAdapter;
+    public ShowImageAdapter mGridAdapter;
     public static ArrayList<Image> images = new ArrayList<Image>();
     MainActivity main;
     Context context = null;
@@ -155,34 +155,31 @@ public class TrashCanLayout extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (btnDeleteChosenImages.getText().toString().equals("Xóa tất cả")) {
-                            images.clear();
-                            mGridAdapter.setmSelectedArray();
-                            mGridAdapter.setChosenArrayImages();
-                            mGridAdapter.notifyDataSetChanged();
-                            // chỗ này còn xóa ở database nữa.
-                            for (int i = 0; i < images.size(); i++) {
-                                MainActivity.dataResource.deleteImage(images.get(i));
-                            }
-                            doBtnChooseWhenIsCancel();
+                            mGridAdapter.addAllIntoImageChosen();
                         }
-                        ArrayList<Image> arrayIdDelete = mGridAdapter.getChosenArrayImages();
-                        //Xóa dòng hình ảnh đó đó ở dataResource
-                        for (int i = 0; i < arrayIdDelete.size(); i++) {
-                            MainActivity.dataResource.deleteImage(arrayIdDelete.get(i));
+                        for (int i = 0; i < mGridAdapter.chosenArrayImages.size(); i++) {
+                            //Xóa dòng hình ảnh đó đó ở dataResource
+                            MainActivity.dataResource.deleteImage(mGridAdapter.chosenArrayImages.get(i));
+
+                            long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
+                            // xóa ở images hiện hành
+                            for (int i1 = 0; i1 < images.size(); i1++) {
+                                if (images.get(i1).getId() == idImage) {
+                                    images.remove(i1);
+                                    break;
+                                }
+                            }
+                            ///???? Có cần khúc này k
+                            //Xóa ở images bên MainActivity
+                            for (int i1 = 0; i1 < main.images.size(); i1++) {
+                                if (main.images.get(i1).getId() == idImage) {
+                                    main.images.remove(i1);
+                                    break;
+                                }
+                            }
+
                         }
 
-                        Log.e("Err", "ffff" + String.valueOf(MainActivity.dataResource.getCount()));
-                        //xóa ảnh ở images hiện hành
-                        int size = images.size();
-                        ArrayList<Boolean> mSelectedItems = mGridAdapter.getmSelectedArray();
-                        for (int i = 0; i < size; i++) {
-                            if (mSelectedItems.get(i)) {
-                                size--;
-                                images.remove(i);
-                                mSelectedItems.remove(i);
-                                i--;
-                            }
-                        }
                         mGridAdapter.setmSelectedArray();
                         mGridAdapter.setChosenArrayImages();
                         mGridAdapter.notifyDataSetChanged();
@@ -238,6 +235,7 @@ public class TrashCanLayout extends Fragment {
         Log.e("DEBUG", "OnPause of TrashCan");
         super.onPause();
     }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -248,18 +246,28 @@ public class TrashCanLayout extends Fragment {
 
     private void DoSthWithOrientation(int newOrientation) {
         if (newOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mGridView.setLayoutManager(new GridLayoutManager(getContext(),5));
+            mGridView.setLayoutManager(new GridLayoutManager(getContext(), 5));
         } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            mGridView.setLayoutManager(new GridLayoutManager(getContext(),3));
+            mGridView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         }
     }
-    public void update(){
+
+    public void update() {
         try {
             mGridAdapter.notifyDataSetChanged();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
 
         }
+    }
+
+    //thay đổi tử ALlLayout sang
+    public void updateTrashCan(Image img) {
+        if (img.getDeleted().equals("F")) {
+            images.add(img);
+        } else {
+            images.remove(img);
+        }
+
     }
 
 }

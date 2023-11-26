@@ -272,6 +272,38 @@ public class AllLayout extends Fragment {
                 tv_choose.callOnClick();
             }
         });
+        tv_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (int i = 0; i < adapter.image_chosen.size(); i++) {
+                    //add vào images ở trashcan
+                    main.trashCanLayout.updateTrashCan(adapter.image_chosen.get(i));
+                    //thay đổi tính chất ảnh đã được xóa, là như này nó đã thay đổi bên main luôn rồi.
+                    adapter.image_chosen.get(i).setDeleted("T");
+
+                    //xoa image o allLayout
+                    long idImage = adapter.image_chosen.get(i).getId();
+                    for (int i1 = 0; i1 < images.size(); i1++) {
+                        if (images.get(i1).getId() == idImage) {
+                            images.remove(i1);
+                            break;
+                        }
+                    }
+
+//                    //xoa image ở adapter
+                    adapter.updateImagesInShowImageAllAdapter(idImage);
+//                    Log.e("DeleteAllLayout","-----------------------------------------");
+//                    Log.e("DeleteAllLayout","Images size="+String.valueOf(images.size()));
+//                    Log.e("DeleteAllLayout","Adapter Size="+String.valueOf(adapter.images.size()));
+                    //update trạng thái ở database
+                    MainActivity.dataResource.updateStateImageDeletedIsTrue(idImage);
+                }
+                adapter.notifyDataSetChanged();
+                dialog.dismiss();
+                adapter.resetChooseSelection();
+                tv_choose.callOnClick();
+            }
+        });
 
     }
 

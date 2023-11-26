@@ -110,8 +110,7 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
                     FragmentManager fragmentmanager = activity.getSupportFragmentManager();
                     FragmentTransaction ft = fragmentmanager.beginTransaction();
                     Fragment fragment = new ViewPagerAllLayoutFragment(images,position);
-                    ft.add(R.id.replace_fragment_layout,fragment);
-                    ft.addToBackStack(fragment.getClass().getSimpleName());
+                    ft.replace(R.id.replace_fragment_layout,fragment);
                     ft.commit();
                 }
             }
@@ -187,5 +186,13 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
     }
     public void update(ArrayList<Image> imgs){
         this.images = imgs;
+    }
+    public void updateImagesInShowImageAllAdapter(long id){
+        for (int i=0;i<images.size();i++){
+            if (images.get(i).getId()==id){
+                images.remove(i);
+                break;
+            }
+        }
     }
 }

@@ -18,11 +18,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.ViewHolder> {
-    private ArrayList<Image> images;
+    public ArrayList<Image> images;
     private int idLayout;
     private MainActivity main;
     private ArrayList<Boolean> mSelectedArray = new ArrayList<>();
-    private ArrayList<Image> chosenArrayImages = new ArrayList<>();
+    public ArrayList<Image> chosenArrayImages = new ArrayList<>();
     private boolean chooseSelection;
     public int count = 0;
     private Button btnDeleteChosenImage;
@@ -37,6 +37,8 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
         this.main = activity;
         this.idLayout = idLayout;
         this.images = images;
+//        Log.e("Hallo",String.valueOf(images));
+//        Log.e("Hallo",String.valueOf(this.images));
         this.myFragment = myFragment;
         for (int i = 0; i < images.size(); i++) {
             mSelectedArray.add(false);
@@ -117,7 +119,6 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
                         FragmentTransaction ft = fragmentmanager.beginTransaction();
                         Fragment fragment = new ViewPagerTrashCanFragment(images, position);
                         ft.replace(R.id.replace_fragment_layout, fragment);
-                        ft.addToBackStack(getClass().getSimpleName());
                         ft.commit();
                     }
                 }
@@ -148,7 +149,6 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
                         FragmentTransaction ft = fragmentmanager.beginTransaction();
                         Fragment fragment = new ViewPagerAllLayoutFragment(images, position);
                         ft.replace(R.id.replace_fragment_layout, fragment);
-                        ft.addToBackStack(getClass().getSimpleName());
                         ft.commit();
                     }
                 }
@@ -216,4 +216,21 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
     public void resetCount() {
         this.count = 0;
     }
+
+    public void deleteImagesInShowImageAdapter(long id){
+        for (int i=0;i<images.size();i++){
+            if (images.get(i).getId()==id){
+                Log.e("DeleteInTrash", "??????????????????????");
+                images.remove(i);
+                break;
+            }
+        }
+    }
+    public void addAllIntoImageChosen(){
+        chosenArrayImages.clear();
+        for (int i=0;i<images.size();i++){
+            chosenArrayImages.add(images.get(i));
+        }
+    }
+
 }

@@ -113,8 +113,6 @@ public class ViewPagerTrashCanFragment extends Fragment {
                         mViewPager.setAdapter(mAdapter);
                         mViewPager.setCurrentItem(index, false);
                         txtNumberPerAll.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
-                        TrashCanLayout.mGridAdapter.notifyDataSetChanged();//xem xét thay doi cua Adapter ben TrashCan
-                        //set mSelected  bên trashcan và bên image adapter
 
                     }
                 });

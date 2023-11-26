@@ -60,7 +60,7 @@ public class FavoriteLayout extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("DEBUG", "onCreate of TrashCan");
+        Log.e("Favorite", "onCreate size="+String.valueOf(images.size()));
         myOriginalMemoryBundle = savedInstanceState;
 
         try {
@@ -146,52 +146,37 @@ public class FavoriteLayout extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (btnUnFavoriteChosenImages.getText().toString().equals("Bỏ thích tất cả")) {
-                            images.clear();
-                            mGridAdapter.setmSelectedArray();
-                            mGridAdapter.setChosenArrayImages();
-                            mGridAdapter.notifyDataSetChanged();
-                            // chỗ này còn unlike ở database nữa.
-                            for (int i = 0; i < images.size(); i++) {
-                                //unlike ở database
-                                MainActivity.dataResource.unlikeImage(images.get(i).getId());
-                            }
-                            //Unlike ở images Allayout để nó k sai khi click lại tab đó
-                            for (int i=0;i<AllLayout.images.size();i++){
-                                AllLayout.images.get(i).setFavorite("F");
-                            }
-                            doBtnChooseWhenIsCancel();
+                            mGridAdapter.addAllIntoImageChosen();
                         }
-                        ArrayList<Image> arrayIdUnFavorite = mGridAdapter.getChosenArrayImages();
-
-                        //Unlike lại ảnh ở database
-                        for (int i = 0; i < arrayIdUnFavorite.size(); i++) {
+                        for (int i = 0; i < mGridAdapter.chosenArrayImages.size(); i++) {
                             //unlike ở database
-                            MainActivity.dataResource.unlikeImage(arrayIdUnFavorite.get(i).getId());
-                        }
+                            MainActivity.dataResource.unlikeImage(mGridAdapter.chosenArrayImages.get(i).getId());
 
-                        Log.e("Err", "ffff" + String.valueOf(MainActivity.dataResource.getCount()));
-                        //xóa ảnh ở images ưa thích hiện hành
-                        int size = images.size();
-                        ArrayList<Boolean> mSelectedItems = mGridAdapter.getmSelectedArray();
-                        for (int i = 0; i < size; i++) {
-                            if (mSelectedItems.get(i)) {
-                                size--;
-                                images.remove(i);
-                                mSelectedItems.remove(i);
-                                i--;
+                            long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
+                            // xóa image ở images hiện hành tức là chỉ còn ảnh ưa thích
+                            for (int i1 = 0; i1 < images.size(); i1++) {
+                                if (images.get(i1).getId() == idImage) {
+                                    images.remove(i1);
+                                    break;
+                                }
                             }
-                        }
-                        //Unlike lại ảnh ở alllayout
-                        ArrayList<Long> idFavorites=new ArrayList<>();
-                        for (int i=0;i<arrayIdUnFavorite.size();i++){
-                            idFavorites.add(arrayIdUnFavorite.get(i).getId());
-                        }
-                        for (int i=0;i<AllLayout.images.size();i++){
-                            if (idFavorites.contains(AllLayout.images.get(i).getId())){
-                                AllLayout.images.get(i).setFavorite("F");
-                            }
-                        }
 
+                            //Unlike ở images
+                            for (int i1 = 0; i1 < images.size(); i1++) {
+                                if (images.get(i1).getId() == idImage) {
+                                    images.get(i1).setFavorite("F");
+                                    break;
+                                }
+                            }
+                            //Unlike ở AllLayout
+                            for (int i1 = 0; i1 < AllLayout.images.size(); i1++) {
+                                if (AllLayout.images.get(i1).getId() == idImage) {
+                                    AllLayout.images.get(i1).setFavorite("F");
+                                    break;
+                                }
+                            }
+
+                        }
                         mGridAdapter.setmSelectedArray();
                         mGridAdapter.setChosenArrayImages();
                         mGridAdapter.notifyDataSetChanged();
@@ -207,8 +192,6 @@ public class FavoriteLayout extends Fragment {
                         dialog.dismiss(); // Đóng AlertDialog mà không làm gì cả
                     }
                 });
-
-
                 // Hiển thị AlertDialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
@@ -285,5 +268,8 @@ public class FavoriteLayout extends Fragment {
                 images.add(imgs.get(i));
             }
         }
+    }
+    public void updateIndex(int index){
+        mGridView.scrollToPosition(index);
     }
 }

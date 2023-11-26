@@ -242,6 +242,21 @@ public class DataResource {
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
         database.execSQL(que);
     }
+    // này là update trạng thái trong database khi chuyển từ all sang trash thôi
+    public void updateStateImageDeletedIsTrue(long id){
+        String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
+                +DatabaseHelper.COLUMN_IS_DELETE+ " = 'T'" +
+                " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
+        database.execSQL(que);
+    }
+    public void updateStateImageDeletedIsFalse(long id){
+        String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
+                +DatabaseHelper.COLUMN_IS_DELETE+ " = 'F'" +
+                " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
+        database.execSQL(que);
+    }
+    ////////////////////
+    //Này là delete ở database, xóa hẳn luôn.
     public boolean deleteImage(Image image){
         long id = image.getId();
         Log.e("SQLite","Person entry delete with id: "+id);

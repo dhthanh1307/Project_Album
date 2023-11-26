@@ -324,20 +324,38 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         txtFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                main.albumLayout.updateFavorite(images.get(index));
-                main.favoriteLayout.updateFavorite(images.get(index));
+                //main.albumLayout.updateFavorite(images.get(index));
+                //main.favoriteLayout.updateFavorite(images.get(index));
                 if (images.get(index).getFavorite().equals("T")){
                     images.get(index).setFavorite("F");
                     txtFavorite.setImageResource(R.drawable.icon_favorite_in_alllayout);
                     MainActivity.dataResource.unlikeImage(images.get(index).getId());
-//                    FavoriteLayout.mGridAdapter.setmSelectedArray();
+                    FavoriteLayout.images.remove(images.get(index));
+
                 }else{
                     images.get(index).setFavorite("T");
                     txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
                     MainActivity.dataResource.likeImage(images.get(index).getId());
-
-//                    FavoriteLayout.mGridAdapter.setmSelectedArray();
+                    FavoriteLayout.images.add(images.get(index));
                 }
+                try {
+                    if (main.getIDItemBottomNavigationView()==R.id.action_favorite){
+                        mViewPager.setCurrentItem(index, false);
+                    }
+                }catch (Exception e){
+
+                }
+//                try {
+//                    mAdapter.notifyDataSetChanged();
+//                }catch (Exception e){
+//                    if(main.getIDItemBottomNavigationView() == R.id.action_favorite){
+//                        FragmentManager fragmentmanager = main.getSupportFragmentManager();
+//                        FragmentTransaction ft = fragmentmanager.beginTransaction();
+//                        ft.replace(R.id.replace_fragment_layout, main.favoriteLayout);
+//                        ft.commit();
+//                    }
+//                }
+                main.albumLayout.updateFavorite(images.get(index));
             }
         });
 

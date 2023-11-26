@@ -447,7 +447,7 @@ public class AlbumLayout extends Fragment {
     }
     public void updateFavorite(Image img){
         if(isInit) {
-            if (img.getFavorite().equals("F")) {
+            if (img.getFavorite().equals("T")) {
                 albums.get(1).getImages().add(img);
             } else {
                 albums.get(1).removeImage(img);
