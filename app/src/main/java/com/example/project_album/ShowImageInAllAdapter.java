@@ -147,7 +147,8 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
     }
     public void resetChooseSelection(){
         count = 0;
-        tv_chose.setText("Chọn mục");
+        if(tv_chose!=null)
+            tv_chose.setText("Chọn mục");
         for(int i=0;i<images.size();i++){
             ischoose.set(i,false);
         }
@@ -179,5 +180,12 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
             }
         }
         return false;
+    }
+    public void insert(Image img){
+        images.add(img);
+        ischoose.add(false);
+    }
+    public void update(ArrayList<Image> imgs){
+        this.images = imgs;
     }
 }

@@ -40,7 +40,9 @@ public class LoginFragment extends Fragment {
     Button btnLogin;
     TextView toSignUp;
     String username;
+    String password;
     int userID;
+    boolean isadmin = false;
 
     public static LoginFragment newInstance(String strArg) {
         LoginFragment fragment = new LoginFragment();
@@ -57,6 +59,12 @@ public class LoginFragment extends Fragment {
         try {
             context = getActivity();
             main = (LoginActivity) getActivity();
+            int count = MainActivity.dataResource.countUser();
+            if(count == 0){
+                User user= new User("admin","admin",
+                        "THASH@gmail.com","035555557");
+                long i=MainActivity.dataResource.InsertUser(user);
+            }
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -92,8 +100,8 @@ public class LoginFragment extends Fragment {
                     Toast.makeText(main, "Mật khẩu không thể để trống", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    String username = inputUsername.getText().toString();
-                    String password = inputPassword.getText().toString();
+                    username = inputUsername.getText().toString();
+                    password = inputPassword.getText().toString();
                     userID = MainActivity.dataResource.checkLogin(username, password);
                     if (userID != -1) {
 //                        Intent intent = new Intent(getActivity(), MainActivity.class);
@@ -101,13 +109,16 @@ public class LoginFragment extends Fragment {
 //                        startActivity(intent);
                         //doc database
                         MainActivity.images = MainActivity.dataResource.getAllImage(userID);
+                        if(username.equals("admin") && password.equals("admin")) {
+                            isadmin = true;
+
+                        }
                         initDataResource();
                     }
                     else {
                         Toast.makeText(main, "Tên đăng nhập hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
                     }
                 }
-
             }
         });
         return view;
@@ -117,10 +128,16 @@ public class LoginFragment extends Fragment {
         ProgressDialog dialog = new ProgressDialog(getContext());
         dialog.setCancelable(false);
         dialog.show();
+        if(isadmin){
+            dialog.setTitle("Đang tạo thông tin admin");
+        }
+        else{
+            dialog.setTitle("Vui lòng đợi");
+        }
         Thread my = new Thread(new Runnable() {
             @Override
             public void run() {
-                if (MainActivity.images.size() == 0) {
+                if (MainActivity.images.size() == 0 && isadmin) {
                     Log.e("LoginFragment","init All images");
                     ArrayList<String> links = Link.AllLinks();
                     ArrayList<Bitmap> bitmaps = new ArrayList<>();
@@ -145,6 +162,7 @@ public class LoginFragment extends Fragment {
                     getImageForLayouts();
                 }
                 else{
+
                     getImageForLayouts();
                     //Change path to bitmap
                     for (int i = AllLayout.images.size() - 1; i >= AllLayout.images.size()
@@ -157,6 +175,9 @@ public class LoginFragment extends Fragment {
                 dialog.dismiss();
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra("userID", userID);
+                intent.putExtra("username",username);
+                intent.putExtra("password",password);
+
                 startActivity(intent);
                 main.finish();
             }

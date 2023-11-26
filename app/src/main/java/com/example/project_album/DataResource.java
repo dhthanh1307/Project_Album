@@ -371,6 +371,13 @@ public class DataResource {
         values.put(DatabaseHelper.COLUMN_PASSWORD, newPassword);
         database1.update(DatabaseHelper.TABLE_USERS, values, DatabaseHelper.COLUMN_USER + "=?", new String[] { String.valueOf(userID) });
     }
+    public int countUser() {
+        String query = "SELECT  * FROM " + DatabaseHelper.TABLE_USERS;
+        Cursor cursor = database.rawQuery(query, null);
+        int count= cursor.getCount();
+        cursor.close();
+        return count;
+    }
 
     private void debug(String str) {
         Log.e("DataResource", str);

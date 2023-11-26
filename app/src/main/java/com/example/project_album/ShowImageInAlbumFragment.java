@@ -135,7 +135,12 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
             }
         }
         else if(view.getId() == img_all_info.getId()){
-            AllInfoDialog();
+            if(image_adapter.image_chosen.size()>0) {
+                AllInfoDialog();
+            }
+            else{
+                Toast.makeText(main,"Bạn chưa chọn ảnh",Toast.LENGTH_SHORT).show();
+            }
         }
         else if (view.getId() == tv_add_to_album.getId()){
             dialog.cancel();

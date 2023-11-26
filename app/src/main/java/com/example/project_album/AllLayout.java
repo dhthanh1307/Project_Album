@@ -322,12 +322,17 @@ public class AllLayout extends Fragment {
         img_all_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Window window = dialog.getWindow();
-                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                WindowManager.LayoutParams attribute = window.getAttributes();
-                attribute.y = 280;
-                attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
-                dialog.show();
+                if(adapter.image_chosen.size()>0) {
+                    Window window = dialog.getWindow();
+                    window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    WindowManager.LayoutParams attribute = window.getAttributes();
+                    attribute.y = 280;
+                    attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+                    dialog.show();
+                }
+                else{
+                    Toast.makeText(main,"Bạn chưa chọn ảnh",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -761,9 +766,10 @@ public class AllLayout extends Fragment {
     public void update(){
         try {
             adapter.notifyDataSetChanged();
+            debug("update");
         }
         catch(Exception e){
-
+            debug(e.toString());
         }
     }
     @Override

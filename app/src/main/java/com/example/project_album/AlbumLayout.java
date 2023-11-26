@@ -350,7 +350,8 @@ public class AlbumLayout extends Fragment {
     }
     private void InitAlbums() {
         if(!isInit) {
-            if (albums.size() == 0) {
+            if (albums.size() == 0 && main.username.equals("admin")
+            &&main.password.equals("admin")) {
                 ArrayList<Integer> ids = new ArrayList<>();
                 long id = MainActivity.dataResource.InsertAlbum("Airplane",MainActivity.userID);
 //            MainActivity.dataResource.InsertAlbum("Holiday",MainActivity.userID);

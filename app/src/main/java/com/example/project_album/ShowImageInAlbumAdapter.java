@@ -145,7 +145,8 @@ public class ShowImageInAlbumAdapter extends RecyclerView.Adapter<ShowImageInAlb
     }
     public void resetChooseSelection(){
         count = 0;
-        tv_chose.setText("Chọn mục");
+        if(tv_chose!=null)
+            tv_chose.setText("Chọn mục");
         for(int i=0;i<images.size();i++){
             ischoose.set(i,false);
         }

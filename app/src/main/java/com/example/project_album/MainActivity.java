@@ -42,6 +42,8 @@ public class MainActivity extends FragmentActivity {
     public static int Width;
     public static int Height;
     public static int userID;
+    public String username;
+    public String password;
     NavigationView navigationView;
     FragmentTransaction ft;
     AllLayout allLayout;
@@ -49,6 +51,7 @@ public class MainActivity extends FragmentActivity {
     FavoriteLayout favoriteLayout;
     TrashCanLayout trashCanLayout;
     AccountLayout accountLayout;
+
 
     BottomNavigationView mBottomNavigationView;
     ConstraintLayout bottom_navigation_album;
@@ -59,13 +62,15 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ver2);
 
-        if(images.get(0).getImgBitmap() == null) {
+        if(images.size()>0 && images.get(0).getImgBitmap() == null) {
             Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
             myBackgroundThread.start();
         }
         Intent data = getIntent();
         Bundle bundle = data.getExtras();
-        userID = bundle.getInt("username");
+        userID = bundle.getInt("userID");
+        username = bundle.getString("username");
+        password = bundle.getString("password");
 
 //        dataResource = new DataResource(this);
 //        dataResource.open();
