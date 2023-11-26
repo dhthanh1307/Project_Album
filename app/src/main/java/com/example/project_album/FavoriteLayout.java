@@ -175,7 +175,8 @@ public class FavoriteLayout extends Fragment {
                                     break;
                                 }
                             }
-
+                            //Unlike ở AlbumLayout
+                            main.albumLayout.updateFavorite(mGridAdapter.chosenArrayImages.get(i));
                         }
                         mGridAdapter.setmSelectedArray();
                         mGridAdapter.setChosenArrayImages();
@@ -256,7 +257,7 @@ public class FavoriteLayout extends Fragment {
         }
     }
     public void updateFavorite(Image img){
-        if (img.getFavorite().equals("F")) {
+        if (img.getFavorite().equals("T")) {
             images.add(img);
         } else {
             images.remove(img);

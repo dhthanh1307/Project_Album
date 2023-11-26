@@ -262,7 +262,7 @@ public class TrashCanLayout extends Fragment {
 
     //thay đổi tử ALlLayout sang
     public void updateTrashCan(Image img) {
-        if (img.getDeleted().equals("F")) {
+        if (img.getDeleted().equals("T")) {
             images.add(img);
         } else {
             images.remove(img);

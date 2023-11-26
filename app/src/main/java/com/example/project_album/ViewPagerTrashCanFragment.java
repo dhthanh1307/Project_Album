@@ -108,7 +108,9 @@ public class ViewPagerTrashCanFragment extends Fragment {
                         //Adapter cũ thì nó sai, tuy nhiên tạo adapter mới thì nó lại đúng, chả biết tại sao
                         //Trong này có cả update images và notify
 //                           mAdapter.updateImagesList(images);
-
+                        if (images.size()==0){
+                            txtBack.callOnClick();
+                        }
                         mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
                         mViewPager.setAdapter(mAdapter);
                         mViewPager.setCurrentItem(index, false);
@@ -135,7 +137,7 @@ public class ViewPagerTrashCanFragment extends Fragment {
             public void onClick(View view) {
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
-                ft.replace(R.id.replace_fragment_layout, TrashCanLayout.newInstance("TrashCanLayout"));
+                ft.replace(R.id.replace_fragment_layout, main.trashCanLayout);
                 ft.commit();
                 main.mBottomNavigationView.setVisibility(View.VISIBLE);
             }

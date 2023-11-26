@@ -260,9 +260,9 @@ public class AllLayout extends Fragment {
             public void onClick(View view) {
                 for (int i = 0;i<adapter.image_chosen.size();i++){
                     if(adapter.image_chosen.get(i).getFavorite().equals("F")){
+                        adapter.image_chosen.get(i).setFavorite("T");
                         main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
                         main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
-                        adapter.image_chosen.get(i).setFavorite("T");
                         MainActivity.dataResource.likeImage(adapter.image_chosen
                                 .get(i).getId());
                     }
@@ -276,10 +276,12 @@ public class AllLayout extends Fragment {
             @Override
             public void onClick(View view) {
                 for (int i = 0; i < adapter.image_chosen.size(); i++) {
-                    //add vào images ở trashcan
-                    main.trashCanLayout.updateTrashCan(adapter.image_chosen.get(i));
                     //thay đổi tính chất ảnh đã được xóa, là như này nó đã thay đổi bên main luôn rồi.
                     adapter.image_chosen.get(i).setDeleted("T");
+
+                    //add vào images ở trashcan
+                    main.trashCanLayout.updateTrashCan(adapter.image_chosen.get(i));
+
 
                     //xoa image o allLayout
                     long idImage = adapter.image_chosen.get(i).getId();
