@@ -155,7 +155,7 @@ public class LoginFragment extends Fragment {
                     for (int j = 0; j < 3; j++) {
                         for (int i = 0; i < bitmaps.size(); i++) {
                             MainActivity.images.add(new Image(bitmaps.get(i), GenerateName()));
-                            MainActivity.images.get(i).setId(MainActivity.dataResource.
+                            MainActivity.images.get(j*bitmaps.size()+i).setId(MainActivity.dataResource.
                                     InsertImage(MainActivity.images.get(i), userID));
                         }
                     }
