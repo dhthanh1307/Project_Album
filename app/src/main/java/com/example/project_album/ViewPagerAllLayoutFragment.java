@@ -95,6 +95,12 @@ public class ViewPagerAllLayoutFragment extends Fragment {
 
     private void onPageChange() {
         Log.e("ViewPaper ", String.valueOf(index));
+        //Để khi mà bấm vào xem ảnh lớn ở bên mục favorite thì k còn cái xóa
+        if (main.getIDItemBottomNavigationView()==R.id.action_favorite){
+            txtDeleteIntoTrashCan.setVisibility(View.GONE);
+        }else{
+            txtDeleteIntoTrashCan.setVisibility(View.VISIBLE);
+        }
         txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
         if (images.get(index).getFavorite().equals("T")) {
             txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
@@ -326,6 +332,11 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //Nếu xóa thì thay đổi ảnh là unlike ở favorite và ở albumfavorite
+                        images.get(index).setFavorite("F");
+                        main.favoriteLayout.updateFavorite(images.get(index));
+                        main.albumLayout.updateFavorite(images.get(index));
+                        //
                         long idImageDelete=images.get(index).getId();
                         //Set hình ảnh đã xóa là True
                         images.get(index).setDeleted("T");

@@ -201,6 +201,76 @@ public class TrashCanLayout extends Fragment {
                 alertDialog.show();
             }
         });
+
+        btnRestoreChosenImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Hiển thị Dialog
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(main);
+                alertDialogBuilder.setMessage("Bạn có muốn khôi phục ảnh?");
+                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (btnRestoreChosenImages.getText().toString().equals("Khôi phục tất cả")) {
+                            mGridAdapter.addAllIntoImageChosen();
+                        }
+                        for (int i = 0; i < mGridAdapter.chosenArrayImages.size(); i++) {
+                            long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
+                            //set trạng thái đã xóa là false ở data resource
+                            MainActivity.dataResource.updateStateImageDeletedIsFalse(idImage);
+
+                            // set trạng thái delete là False
+                            for (int j = 0; j < images.size(); j++) {
+                                if (images.get(j).getId() == idImage) {
+                                    images.get(j).setDeleted("F");
+                                    break;
+                                }
+                            }
+
+                            //add ảnh vào lại allLayout đúng vị trí đã xóa
+                            if (idImage > AllLayout.images.get(AllLayout.images.size() - 1).getId()) {
+                                AllLayout.images.add(mGridAdapter.chosenArrayImages.get(i));
+                            } else if (idImage < AllLayout.images.get(0).getId()) {
+                                AllLayout.images.add(0, mGridAdapter.chosenArrayImages.get(i));
+                            } else {
+                                for (int j = 1; j < AllLayout.images.size(); j++) {
+                                    if (AllLayout.images.get(j - 1).getId() < idImage
+                                            && idImage < AllLayout.images.get(j).getId()) {
+                                        AllLayout.images.add(j, mGridAdapter.chosenArrayImages.get(i));
+                                        break;
+                                    }
+                                }
+                            }
+                            // Xóa ảnh ở imgaes hiện hành là cũng như xóa ở adapter hiện hành r
+                            for (int j = 0; j < images.size(); j++) {
+                                if (images.get(j).getId() == idImage) {
+                                    images.remove(j);
+                                    break;
+                                }
+                            }
+
+                        }
+                        mGridAdapter.setmSelectedArray();
+                        mGridAdapter.setChosenArrayImages();
+                        mGridAdapter.notifyDataSetChanged();
+                        doBtnChooseWhenIsCancel();
+                    }
+                });
+
+                alertDialogBuilder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Xử lý khi chọn Cancel
+                        dialog.dismiss(); // Đóng AlertDialog mà không làm gì cả
+                    }
+                });
+
+
+                // Hiển thị AlertDialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
+        });
         txtTotal.setText("Tổng " + String.valueOf(images.size()));
     }
 

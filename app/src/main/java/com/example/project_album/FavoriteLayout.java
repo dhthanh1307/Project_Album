@@ -153,13 +153,6 @@ public class FavoriteLayout extends Fragment {
                             MainActivity.dataResource.unlikeImage(mGridAdapter.chosenArrayImages.get(i).getId());
 
                             long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
-                            // xóa image ở images hiện hành tức là chỉ còn ảnh ưa thích
-                            for (int i1 = 0; i1 < images.size(); i1++) {
-                                if (images.get(i1).getId() == idImage) {
-                                    images.remove(i1);
-                                    break;
-                                }
-                            }
 
                             //Unlike ở images
                             for (int i1 = 0; i1 < images.size(); i1++) {
@@ -168,13 +161,22 @@ public class FavoriteLayout extends Fragment {
                                     break;
                                 }
                             }
-                            //Unlike ở AllLayout
+                            //Unlike ở AllLayout- có vẻ này k cần
                             for (int i1 = 0; i1 < AllLayout.images.size(); i1++) {
                                 if (AllLayout.images.get(i1).getId() == idImage) {
                                     AllLayout.images.get(i1).setFavorite("F");
                                     break;
                                 }
                             }
+                            // xóa image ở images hiện hành tức là chỉ còn ảnh ưa thích
+                            for (int i1 = 0; i1 < images.size(); i1++) {
+                                if (images.get(i1).getId() == idImage) {
+                                    images.remove(i1);
+                                    break;
+                                }
+                            }
+
+
                             //Unlike ở AlbumLayout
                             main.albumLayout.updateFavorite(mGridAdapter.chosenArrayImages.get(i));
                         }
