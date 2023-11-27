@@ -37,6 +37,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -63,6 +67,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -100,7 +105,8 @@ public class AllLayout extends Fragment {
     Context context = null;
 
     //khai báo của TA
-    FloatingActionButton btnAddPicture, btnAddCamera, btnAddUrl;
+    ActivityResultLauncher<PickVisualMediaRequest> pickMultiImages;
+    FloatingActionButton btnAdd, btnAddCamera, btnAddUrl, btnAddImage;
     private Animation rotateOpen;
     private Animation rotateClose;
     private Animation fromBottom;
@@ -113,7 +119,6 @@ public class AllLayout extends Fragment {
     Spinner spinner;
     ArrayAdapter<String> spinnerAdapter;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
-    private static final int REQUEST_IMAGE_CAPTURE = 2;
 
     //Zip
     Button btnOkZip,btnCancelZip;
@@ -194,9 +199,10 @@ public class AllLayout extends Fragment {
         fromBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.from_bottom_anim);
         toBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.to_bottom_anim);
 
-        btnAddPicture = view.findViewById(R.id.btn_add_Picture);
+        btnAdd = view.findViewById(R.id.btn_add);
         btnAddCamera = view.findViewById(R.id.btn_add_Camera);
         btnAddUrl = view.findViewById(R.id.btn_add_Url);
+        btnAddImage = view.findViewById(R.id.btn_add_Images);
         EventViewAddPicture();
 
 
@@ -212,7 +218,7 @@ public class AllLayout extends Fragment {
 
 
         spinner = view.findViewById(R.id.spinner);
-        initSpinerView();
+        initSpinnerView();
 
 
         return view;
@@ -374,7 +380,7 @@ public class AllLayout extends Fragment {
 
     //bắt sự kiện view addPicture của TA
     private void EventViewAddPicture(){
-        btnAddPicture.setOnClickListener(new View.OnClickListener() {
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onAddButtonClicked();
@@ -396,11 +402,45 @@ public class AllLayout extends Fragment {
                 new UrlFragment().show(main.getSupportFragmentManager(), UrlFragment.Tag);
             }
         });
+        registerImageResultLauncher();
+        btnAddImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickMultiImages.launch(new PickVisualMediaRequest.Builder().setMediaType
+                        (ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
+            }
+        });
     }
 
+    private void registerImageResultLauncher(){
+        pickMultiImages = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(99),
+                new ActivityResultCallback<List<Uri>>() {
+            @Override
+            public void onActivityResult(List<Uri> result) {
+                if (!result.isEmpty()){
+                    try {
+                        main.dataResource.open();
+                        for (int i = 0; i<result.size(); i++){
+                            Bitmap image = MediaStore.Images.Media.getBitmap(main.getContentResolver(),result.get(i));
+                            Image img = new Image(image,main.GenerateName());
+                            img.setId(main.dataResource.InsertImage(img, MainActivity.userID));
+                            AllLayout.images.add(img);
+                            MainActivity.images.add(img);
+                            main.allLayout.adapter.insert(img);
+                            main.allLayout.update();
+                        }
+                        Log.d("PhotoPicker", "Number of items selected: " + result.size());
+                    } catch (Exception e){
 
+                    }
+                } else{
+                    Log.d("PhotoPicker", "No media selected");
+                }
+            }
+        });
+    }
 
-    private void initSpinerView() {
+    private void initSpinnerView() {
         ArrayList<String> data = new ArrayList<>();
         data.add("Default");
         data.add("ID");
@@ -534,23 +574,27 @@ public class AllLayout extends Fragment {
         if (!clicked) {
             btnAddCamera.setVisibility(View.VISIBLE);
             btnAddUrl.setVisibility(View.VISIBLE);
+            btnAddImage.setVisibility(View.VISIBLE);
         }
         else {
             btnAddCamera.setVisibility(View.GONE);
             btnAddUrl.setVisibility(View.GONE);
+            btnAddImage.setVisibility(View.GONE);
         }
     }
 
     private void setAnimation(boolean clicked) {
         if(!clicked) {
-            btnAddPicture.setAnimation(rotateOpen);
+            btnAdd.setAnimation(rotateOpen);
             btnAddCamera.setAnimation(fromBottom);
             btnAddUrl.setAnimation(fromBottom);
+            btnAddImage.setAnimation(fromBottom);
         }
         else {
-            btnAddPicture.setAnimation(rotateClose);
+            btnAdd.setAnimation(rotateClose);
             btnAddCamera.setAnimation(toBottom);
             btnAddUrl.setAnimation(toBottom);
+            btnAddImage.setAnimation(toBottom);
         }
     }
 
