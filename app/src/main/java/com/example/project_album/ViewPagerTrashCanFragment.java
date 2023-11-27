@@ -88,7 +88,7 @@ public class ViewPagerTrashCanFragment extends Fragment {
             public void onClick(View view) {
                 // Hiển thị Dialog
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(main);
-                alertDialogBuilder.setMessage("Are you sure you want to delete?");
+                alertDialogBuilder.setMessage("Bạn có muốn xóa hoàn toàn ảnh?");
                 alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -120,7 +120,7 @@ public class ViewPagerTrashCanFragment extends Fragment {
                 });
 
 
-                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                alertDialogBuilder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Xử lý khi chọn Cancel

@@ -1,6 +1,8 @@
 package com.example.project_album;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -319,7 +321,61 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         txtDeleteIntoTrashCan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(main, "Delete", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(main);
+                alertDialogBuilder.setMessage("Bạn có muốn xóa ảnh?");
+                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        long idImageDelete=images.get(index).getId();
+                        //Set hình ảnh đã xóa là True
+                        images.get(index).setDeleted("T");
+                        //Set ở dataResource là True đã xóa
+                        MainActivity.dataResource.updateStateImageDeletedIsTrue(images.get(index).getId());
+
+                        // cap nhật ở trashcan. them vao trash can
+                        main.trashCanLayout.updateTrashCan(images.get(index));
+
+                        //xóa ở images cua viewpager, k hiểu tại sao cái này nó lại xóa luôn
+                        //bên adapter của AllLayout nữa
+                        if (index == images.size() - 1) {
+                            images.remove(index);
+                            index = images.size() - 1;
+                        } else if (index == 0) {
+                            images.remove(0);
+                            index = 0;
+                        } else {
+                            images.remove(index);
+                        }
+                        if (images.size()==0){
+                            imgBack.callOnClick();
+                        }
+                        mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
+                        mViewPager.setAdapter(mAdapter);
+                        mViewPager.setCurrentItem(index, false);
+                        txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
+
+                        //xoa image o allLayout
+                        for (int i=0;i<AllLayout.images.size();i++){
+                            if (AllLayout.images.get(i).getId()==idImageDelete){
+                                AllLayout.images.remove(i);
+                                Log.e("TestAll","---------------------");
+                                break;
+                            }
+                        }
+                    }
+                });
+
+
+                alertDialogBuilder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Xử lý khi chọn Cancel
+                        dialog.dismiss(); // Đóng AlertDialog mà không làm gì cả
+                    }
+                });
+                // Hiển thị AlertDialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         });
         txtFavorite.setOnClickListener(new View.OnClickListener() {
