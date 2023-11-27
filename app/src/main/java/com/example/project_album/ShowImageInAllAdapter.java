@@ -48,12 +48,19 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         activity.allLayout.setTextInfo(new SimpleDateFormat("MM/dd/yyyy")
                 .format(images.get(position).getDate()));
+        if(activity.typeSquare.equals("square")) {
+            holder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
+        else{
+            holder.img.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        }
         holder.img.setImageBitmap(images.get(position).getImgBitmap());
         debug(String.valueOf(position));
         if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             debug("ok");
             RelativeLayout.LayoutParams layout = new RelativeLayout.LayoutParams
-                    (MainActivity.Width / 3 - 40, MainActivity.Width / 3 - 40);
+                    (MainActivity.Width / activity.NUMCOLUMN - 40,
+                            MainActivity.Width / activity.NUMCOLUMN - 40);
             layout.setMargins(0,0,0,10);
             if(checkFirstRow(position)){
                 layout.setMargins(0,200,0,10);;
@@ -66,7 +73,8 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
         }
         else {
             RelativeLayout.LayoutParams layout =new RelativeLayout.LayoutParams(
-                    MainActivity.Height / 5 - 30, MainActivity.Height / 5 - 30);
+                    MainActivity.Height / (activity.NUMCOLUMN*2) - 30,
+                    MainActivity.Height / (activity.NUMCOLUMN*2) - 30);
             layout.setMargins(0,0,0,10);
             holder.img.setLayoutParams(layout);
         }
@@ -157,11 +165,11 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
     private boolean checkFirstRow(int position){
         if(activity.getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_PORTRAIT ){
-            if(position<3)
+            if(position<activity.NUMCOLUMN)
                 return true;
         }
         else {
-            if (position<5){
+            if (position<activity.NUMCOLUMN*2){
                 return true;
             }
         }
@@ -170,11 +178,11 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
     private boolean checkLastRow(int position){
         if(activity.getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_PORTRAIT ){
-            if(position>= 3*(images.size()/3))
+            if(position>= activity.NUMCOLUMN*(images.size()/activity.NUMCOLUMN))
                 return true;
         }
         else {
-            if (position>=5*(images.size()/5)){
+            if (position>=activity.NUMCOLUMN*2*(images.size()/activity.NUMCOLUMN*2)){
                 return true;
             }
         }

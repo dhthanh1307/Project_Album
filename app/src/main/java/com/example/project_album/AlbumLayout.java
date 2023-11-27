@@ -396,9 +396,9 @@ public class AlbumLayout extends Fragment {
 
     }
     private Image getImage(long id){
-        for(int i = 0;i<AllLayout.images.size();i++){
-            if(id == AllLayout.images.get(i).getId()){
-                return AllLayout.images.get(i);
+        for(int i = 0;i<MainActivity.images.size();i++){
+            if(id == MainActivity.images.get(i).getId()){
+                return MainActivity.images.get(i);
             }
         }
         return null;
@@ -452,6 +452,7 @@ public class AlbumLayout extends Fragment {
             } else {
                 albums.get(1).removeImage(img);
             }
+            update();
         }
     }
     public void updateArrayFavorite(ArrayList<Image> imgs){
