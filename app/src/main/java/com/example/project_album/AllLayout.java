@@ -33,6 +33,8 @@ import android.widget.GridView;
 
 import android.hardware.Camera;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -88,6 +90,15 @@ public class AllLayout extends Fragment {
     private View v_allInfo;
     private boolean clicked = false;
 
+    //view header dialog
+    private TextView tv_theme;
+    private TextView tv_size_square_small;
+    private TextView tv_size_square_big;
+    private TextView tv_type_square;
+    private TextView tv_unzip;
+    private View v_dialog_h;
+    Dialog dialog_header;
+    //finish=======================================
 
     //finish
 
@@ -117,6 +128,7 @@ public class AllLayout extends Fragment {
     ShowImageInAllAdapter adapter;
     RecyclerView recyclerView;
     Spinner spinner;
+    private RelativeLayout rl_background;
     ArrayAdapter<String> spinnerAdapter;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
 
@@ -186,6 +198,16 @@ public class AllLayout extends Fragment {
 
         EventViewHeader();
         //finish===================================================
+        //View for header dialog
+        v_dialog_h = main.getLayoutInflater().inflate(R.layout.header_dialog,null);
+        tv_theme = v_dialog_h.findViewById(R.id.tv_theme);
+        tv_size_square_small = v_dialog_h.findViewById(R.id.tv_size_small);
+        tv_size_square_big = v_dialog_h.findViewById(R.id.tv_size_big);
+        tv_type_square = v_dialog_h.findViewById(R.id.tv_type_square);
+        tv_unzip = v_dialog_h.findViewById(R.id.tv_unzip);
+        dialog_header = new Dialog(main);
+        dialog_header.setContentView(v_dialog_h);
+        EventViewDialogHeader();
 
         //view footer
         img_all_info = main.bottom_navigation_album.findViewById(R.id.img_all_info);
@@ -207,6 +229,7 @@ public class AllLayout extends Fragment {
 
 
         //finish=====================================================
+        rl_background = view.findViewById(R.id.rl_background);
         tv_bottom = view.findViewById(R.id.tv_bottom);
         tv_bottom.setText(String.valueOf(images.size()) + " ảnh");
         adapter=new ShowImageInAllAdapter(main,R.layout.item_image,images);
@@ -219,7 +242,7 @@ public class AllLayout extends Fragment {
 
         spinner = view.findViewById(R.id.spinner);
         initSpinnerView();
-
+        setTheme();
 
         return view;
     }
@@ -227,6 +250,40 @@ public class AllLayout extends Fragment {
     public void setTextInfo(String info){
         tv_info.setText(info);
     }
+
+    private void EventViewDialogHeader() {
+        tv_theme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateTheme();
+            }
+        });
+        tv_size_square_small.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateSizeSquareSmall();
+            }
+        });
+        tv_size_square_big.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateSizeSquareBig();
+            }
+        });
+        tv_type_square.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateTypeSquare();
+            }
+        });
+        tv_unzip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doUnzipImage();
+            }
+        });
+    }
+
     //=======================bắt các sự kiện từ dialog ===================
     private void EventViewDialog() {
         tv_slider.setOnClickListener(new View.OnClickListener() {
@@ -349,8 +406,12 @@ public class AllLayout extends Fragment {
             @Override
             public void onClick(View view) {
                 // Chỗ này đang thử cho unzip sau Huy thêm dialog mới dô sau đó đổi là được
-                Toast.makeText(main, "UnZip", Toast.LENGTH_SHORT).show();
-                doUnzipImage();
+                Window window = dialog_header.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                WindowManager.LayoutParams attribute = window.getAttributes();
+                attribute.y = getResources().getDisplayMetrics().heightPixels -40;
+                attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+                dialog_header.show();
             }
         });
     }
@@ -558,9 +619,9 @@ public class AllLayout extends Fragment {
 
     private void DoSthWithOrientation(int newOrientation ) {
         if (newOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(),5));
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(),main.NUMCOLUMN*2));
         } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(),3));
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(),main.NUMCOLUMN));
         }
         //Toast.makeText(getContext(),"oke",Toast.LENGTH_SHORT).show();
     }
@@ -849,6 +910,68 @@ public class AllLayout extends Fragment {
         catch(Exception e){
             debug(e.toString());
         }
+    }
+    private void updateTheme(){
+        if(tv_theme.getText().toString().equals("Chế độ sáng")){
+            tv_theme.setText("Chế độ tối");
+            main.theme = "light";
+
+        }
+        else{
+            tv_theme.setText("Chế độ sáng");
+            main.theme = "dark";
+        }
+        setTheme();
+    }
+    private void setTheme(){
+        LinearLayout dialog_header = v_dialog_h.findViewById(R.id.linear);
+        LinearLayout dialog_all = v_dialog_h.findViewById(R.id.linear);
+        if(main.theme.equals("light")){
+            rl_background.setBackground(main.getDrawable(R.drawable.light_theme_background));
+            dialog_header.setBackground(main.getDrawable(R.drawable.light_theme_background));
+            dialog_all.setBackground(main.getDrawable(R.drawable.light_theme_background));
+        }
+        else{
+            rl_background.setBackgroundColor(main.getColor(R.color.black_n));
+            dialog_all.setBackgroundColor(main.getColor(R.color.black_n));
+            dialog_header.setBackgroundColor(main.getColor(R.color.black_n));
+
+        }
+    }
+    private void updateSizeSquareSmall(){
+        main.NUMCOLUMN += 2;
+        tv_size_square_big.setEnabled(true);
+        tv_size_square_big.setTextColor(main.getColor(R.color.textview_form));
+        if(main.NUMCOLUMN == 9){
+            tv_size_square_small.setEnabled(false);
+            tv_size_square_small.setTextColor(main.getColor(R.color.blue_press));
+        }
+        DoSthWithOrientation(getResources().getConfiguration().orientation);
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(images.size()-1);
+    }
+    private void updateSizeSquareBig(){
+        main.NUMCOLUMN -=2;
+        tv_size_square_small.setEnabled(true);
+        tv_size_square_small.setTextColor(main.getColor(R.color.textview_form));
+        if (main.NUMCOLUMN == 1){
+            tv_size_square_big.setEnabled(false);
+            tv_size_square_big.setTextColor(main.getColor(R.color.blue_press));
+        }
+        DoSthWithOrientation(getResources().getConfiguration().orientation);
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(images.size()-1);
+    }
+    private void updateTypeSquare(){
+        if(tv_type_square.getText().toString().equals("Chỉnh dạng lưới")){
+            tv_type_square.setText("Hiện thị vuông");
+            main.typeSquare = "non_square";
+        }
+        else{
+            tv_type_square.setText("Chỉnh dạng lưới");
+            main.typeSquare = "square";
+        }
+        adapter.notifyDataSetChanged();
     }
     @Override
     public void onPause(){

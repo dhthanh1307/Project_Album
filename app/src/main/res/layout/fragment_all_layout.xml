@@ -7,10 +7,12 @@
     tools:context=".AllLayout"
     android:background="@color/black_1">
     <RelativeLayout
+        android:id="@+id/rl_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        android:background="@drawable/light_theme_background"
         app:layout_constraintTop_toTopOf="parent">
         <Spinner
             android:layout_margin="10dp"

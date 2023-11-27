@@ -44,6 +44,9 @@ public class MainActivity extends FragmentActivity {
     public static int userID;
     public String username;
     public String password;
+    public String theme="Dark";
+    public int NUMCOLUMN = 3;
+    public String typeSquare = "square";
     NavigationView navigationView;
     FragmentTransaction ft;
     AllLayout allLayout;
@@ -252,10 +255,12 @@ public class MainActivity extends FragmentActivity {
         @Override
         public void run() { // busy work goes here...
             try {
-                for(int i = images.size() -16;i >=0;i--) {
+                for(int i = images.size() -1;i >=0;i--) {
                     Thread.sleep(1);
-                    images.get(i).setImgBitmap(
-                            getImageFromPath(images.get(i).getPath()));
+                    if(images.get(i).getImgBitmap()==null) {
+                        images.get(i).setImgBitmap(
+                                getImageFromPath(images.get(i).getPath()));
+                    }
                     debug(String.valueOf(i));
 //                    allLayout.update();
 //                    favoriteLayout.update();
