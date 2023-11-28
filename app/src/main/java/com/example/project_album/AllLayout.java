@@ -341,11 +341,12 @@ public class AllLayout extends Fragment {
                 for (int i = 0; i < adapter.image_chosen.size(); i++) {
 
                     //Nếu chọn xóa ảnh thì bắt buộc ảnh đó la unlike
-                    adapter.image_chosen.get(i).setFavorite("F");
-                    main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
-                    //Unlike ở Album
-                    main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
-
+                    if (adapter.image_chosen.get(i).getFavorite().equals("T")){
+                        adapter.image_chosen.get(i).setFavorite("F");
+                        main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
+                        //Unlike ở Album
+                        main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
+                    }
                     //thay đổi tính chất ảnh đã được xóa, là như này nó đã thay đổi bên main luôn rồi.
                     adapter.image_chosen.get(i).setDeleted("T");
 

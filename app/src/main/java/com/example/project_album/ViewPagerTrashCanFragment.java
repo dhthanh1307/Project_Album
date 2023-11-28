@@ -80,7 +80,65 @@ public class ViewPagerTrashCanFragment extends Fragment {
         btnRestore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(main, "Restore", Toast.LENGTH_SHORT).show();
+                // Hiển thị Dialog
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(main);
+                alertDialogBuilder.setMessage("Bạn có muốn khôi phục ảnh?");
+                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        long idImage = images.get(index).getId();
+                        //set trạng thái đã xóa là false ở data resource
+                        MainActivity.dataResource.updateStateImageDeletedIsFalse(idImage);
+                        //set trạng thái ảnh delete là F
+                        images.get(index).setDeleted("F");
+
+                        //add ảnh vào lại allLayout đúng vị trí đã xóa
+                        if (idImage > AllLayout.images.get(AllLayout.images.size() - 1).getId()) {
+                            AllLayout.images.add(images.get(index));
+                        } else if (idImage < AllLayout.images.get(0).getId()) {
+                            AllLayout.images.add(0, images.get(index));
+                        } else {
+                            for (int j = 1; j < AllLayout.images.size(); j++) {
+                                if (AllLayout.images.get(j - 1).getId() < idImage
+                                        && idImage < AllLayout.images.get(j).getId()) {
+                                    AllLayout.images.add(j, images.get(index));
+                                    break;
+                                }
+                            }
+                        }
+
+                        //Xóa ảnh ở image hiện hành
+                        if (index == images.size() - 1) {
+                            images.remove(index);
+                            index = images.size() - 1;
+                        } else if (index == 0) {
+                            images.remove(0);
+                            index = 0;
+                        } else {
+                            images.remove(index);
+                        }
+                        if (images.size()==0){
+                            txtBack.callOnClick();
+                        }
+                        mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
+                        mViewPager.setAdapter(mAdapter);
+                        mViewPager.setCurrentItem(index, false);
+                        txtNumberPerAll.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
+
+                    }
+                });
+
+
+                alertDialogBuilder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Xử lý khi chọn Cancel
+                        dialog.dismiss(); // Đóng AlertDialog mà không làm gì cả
+                    }
+                });
+                // Hiển thị AlertDialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         });
         btnDeleteImmediately.setOnClickListener(new View.OnClickListener() {

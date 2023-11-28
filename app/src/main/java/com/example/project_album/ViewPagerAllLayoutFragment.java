@@ -333,9 +333,12 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Nếu xóa thì thay đổi ảnh là unlike ở favorite và ở albumfavorite
-                        images.get(index).setFavorite("F");
-                        main.favoriteLayout.updateFavorite(images.get(index));
-                        main.albumLayout.updateFavorite(images.get(index));
+                        if(images.get(index).getFavorite().equals("T")){
+                            images.get(index).setFavorite("F");
+                            main.favoriteLayout.updateFavorite(images.get(index));
+                            main.albumLayout.updateFavorite(images.get(index));
+                        }
+
                         //
                         long idImageDelete=images.get(index).getId();
                         //Set hình ảnh đã xóa là True
