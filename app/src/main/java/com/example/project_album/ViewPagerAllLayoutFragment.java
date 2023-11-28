@@ -96,9 +96,9 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     private void onPageChange() {
         Log.e("ViewPaper ", String.valueOf(index));
         //Để khi mà bấm vào xem ảnh lớn ở bên mục favorite thì k còn cái xóa
-        if (main.getIDItemBottomNavigationView()==R.id.action_favorite){
+        if (main.getIDItemBottomNavigationView() == R.id.action_favorite) {
             txtDeleteIntoTrashCan.setVisibility(View.GONE);
-        }else{
+        } else {
             txtDeleteIntoTrashCan.setVisibility(View.VISIBLE);
         }
         txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
@@ -333,14 +333,14 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Nếu xóa thì thay đổi ảnh là unlike ở favorite và ở albumfavorite
-                        if(images.get(index).getFavorite().equals("T")){
+                        if (images.get(index).getFavorite().equals("T")) {
                             images.get(index).setFavorite("F");
                             main.favoriteLayout.updateFavorite(images.get(index));
-                            main.albumLayout.updateFavorite(images.get(index));
+                            // main.albumLayout.updateFavorite(images.get(index));
                         }
 
                         //
-                        long idImageDelete=images.get(index).getId();
+                        long idImageDelete = images.get(index).getId();
                         //Set hình ảnh đã xóa là True
                         images.get(index).setDeleted("T");
                         //Set ở dataResource là True đã xóa
@@ -360,7 +360,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                         } else {
                             images.remove(index);
                         }
-                        if (images.size()==0){
+                        if (images.size() == 0) {
                             imgBack.callOnClick();
                         }
                         mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
@@ -369,10 +369,10 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                         txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
 
                         //xoa image o allLayout
-                        for (int i=0;i<AllLayout.images.size();i++){
-                            if (AllLayout.images.get(i).getId()==idImageDelete){
+                        for (int i = 0; i < AllLayout.images.size(); i++) {
+                            if (AllLayout.images.get(i).getId() == idImageDelete) {
                                 AllLayout.images.remove(i);
-                                Log.e("TestAll","---------------------");
+                                Log.e("TestAll", "---------------------");
                                 break;
                             }
                         }
@@ -403,12 +403,12 @@ public class ViewPagerAllLayoutFragment extends Fragment {
 
 
                     if (main.getIDItemBottomNavigationView() == R.id.action_all_picture) {
-                        //Xóa Favorite khỏi album
-                        main.albumLayout.updateFavorite(images.get(index));
+                        //Xóa Favorite khỏi album- Huy cs xử lí bên Huy r
+                        //main.albumLayout.updateFavorite(images.get(index));
                         main.favoriteLayout.images.remove(images.get(index));
                     } else if (main.getIDItemBottomNavigationView() == R.id.action_favorite) {
                         //Xóa Favorite khỏi album
-                        main.albumLayout.updateFavorite(images.get(index));
+                        //main.albumLayout.updateFavorite(images.get(index));
                         if (index == 0) {
                             main.favoriteLayout.images.remove(0);
                             index = 0;
@@ -441,7 +441,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 } else {
                     images.get(index).setFavorite("T");
                     //Thêm Favorite vào album
-                    main.albumLayout.updateFavorite(images.get(index));
+                    //main.albumLayout.updateFavorite(images.get(index));
                     txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
                     MainActivity.dataResource.likeImage(images.get(index).getId());
                     main.favoriteLayout.images.add(images.get(index));

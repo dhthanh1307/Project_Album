@@ -261,7 +261,8 @@ public class DataResource {
         long id = image.getId();
         Log.e("SQLite","Person entry delete with id: "+id);
         try {
-            context.deleteFile(image.getPath());
+            File file = new File(image.getPath());
+            file.delete();
             database.delete(DatabaseHelper.TABLE_PICTURE, DatabaseHelper.COLUMN_ID + " = " + id,
                     null);
             return true;

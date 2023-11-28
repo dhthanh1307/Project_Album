@@ -178,7 +178,7 @@ public class FavoriteLayout extends Fragment {
 
 
                             //Unlike ở AlbumLayout
-                            main.albumLayout.updateFavorite(mGridAdapter.chosenArrayImages.get(i));
+                           // main.albumLayout.updateFavorite(mGridAdapter.chosenArrayImages.get(i));
                         }
                         mGridAdapter.setmSelectedArray();
                         mGridAdapter.setChosenArrayImages();

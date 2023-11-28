@@ -227,7 +227,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     private void updateFavorite(ArrayList<Image> imgs){
         for(int i = 0;i<imgs.size();i++){
             if(imgs.get(i).getFavorite().equals("F")){
-                main.albumLayout.updateFavorite(imgs.get(i));
+                //main.albumLayout.updateFavorite(imgs.get(i));
                 MainActivity.dataResource.likeImage(imgs.get(i).getId());
             }
         }

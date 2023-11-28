@@ -445,16 +445,16 @@ public class AlbumLayout extends Fragment {
         UpdateConfiguration(getResources().getConfiguration());
         myAlbumFragment.update();
     }
-    public void updateFavorite(Image img){
-        if(isInit) {
-            if (img.getFavorite().equals("T")) {
-                albums.get(1).getImages().add(img);
-            } else {
-                albums.get(1).removeImage(img);
-            }
-            update();
-        }
-    }
+//    public void updateFavorite(Image img){
+//        if(isInit) {
+//            if (img.getFavorite().equals("T")) {
+//                albums.get(1).getImages().add(img);
+//            } else {
+//                albums.get(1).removeImage(img);
+//            }
+//            update();
+//        }
+//    }
     public void updateArrayFavorite(ArrayList<Image> imgs){
         for(int i = 0;i<imgs.size();i++){
             if (imgs.get(i).getFavorite().equals("F")){

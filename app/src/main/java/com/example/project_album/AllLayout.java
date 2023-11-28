@@ -307,7 +307,6 @@ public class AllLayout extends Fragment {
                 for(int i=0;i<images.size();i++){
                     Log.e("pathImage","Path="+images.get(i).getPath());
                 }
-                Toast.makeText(main, "Zip", Toast.LENGTH_SHORT).show();
                 ArrayList<String> folder=new ArrayList<>();
                 for (int i=0;i<adapter.image_chosen.size();i++){
                     folder.add(adapter.image_chosen.get(i).getPath());
@@ -325,7 +324,7 @@ public class AllLayout extends Fragment {
                     if(adapter.image_chosen.get(i).getFavorite().equals("F")){
                         adapter.image_chosen.get(i).setFavorite("T");
                         main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
-                        main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
+                        //main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
                         MainActivity.dataResource.likeImage(adapter.image_chosen
                                 .get(i).getId());
                     }
@@ -345,7 +344,7 @@ public class AllLayout extends Fragment {
                         adapter.image_chosen.get(i).setFavorite("F");
                         main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
                         //Unlike ở Album
-                        main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
+                        //main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
                     }
                     //thay đổi tính chất ảnh đã được xóa, là như này nó đã thay đổi bên main luôn rồi.
                     adapter.image_chosen.get(i).setDeleted("T");
@@ -725,15 +724,17 @@ public class AllLayout extends Fragment {
                 if (edtNameZip.getText().toString().length()==0){
                     Toast.makeText(main, "Nhập tên file zip", Toast.LENGTH_SHORT).show();
                 }else{
-                    for (int i=0;i<folder.size();i++){
-                        Log.e("Path_file","Loi*" +folder.get(i));
-                    }
                     //Lấy đường dẫn thử mục Document
                     File externalDir = Environment.getExternalStorageDirectory();
                     String parentDirPath = externalDir.getPath() + "/Documents";
                     //Tạo thư mục ImageZips nếu chưa có
-                    Log.e("ABC",parentDirPath);
-                    File dir = new File(parentDirPath, "ImageZips");
+//                    String folder_main = "NewFolder";
+//
+//                    File f = new File(Environment.getExternalStorageDirectory(), folder_main);
+//                    if (!f.exists()) {
+//                        f.mkdirs();
+//                    }
+                    File dir = new File(Environment.getExternalStorageDirectory(), "ImageZips");
                     if (!dir.exists()) {
                         dir.mkdir();
                     }
