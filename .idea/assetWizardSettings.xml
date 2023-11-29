@@ -321,7 +321,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/add_photo_alternate/baseline_add_photo_alternate_24.xml" />
+                                      <entry key="url" value="file:/C:/Users/Dao%20Huu%20Thanh/AppData/Local/Android/Sdk/icons/material/materialicons/photo_filter/baseline_photo_filter_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -331,7 +331,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="add_image" />
+                            <entry key="outputName" value="filter" />
                             <entry key="sourceFile" value="E:\Github\Project_Album" />
                           </map>
                         </option>
