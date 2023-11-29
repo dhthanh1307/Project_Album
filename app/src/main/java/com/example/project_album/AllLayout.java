@@ -103,7 +103,7 @@ public class AllLayout extends Fragment {
     //finish
 
     //view header
-    private TextView tv_info,tv_choose;
+    private TextView tv_info, tv_choose;
     private Button btn_extend;
     //finish
 
@@ -123,7 +123,7 @@ public class AllLayout extends Fragment {
     private Animation fromBottom;
     private Animation toBottom;
     public static ArrayList<Image> images = new ArrayList<>();
-//    ImageAdapter adapter;
+    //    ImageAdapter adapter;
     //GridView gridView;
     ShowImageInAllAdapter adapter;
     RecyclerView recyclerView;
@@ -133,12 +133,13 @@ public class AllLayout extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
 
     //Zip
-    Button btnOkZip,btnCancelZip;
-    TextView txtTitleZip,txtDetailZip;
+    Button btnOkZip, btnCancelZip;
+    TextView txtTitleZip, txtDetailZip;
     EditText edtNameZip;
+
     //Xong zip
     public AllLayout() {
-        debug("constructor, images.count = "+String.valueOf(images.size()));
+        debug("constructor, images.count = " + String.valueOf(images.size()));
         //images = MainActivity.dataResource.getAllImage();
     }
 
@@ -153,7 +154,7 @@ public class AllLayout extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        debug("onCreate, images.size = "+String.valueOf(MainActivity.images.size()));
+        debug("onCreate, images.size = " + String.valueOf(MainActivity.images.size()));
         super.onCreate(savedInstanceState);
         try {
             context = getActivity();
@@ -165,10 +166,11 @@ public class AllLayout extends Fragment {
         }
         debug("finish onCreate");
     }
+
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        debug("onResume"+String.valueOf(images.size()));
+        debug("onResume" + String.valueOf(images.size()));
     }
 
     @Override
@@ -176,7 +178,7 @@ public class AllLayout extends Fragment {
                              Bundle savedInstanceState) {
         debug("onCreateView");
         // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_all_layout, container, false);
+        View view = inflater.inflate(R.layout.fragment_all_layout, container, false);
 
         // view for all info dialog
         v_allInfo = main.getLayoutInflater().inflate(R.layout.all_info_alllayout, null);
@@ -199,7 +201,7 @@ public class AllLayout extends Fragment {
         EventViewHeader();
         //finish===================================================
         //View for header dialog
-        v_dialog_h = main.getLayoutInflater().inflate(R.layout.header_dialog,null);
+        v_dialog_h = main.getLayoutInflater().inflate(R.layout.header_dialog, null);
         tv_theme = v_dialog_h.findViewById(R.id.tv_theme);
         tv_size_square_small = v_dialog_h.findViewById(R.id.tv_size_small);
         tv_size_square_big = v_dialog_h.findViewById(R.id.tv_size_big);
@@ -232,12 +234,11 @@ public class AllLayout extends Fragment {
         rl_background = view.findViewById(R.id.rl_background);
         tv_bottom = view.findViewById(R.id.tv_bottom);
         tv_bottom.setText(String.valueOf(images.size()) + " ảnh");
-        adapter=new ShowImageInAllAdapter(main,R.layout.item_image,images);
+        adapter = new ShowImageInAllAdapter(main, R.layout.item_image, images);
         recyclerView = view.findViewById(R.id.rv_image_in_all);
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         recyclerView.setAdapter(adapter);
         recyclerView.scrollToPosition(images.size() - 1);
-
 
 
         spinner = view.findViewById(R.id.spinner);
@@ -247,7 +248,7 @@ public class AllLayout extends Fragment {
         return view;
     }
 
-    public void setTextInfo(String info){
+    public void setTextInfo(String info) {
         tv_info.setText(info);
     }
 
@@ -292,7 +293,7 @@ public class AllLayout extends Fragment {
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
                 Fragment fragment = new ViewPagerAllLayoutFragment(adapter.image_chosen);
-                ft.add(R.id.replace_fragment_layout,fragment);
+                ft.add(R.id.replace_fragment_layout, fragment);
                 ft.addToBackStack(fragment.getClass().getSimpleName());
                 ft.commit();
                 dialog.dismiss();
@@ -304,11 +305,11 @@ public class AllLayout extends Fragment {
         tv_zip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for(int i=0;i<images.size();i++){
-                    Log.e("pathImage","Path="+images.get(i).getPath());
+                for (int i = 0; i < images.size(); i++) {
+                    Log.e("pathImage", "Path=" + images.get(i).getPath());
                 }
-                ArrayList<String> folder=new ArrayList<>();
-                for (int i=0;i<adapter.image_chosen.size();i++){
+                ArrayList<String> folder = new ArrayList<>();
+                for (int i = 0; i < adapter.image_chosen.size(); i++) {
                     folder.add(adapter.image_chosen.get(i).getPath());
                 }
                 doZipImage(folder);
@@ -320,8 +321,8 @@ public class AllLayout extends Fragment {
         tv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (int i = 0;i<adapter.image_chosen.size();i++){
-                    if(adapter.image_chosen.get(i).getFavorite().equals("F")){
+                for (int i = 0; i < adapter.image_chosen.size(); i++) {
+                    if (adapter.image_chosen.get(i).getFavorite().equals("F")) {
                         adapter.image_chosen.get(i).setFavorite("T");
                         main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
                         //main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
@@ -340,7 +341,7 @@ public class AllLayout extends Fragment {
                 for (int i = 0; i < adapter.image_chosen.size(); i++) {
 
                     //Nếu chọn xóa ảnh thì bắt buộc ảnh đó la unlike
-                    if (adapter.image_chosen.get(i).getFavorite().equals("T")){
+                    if (adapter.image_chosen.get(i).getFavorite().equals("T")) {
                         adapter.image_chosen.get(i).setFavorite("F");
                         main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
                         //Unlike ở Album
@@ -386,7 +387,7 @@ public class AllLayout extends Fragment {
         tv_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(tv_choose.getText().equals("Chọn")){
+                if (tv_choose.getText().equals("Chọn")) {
                     tv_choose.setTranslationX(100);
                     btnAddCamera.setVisibility(View.INVISIBLE);
                     tv_choose.setText("Hủy");
@@ -394,8 +395,7 @@ public class AllLayout extends Fragment {
                     btn_extend.setVisibility(View.INVISIBLE);
                     main.mBottomNavigationView.setVisibility(View.INVISIBLE);
                     main.bottom_navigation_album.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     tv_choose.setTranslationX(0);
                     btnAddCamera.setVisibility(View.VISIBLE);
                     adapter.setChooseSelection(false);
@@ -416,7 +416,7 @@ public class AllLayout extends Fragment {
                 Window window = dialog_header.getWindow();
                 window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 WindowManager.LayoutParams attribute = window.getAttributes();
-                attribute.y = getResources().getDisplayMetrics().heightPixels -40;
+                attribute.y = getResources().getDisplayMetrics().heightPixels - 40;
                 attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
                 dialog_header.show();
             }
@@ -430,16 +430,15 @@ public class AllLayout extends Fragment {
         img_all_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(adapter.image_chosen.size()>0) {
+                if (adapter.image_chosen.size() > 0) {
                     Window window = dialog.getWindow();
                     window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     WindowManager.LayoutParams attribute = window.getAttributes();
                     attribute.y = 280;
                     attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
                     dialog.show();
-                }
-                else{
-                    Toast.makeText(main,"Bạn chưa chọn ảnh",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(main, "Bạn chưa chọn ảnh", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -447,7 +446,7 @@ public class AllLayout extends Fragment {
     //kết thúc bắt sự kiện từ view footer=============================
 
     //bắt sự kiện view addPicture của TA
-    private void EventViewAddPicture(){
+    private void EventViewAddPicture() {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -480,32 +479,32 @@ public class AllLayout extends Fragment {
         });
     }
 
-    private void registerImageResultLauncher(){
+    private void registerImageResultLauncher() {
         pickMultiImages = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(99),
                 new ActivityResultCallback<List<Uri>>() {
-            @Override
-            public void onActivityResult(List<Uri> result) {
-                if (!result.isEmpty()){
-                    try {
-                        main.dataResource.open();
-                        for (int i = 0; i<result.size(); i++){
-                            Bitmap image = MediaStore.Images.Media.getBitmap(main.getContentResolver(),result.get(i));
-                            Image img = new Image(image,main.GenerateName());
-                            img.setId(main.dataResource.InsertImage(img, MainActivity.userID));
-                            AllLayout.images.add(img);
-                            MainActivity.images.add(img);
-                            main.allLayout.adapter.insert(img);
-                            main.allLayout.update();
-                        }
-                        Log.d("PhotoPicker", "Number of items selected: " + result.size());
-                    } catch (Exception e){
+                    @Override
+                    public void onActivityResult(List<Uri> result) {
+                        if (!result.isEmpty()) {
+                            try {
+                                main.dataResource.open();
+                                for (int i = 0; i < result.size(); i++) {
+                                    Bitmap image = MediaStore.Images.Media.getBitmap(main.getContentResolver(), result.get(i));
+                                    Image img = new Image(image, main.GenerateName());
+                                    img.setId(main.dataResource.InsertImage(img, MainActivity.userID));
+                                    AllLayout.images.add(img);
+                                    MainActivity.images.add(img);
+                                    main.allLayout.adapter.insert(img);
+                                    main.allLayout.update();
+                                }
+                                Log.d("PhotoPicker", "Number of items selected: " + result.size());
+                            } catch (Exception e) {
 
+                            }
+                        } else {
+                            Log.d("PhotoPicker", "No media selected");
+                        }
                     }
-                } else{
-                    Log.d("PhotoPicker", "No media selected");
-                }
-            }
-        });
+                });
     }
 
     private void initSpinnerView() {
@@ -544,10 +543,10 @@ public class AllLayout extends Fragment {
                         }
                     }
                     adapter.notifyDataSetChanged();
-                }else if(selectedItem.equals("Default")){
+                } else if (selectedItem.equals("Default")) {
                     images = new ArrayList<>();
-                    for (int i = 0;i<MainActivity.images.size();i++){
-                        if(MainActivity.images.get(i).getDeleted().equals("F")){
+                    for (int i = 0; i < MainActivity.images.size(); i++) {
+                        if (MainActivity.images.get(i).getDeleted().equals("F")) {
                             images.add(MainActivity.images.get(i));
                         }
                     }
@@ -624,11 +623,11 @@ public class AllLayout extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    private void DoSthWithOrientation(int newOrientation ) {
+    private void DoSthWithOrientation(int newOrientation) {
         if (newOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(),main.NUMCOLUMN*2));
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), main.NUMCOLUMN * 2));
         } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(),main.NUMCOLUMN));
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), main.NUMCOLUMN));
         }
         //Toast.makeText(getContext(),"oke",Toast.LENGTH_SHORT).show();
     }
@@ -638,13 +637,13 @@ public class AllLayout extends Fragment {
         setAnimation(clicked);
         clicked = !clicked;
     }
+
     private void setVisibility(boolean clicked) {
         if (!clicked) {
             btnAddCamera.setVisibility(View.VISIBLE);
             btnAddUrl.setVisibility(View.VISIBLE);
             btnAddImage.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             btnAddCamera.setVisibility(View.GONE);
             btnAddUrl.setVisibility(View.GONE);
             btnAddImage.setVisibility(View.GONE);
@@ -652,13 +651,12 @@ public class AllLayout extends Fragment {
     }
 
     private void setAnimation(boolean clicked) {
-        if(!clicked) {
+        if (!clicked) {
             btnAdd.setAnimation(rotateOpen);
             btnAddCamera.setAnimation(fromBottom);
             btnAddUrl.setAnimation(fromBottom);
             btnAddImage.setAnimation(fromBottom);
-        }
-        else {
+        } else {
             btnAdd.setAnimation(rotateClose);
             btnAddCamera.setAnimation(toBottom);
             btnAddUrl.setAnimation(toBottom);
@@ -668,50 +666,52 @@ public class AllLayout extends Fragment {
 
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
     }
 
-    public void debug1(){
-        for(int i =0;i<images.size();i++){
+    public void debug1() {
+        for (int i = 0; i < images.size(); i++) {
             debug(String.valueOf(images.get(i).getId()));
         }
     }
-    public void showBigScreen(int position){
+
+    public void showBigScreen(int position) {
         FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
-        ViewPagerAllLayoutFragment newFragment=new ViewPagerAllLayoutFragment(images,position);
+        ViewPagerAllLayoutFragment newFragment = new ViewPagerAllLayoutFragment(images, position);
         ft.replace(R.id.replace_fragment_layout, newFragment);
         ft.commit();
 
     }
-    private void debug(String str){
-        Log.e("AllLayout",str);
+
+    private void debug(String str) {
+        Log.e("AllLayout", str);
     }
+
     private Bitmap getImageFromPath(String path) {
-        Bitmap b =null;
+        Bitmap b = null;
         debug(path);
         try {
             File f = new File(path);
             b = BitmapFactory.decodeStream(new FileInputStream(f));
-        }
-        catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
 
             e.printStackTrace();
         }
         return b;
     }
+
     //=================== Quá trình zip =======================
-    public void doZipImage(ArrayList<String> folder){
-        Dialog mDialog=new Dialog(main);
+    public void doZipImage(ArrayList<String> folder) {
+        Dialog mDialog = new Dialog(main);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mDialog.setContentView(R.layout.dialog_zip);
-        txtTitleZip=mDialog.findViewById(R.id.txt_title_zip);
-        txtDetailZip=mDialog.findViewById(R.id.txt_detail_zip);
-        edtNameZip=mDialog.findViewById(R.id.edt_name_zip);
-        btnOkZip=mDialog.findViewById(R.id.btn_ok_zip);
-        btnCancelZip=mDialog.findViewById(R.id.btn_cancel_zip);
+        txtTitleZip = mDialog.findViewById(R.id.txt_title_zip);
+        txtDetailZip = mDialog.findViewById(R.id.txt_detail_zip);
+        edtNameZip = mDialog.findViewById(R.id.edt_name_zip);
+        btnOkZip = mDialog.findViewById(R.id.btn_ok_zip);
+        btnCancelZip = mDialog.findViewById(R.id.btn_cancel_zip);
         btnCancelZip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -721,20 +721,13 @@ public class AllLayout extends Fragment {
         btnOkZip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (edtNameZip.getText().toString().length()==0){
+                if (edtNameZip.getText().toString().length() == 0) {
                     Toast.makeText(main, "Nhập tên file zip", Toast.LENGTH_SHORT).show();
-                }else{
+                } else{
                     //Lấy đường dẫn thử mục Document
                     File externalDir = Environment.getExternalStorageDirectory();
                     String parentDirPath = externalDir.getPath() + "/Documents";
-                    //Tạo thư mục ImageZips nếu chưa có
-//                    String folder_main = "NewFolder";
-//
-//                    File f = new File(Environment.getExternalStorageDirectory(), folder_main);
-//                    if (!f.exists()) {
-//                        f.mkdirs();
-//                    }
-                    File dir = new File(Environment.getExternalStorageDirectory(), "ImageZips");
+                    File dir = new File(parentDirPath, "ImageZips");
                     if (!dir.exists()) {
                         dir.mkdir();
                     }
@@ -761,6 +754,7 @@ public class AllLayout extends Fragment {
         });
         mDialog.show();
     }
+
     public void zip(ArrayList<String> folder, String fileNameZip) throws IOException {
         BufferedInputStream origin = null;
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileNameZip)));
@@ -789,7 +783,6 @@ public class AllLayout extends Fragment {
     //===================Kết thúc zip=======================
 
 
-
     //=================== Quá trình unzip =======================
     // list ds đã zip bên trong thư mục ImagesZip
     public ArrayList<String> getListOfFilesInDirectory(String directoryPath) {
@@ -806,20 +799,21 @@ public class AllLayout extends Fragment {
                 }
             }
         } else {
-            Log.e("Loi","Thư mục không tồn tại hoặc không phải là thư mục.");
+            Log.e("Loi", "Thư mục không tồn tại hoặc không phải là thư mục.");
         }
 
         return fileList;
     }
-    public  void doUnzipImage(){
-        Dialog mDialog=new Dialog(main);
+
+    public void doUnzipImage() {
+        Dialog mDialog = new Dialog(main);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mDialog.setContentView(R.layout.dialog_zip);
-        txtTitleZip=mDialog.findViewById(R.id.txt_title_zip);
-        txtDetailZip=mDialog.findViewById(R.id.txt_detail_zip);
-        edtNameZip=mDialog.findViewById(R.id.edt_name_zip);
-        btnOkZip=mDialog.findViewById(R.id.btn_ok_zip);
-        btnCancelZip=mDialog.findViewById(R.id.btn_cancel_zip);
+        txtTitleZip = mDialog.findViewById(R.id.txt_title_zip);
+        txtDetailZip = mDialog.findViewById(R.id.txt_detail_zip);
+        edtNameZip = mDialog.findViewById(R.id.edt_name_zip);
+        btnOkZip = mDialog.findViewById(R.id.btn_ok_zip);
+        btnCancelZip = mDialog.findViewById(R.id.btn_cancel_zip);
 
         txtTitleZip.setText("Unzip");
         txtDetailZip.setText("Sau khi unzip tệp sẽ hiển thị ở theo đường dẫn \n Documents/ImageUnZips/TênFileZip");
@@ -833,15 +827,15 @@ public class AllLayout extends Fragment {
         btnOkZip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (edtNameZip.getText().toString().length()==0){
+                if (edtNameZip.getText().toString().length() == 0) {
                     Toast.makeText(main, "Nhập tên file cần unzip", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     //Lấy đường dẫn Zip truyền vào để UnZip
                     File externalDir1 = Environment.getExternalStorageDirectory();
                     String parentDirPath1 = externalDir1.getPath() + "/Documents/ImageZips";
-                    String zipFile=parentDirPath1+"/"+edtNameZip.getText().toString();
+                    String zipFile = parentDirPath1 + "/" + edtNameZip.getText().toString();
                     ArrayList<String> fileList = getListOfFilesInDirectory(parentDirPath1);
-                    if (!fileList.contains(edtNameZip.getText().toString())){
+                    if (!fileList.contains(edtNameZip.getText().toString())) {
                         Toast.makeText(main, "Không tồn tại file đã zip", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -854,13 +848,13 @@ public class AllLayout extends Fragment {
                         dir.mkdir();
                     }
                     //Tạo thư mục chứa ảnh UnZip
-                    File dirChildNameZip=new File(dir, edtNameZip.getText().toString());
+                    File dirChildNameZip = new File(dir, edtNameZip.getText().toString());
                     if (!dirChildNameZip.exists()) {
                         dirChildNameZip.mkdir();
                     }
 
                     try {
-                        unzip(zipFile,dirChildNameZip.getPath());
+                        unzip(zipFile, dirChildNameZip.getPath());
                         Toast.makeText(main, "UnZip thành công", Toast.LENGTH_SHORT).show();
                         mDialog.dismiss();
                     } catch (IOException e) {
@@ -911,84 +905,87 @@ public class AllLayout extends Fragment {
     }
 
     //=======================Kết thúc unzip
-    public void update(){
+    public void update() {
         try {
             adapter.notifyDataSetChanged();
             debug("update");
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             debug(e.toString());
         }
     }
-    private void updateTheme(){
-        if(tv_theme.getText().toString().equals("Chế độ sáng")){
+
+    private void updateTheme() {
+        if (tv_theme.getText().toString().equals("Chế độ sáng")) {
             tv_theme.setText("Chế độ tối");
             main.theme = "light";
 
-        }
-        else{
+        } else {
             tv_theme.setText("Chế độ sáng");
             main.theme = "dark";
         }
         setTheme();
     }
-    private void setTheme(){
+
+    private void setTheme() {
         LinearLayout dialog_header = v_dialog_h.findViewById(R.id.linear);
         LinearLayout dialog_all = v_dialog_h.findViewById(R.id.linear);
-        if(main.theme.equals("light")){
+        if (main.theme.equals("light")) {
             rl_background.setBackground(main.getDrawable(R.drawable.light_theme_background));
             dialog_header.setBackground(main.getDrawable(R.drawable.light_theme_background));
             dialog_all.setBackground(main.getDrawable(R.drawable.light_theme_background));
-        }
-        else{
+        } else {
             rl_background.setBackgroundColor(main.getColor(R.color.black_n));
             dialog_all.setBackgroundColor(main.getColor(R.color.black_n));
             dialog_header.setBackgroundColor(main.getColor(R.color.black_n));
 
         }
     }
-    private void updateSizeSquareSmall(){
+
+    private void updateSizeSquareSmall() {
         main.NUMCOLUMN += 2;
         tv_size_square_big.setEnabled(true);
         tv_size_square_big.setTextColor(main.getColor(R.color.textview_form));
-        if(main.NUMCOLUMN == 9){
+        if (main.NUMCOLUMN == 9) {
             tv_size_square_small.setEnabled(false);
             tv_size_square_small.setTextColor(main.getColor(R.color.blue_press));
         }
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         adapter.notifyDataSetChanged();
-        recyclerView.scrollToPosition(images.size()-1);
+        recyclerView.scrollToPosition(images.size() - 1);
     }
-    private void updateSizeSquareBig(){
-        main.NUMCOLUMN -=2;
+
+    private void updateSizeSquareBig() {
+        main.NUMCOLUMN -= 2;
         tv_size_square_small.setEnabled(true);
         tv_size_square_small.setTextColor(main.getColor(R.color.textview_form));
-        if (main.NUMCOLUMN == 1){
+        if (main.NUMCOLUMN == 1) {
             tv_size_square_big.setEnabled(false);
             tv_size_square_big.setTextColor(main.getColor(R.color.blue_press));
         }
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         adapter.notifyDataSetChanged();
-        recyclerView.scrollToPosition(images.size()-1);
+        recyclerView.scrollToPosition(images.size() - 1);
     }
-    private void updateTypeSquare(){
-        if(tv_type_square.getText().toString().equals("Chỉnh dạng lưới")){
+
+    private void updateTypeSquare() {
+        if (tv_type_square.getText().toString().equals("Chỉnh dạng lưới")) {
             tv_type_square.setText("Hiện thị vuông");
             main.typeSquare = "non_square";
-        }
-        else{
+        } else {
             tv_type_square.setText("Chỉnh dạng lưới");
             main.typeSquare = "square";
         }
         adapter.notifyDataSetChanged();
     }
+
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         debug("onPause " + String.valueOf(images.size()));
     }
+
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
         debug("onStop " + String.valueOf(images.size()));
     }

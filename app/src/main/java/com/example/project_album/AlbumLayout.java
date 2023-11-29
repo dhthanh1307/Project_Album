@@ -351,7 +351,7 @@ public class AlbumLayout extends Fragment {
     private void InitAlbums() {
         if(!isInit) {
             if (albums.size() == 0 && main.username.equals("admin")
-            &&main.password.equals("admin")) {
+                    &&main.password.equals("admin")) {
                 ArrayList<Integer> ids = new ArrayList<>();
                 long id = MainActivity.dataResource.InsertAlbum("Airplane",MainActivity.userID);
 //            MainActivity.dataResource.InsertAlbum("Holiday",MainActivity.userID);
@@ -367,20 +367,19 @@ public class AlbumLayout extends Fragment {
                 }
                 albums = MainActivity.dataResource.getAllAlbum(MainActivity.userID);
             }
-            ArrayList<Image> images3 = new ArrayList<Image>();
+            ArrayList<Image> images3;
+            images3 = FavoriteLayout.images;
             Album a2 = new Album(-1,"Mục yêu thích", images3);
-            for(int i = 0;i<AllLayout.images.size();i++){
-                if(AllLayout.images.get(i).getFavorite().equals("T")){
-                    a2.addImage(AllLayout.images.get(i));
-                }
-            }
 
-            ArrayList<Image> images4 = new ArrayList<Image>();
-            images4.addAll(AllLayout.images);
+            ArrayList<Image> images4;
+            images4 = AllLayout.images;
             Album a1 = new Album(-2,"Tất cả", images4);
             albums.add(0, a1);
             albums.add(1, a2);
             ConvertAlbum();
+        }
+        else{
+            albums.get(0).setImages(AllLayout.images);
         }
 
     }
@@ -462,4 +461,5 @@ public class AlbumLayout extends Fragment {
             }
         }
     }
+
 }

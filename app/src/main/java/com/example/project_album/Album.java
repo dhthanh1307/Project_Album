@@ -47,6 +47,9 @@ public class Album {
             }
         }
     }
+    public void setImages(ArrayList<Image> img){
+        images = img;
+    }
     public void clear(){
         images = new ArrayList<>();
     }
