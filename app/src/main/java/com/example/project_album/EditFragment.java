@@ -2,7 +2,13 @@ package com.example.project_album;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,22 +16,30 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 
 public class EditFragment extends Fragment {
 
-
+    private Canvas canvas;
+    private Paint paint;
 
     Context context = null;
     MainActivity main;
     ImageView imageView;
     Bitmap originalBitmap ;
+    int size=5;
+
     ArrayList<Image> images = new ArrayList<>();
     int index=0;
     EditFragment(ArrayList<Image> imgs, int index){
@@ -69,8 +83,65 @@ public class EditFragment extends Fragment {
         ImageView right=view.findViewById(R.id.txt_right);
         ImageView left=view.findViewById(R.id.txt_left);
         ImageView flip=view.findViewById(R.id.txt_flip);
+        ImageView draw=view.findViewById(R.id.txt_draw);
+        ImageView filter=view.findViewById(R.id.txt_filter);
         ImageView cancel=view.findViewById(R.id.cancel);
         ImageView save=view.findViewById(R.id.save);
+        HorizontalScrollView scrollView=view.findViewById(R.id.srcollview);
+        ImageView filter1=view.findViewById(R.id.filter1);
+        ImageView filter2=view.findViewById(R.id.filter2);
+        ImageView filter3=view.findViewById(R.id.filter3);
+        ImageView filter4=view.findViewById(R.id.filter4);
+        ImageView filter5=view.findViewById(R.id.filter5);
+        ImageView filter6=view.findViewById(R.id.filter6);
+        ImageView filter7=view.findViewById(R.id.filter7);
+        ImageView filter8=view.findViewById(R.id.filter8);
+
+
+        LinearLayout color=view.findViewById(R.id.color);
+        ImageView color1=view.findViewById(R.id.color1);
+        ImageView color2=view.findViewById(R.id.color2);
+        ImageView color3=view.findViewById(R.id.color3);
+        ImageView color4=view.findViewById(R.id.color4);
+        ImageView color5=view.findViewById(R.id.color5);
+        ImageView color6=view.findViewById(R.id.color6);
+        ImageView increase=view.findViewById(R.id.increase);
+        ImageView decrease=view.findViewById(R.id.decrease);
+
+
+
+        //định dạng nét vẽ
+        paint = new Paint();
+        paint.setStrokeWidth(5);
+        paint.setStyle(Paint.Style.STROKE);
+
+
+
+
+
+        Bitmap tempfilter=originalBitmap;
+        filter1.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter1(originalBitmap,0.5f);
+        filter2.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter2(originalBitmap,0.33333f);
+        filter3.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter3(originalBitmap,-1.0f);
+        filter4.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter2(originalBitmap,0.1f);
+        filter5.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter1(originalBitmap,1.2f);
+        filter6.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter2(originalBitmap,1.5f);
+        filter7.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter1(originalBitmap,0.75f);
+        filter8.setImageBitmap(tempfilter);
 
         right.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +182,188 @@ public class EditFragment extends Fragment {
 
             }
         });
+        draw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(main, "Draw", Toast.LENGTH_SHORT).show();
+                scrollView.setVisibility(View.INVISIBLE);
+                color.setVisibility(view.VISIBLE);
+                imageView.setOnTouchListener(new View.OnTouchListener() {
+                    float startX, startY;
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        // chuyển sang bitmap có thể thay đổi
+                        originalBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                        canvas = new Canvas(originalBitmap);
+                        //chuyển tọa độ trên imageview lên ảnh gốc
+                        Matrix matrix = imageView.getImageMatrix();
+                        Matrix inverseMatrix = new Matrix();
+                        matrix.invert(inverseMatrix);
+                        float[] touchPoint = {event.getX(), event.getY()};
+                        inverseMatrix.mapPoints(touchPoint);
+
+                        float originalX = touchPoint[0];
+                        float originalY = touchPoint[1];
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+                                startX = originalX;
+                                startY = originalY;
+                                break;
+                            case MotionEvent.ACTION_MOVE:
+                                float endX = originalX;
+                                float endY = originalY;
+                                canvas.drawLine(startX, startY, endX, endY, paint);
+                                startX = endX;
+                                startY = endY;
+                                imageView.setImageBitmap(originalBitmap);
+                                break;
+
+                        }
+                        return true;
+                    }
+                });
+
+
+
+            }
+        });
+        color1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.setColor(Color.WHITE);
+            }
+        });
+        color2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.setColor(Color.BLACK);
+            }
+        });
+        color3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.setColor(Color.RED);
+            }
+        });
+        color4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.setColor(Color.GREEN);
+            }
+        });
+        color5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.setColor(Color.parseColor("#FF69B4"));
+            }
+        });
+        color6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.setColor(Color.parseColor("#FFFF00"));
+            }
+        });
+
+
+        increase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                size+=3;
+                paint.setStrokeWidth(size);
+            }
+        });
+        decrease.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                size-=3;
+                if(size<1) size=1;
+                paint.setStrokeWidth(size);
+            }
+        });
+        filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(main, "Filter", Toast.LENGTH_SHORT).show();
+                scrollView.setVisibility(View.VISIBLE);
+                color.setVisibility(view.INVISIBLE);
+
+            }
+        });
+        filter1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
+        filter2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+
+                originalBitmap=setfilter1(originalBitmap,0.5f);
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
+        filter3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+
+                originalBitmap=setfilter2(originalBitmap,0.333333f);
+
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
+        filter4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+
+                originalBitmap=setfilter3(originalBitmap,-1.0f);
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
+        filter5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+
+                originalBitmap=setfilter2(originalBitmap,0.1f);
+
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
+        filter6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+
+                originalBitmap=setfilter1(originalBitmap,1.2f);
+
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
+        filter7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+
+                originalBitmap=setfilter2(originalBitmap,1.5f);
+
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
+        filter8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                originalBitmap=images.get(index).getImgBitmap();
+
+                originalBitmap=setfilter1(originalBitmap,0.75f);
+
+                imageView.setImageBitmap(originalBitmap);
+            }
+        });
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,5 +387,53 @@ public class EditFragment extends Fragment {
         });
 
         return view;
+    }
+    public Bitmap setfilter1(Bitmap originalBitmap,float x){
+        // chuyển sang bitmap có thể thay đổi
+        originalBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        canvas = new Canvas(originalBitmap);
+        //biến đổi màu sắc ảnh
+        ColorMatrix colorMatrix=new ColorMatrix();
+        colorMatrix.set(new float[] {
+                x, 0,0, 0, 0,
+                0,x,0, 0, 0,
+                0,0,x, 0, 0,
+                0, 0, 0, 1, 0
+        });
+        paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+        canvas.drawBitmap(originalBitmap,0, 0, paint);
+        return originalBitmap;
+    }
+    public Bitmap setfilter2(Bitmap originalBitmap,float x){
+        // chuyển sang bitmap có thể thay đổi
+        originalBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        canvas = new Canvas(originalBitmap);
+        //biến đổi màu sắc ảnh
+        ColorMatrix colorMatrix=new ColorMatrix();
+        colorMatrix.set(new float[] {
+                x, x,x, 0, 0,
+                x,x,x, 0, 0,
+                x,x,x, 0, 0,
+                0, 0, 0, 1, 0
+        });
+        paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+        canvas.drawBitmap(originalBitmap,0, 0, paint);
+        return originalBitmap;
+    }
+    public Bitmap setfilter3(Bitmap originalBitmap,float x){
+        // chuyển sang bitmap có thể thay đổi
+        originalBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        canvas = new Canvas(originalBitmap);
+        //biến đổi màu sắc ảnh
+        ColorMatrix colorMatrix=new ColorMatrix();
+        colorMatrix.set(new float[] {
+                x, 0,0, 0, 255,
+                0,x,0, 0, 255,
+                0,0,x, 0, 255,
+                0, 0, 0, 1, 0
+        });
+        paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+        canvas.drawBitmap(originalBitmap,0, 0, paint);
+        return originalBitmap;
     }
 }
