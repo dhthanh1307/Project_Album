@@ -62,6 +62,10 @@ public class AlbumLayout extends Fragment {
     //view dialog
     private Dialog dialog;
 
+    //Hiden
+    RelativeLayout rllHiden;
+    TextView tvNumberHiden;
+
 
     private AlbumLayout(){
         debug("constructor");
@@ -116,6 +120,17 @@ public class AlbumLayout extends Fragment {
         btnAddAlbum = mainView.findViewById(R.id.btn_add_album);
         layout_icon = (RelativeLayout)mainView.findViewById(R.id.layout_icon);
         sv = (ScrollView)mainView.findViewById(R.id.sv_parent);
+        //Hidden
+        rllHiden=mainView.findViewById(R.id.rll_hidden);
+        tvNumberHiden=mainView.findViewById(R.id.tv_num_hiden);
+        tvNumberHiden.setText(String.valueOf(HideInAlbumLayoutFragment.images.size()));
+        rllHiden.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToFragmentPictureHidden();
+            }
+        });
+        //Hiden
         sv.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View view,int i, int i1, int i2, int i3) {
@@ -460,6 +475,16 @@ public class AlbumLayout extends Fragment {
                 albums.get(1).getImages().add(imgs.get(i));
             }
         }
+    }
+    //Hidden
+    public  void goToFragmentPictureHidden(){
+        FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
+        HideInAlbumLayoutFragment hideFragment=new HideInAlbumLayoutFragment();
+        ft.replace(R.id.replace_fragment_layout, hideFragment);
+        ft.commit();
+    }
+    public void setTextNumberHide(int numberHide){
+        tvNumberHiden.setText(String.valueOf(numberHide));
     }
 
 }

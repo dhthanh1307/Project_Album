@@ -40,6 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //mà chỉ hiển thị ở trash can, biến này kiểu trong SQL là text
 
     public static final String COLUMN_IS_FAVORITE = "is_favorite";
+    public static final String COLUMN_IS_HIDE = "is_hide";
 
     // cac cau lenh tao bang
     private static final String DATABASE_CREATE_USERS = "create table " + TABLE_USERS + "( "
@@ -73,6 +74,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_IS_DELETE
             + " text not null, "
             + COLUMN_IS_FAVORITE
+            + " text not null, "
+            + COLUMN_IS_HIDE
             + " text not null, "
             + COLUMN_DESCRIBE
             + " text);";

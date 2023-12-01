@@ -21,7 +21,8 @@ public class DataResource {
     private Context context;
     private String[] allColumns = {DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_USER, DatabaseHelper.COLUMN_IMAGE
             , DatabaseHelper.COLUMN_NAME, DatabaseHelper.COLUMN_SIZE, DatabaseHelper.COLUMN_DATE,
-            DatabaseHelper.COLUMN_TYPE, DatabaseHelper.COLUMN_DESCRIBE, DatabaseHelper.COLUMN_IS_DELETE,DatabaseHelper.COLUMN_IS_FAVORITE};
+            DatabaseHelper.COLUMN_TYPE, DatabaseHelper.COLUMN_DESCRIBE,
+            DatabaseHelper.COLUMN_IS_DELETE,DatabaseHelper.COLUMN_IS_FAVORITE,DatabaseHelper.COLUMN_IS_HIDE};
 
     //    private String[] allColumns = {DatabaseHelper.COLUMN_ID,DatabaseHelper.COLUMN_IMAGE
 //        ,DatabaseHelper.COLUMN_DATE};
@@ -172,7 +173,7 @@ public class DataResource {
         key.put(DatabaseHelper.COLUMN_NAME_ALBUM,newName);
         database.update(DatabaseHelper.TABLE_ALBUM,key,
                 DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'"
-                +" and "+ DatabaseHelper.COLUMN_USER +" = "+String.valueOf(idUser),
+                        +" and "+ DatabaseHelper.COLUMN_USER +" = "+String.valueOf(idUser),
                 null);
     }
     //-------------------------------finish album space------------------------------------
@@ -206,6 +207,7 @@ public class DataResource {
             values.put(DatabaseHelper.COLUMN_DESCRIBE, image.getDescribe());
             values.put(DatabaseHelper.COLUMN_IS_DELETE, image.getDeleted());
             values.put(DatabaseHelper.COLUMN_IS_FAVORITE, image.getFavorite());
+            values.put(DatabaseHelper.COLUMN_IS_HIDE, image.getHide());
 
             long insertId = database.insert(DatabaseHelper.TABLE_PICTURE, null, values);
 
@@ -242,6 +244,20 @@ public class DataResource {
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
         database.execSQL(que);
     }
+    // này là update trạng thái trong database khi chuyển từ all sang Hide bên album thôi
+    public void updateStateImageHideIsTrue(long id){
+        String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
+                +DatabaseHelper.COLUMN_IS_HIDE+ " = 'T'" +
+                " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
+        database.execSQL(que);
+    }
+    public void updateStateImageHideIsFalse(long id){
+        String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
+                +DatabaseHelper.COLUMN_IS_HIDE+ " = 'F'" +
+                " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
+        database.execSQL(que);
+    }
+    ////////////////////
     // này là update trạng thái trong database khi chuyển từ all sang trash thôi
     public void updateStateImageDeletedIsTrue(long id){
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
@@ -272,34 +288,6 @@ public class DataResource {
         }
 
     }
-
-    public boolean deleteArrayImage(ArrayList<Long> arrayIdDelete) {
-        //Log.e("SQLite","Person entry delete with id: "+id);
-        try {
-            for (int i = 0; i < arrayIdDelete.size(); i++) {
-                database.delete(DatabaseHelper.TABLE_PICTURE, DatabaseHelper.COLUMN_ID + " = " + arrayIdDelete.get(i),
-                        null);
-            }
-            return true;
-        } catch (Exception ex) {
-            return false;
-        }
-
-    }
-    public ArrayList<Image> getImageInDbHasIsDeletedIsTrue(){
-        Log.e("Err","Loi o day1");
-        ArrayList<Image> list = new ArrayList<Image>();
-        Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns, DatabaseHelper.COLUMN_IS_DELETE + "='T'",
-                null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            list.add(cursorToImage(cursor));
-            cursor.moveToNext();
-            debug(String.valueOf(list.size()));
-        }
-        Log.e("Err","Loi o day3");
-        return list;
-    }
     public ArrayList<Image> getAllImage(int userID) {
         ArrayList<Image> list = new ArrayList<Image>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns,
@@ -325,6 +313,7 @@ public class DataResource {
         image.setDescribe(cursor.getString(7));
         image.setDeleted(cursor.getString(8));
         image.setFavorite(cursor.getString(9));
+        image.setHide(cursor.getString(10));
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         try {
             image.setDate(df.parse(cursor.getString(5)));

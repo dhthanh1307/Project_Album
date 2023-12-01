@@ -377,6 +377,45 @@ public class AllLayout extends Fragment {
                 tv_choose.callOnClick();
             }
         });
+        tv_blind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e("Hide","Size trước ẩn="+String.valueOf(images.size()));
+                for (int i = 0; i < adapter.image_chosen.size(); i++) {
+
+                    //Nếu chọn ẩn ảnh thì bắt buộc phải xóa ảnh đó khỏi favorite, mặc dù nó vẫn là ưa thích
+                    if (adapter.image_chosen.get(i).getFavorite().equals("T")) {
+                        //chỉ xóa khỏi imagesFavorite thôi, chứ k xóa tính chất ưa thích của nó
+                        main.favoriteLayout.removeImageOutFavorite(adapter.image_chosen.get(i));
+                    }
+                    //thay đổi tính chất ảnh đã được ẩn, là như này nó đã thay đổi bên main luôn rồi.
+                    adapter.image_chosen.get(i).setHide("T");
+
+                    //add vào images ở hide
+                    HideInAlbumLayoutFragment.images.add(adapter.image_chosen.get(i));
+
+                    //xoa image o allLayout
+                    long idImage = adapter.image_chosen.get(i).getId();
+                    for (int i1 = 0; i1 < images.size(); i1++) {
+                        if (images.get(i1).getId() == idImage) {
+                            images.remove(i1);
+                            break;
+                        }
+                    }
+
+//                    //xoa image ở adapter, do AllLayout chưa đồng bộ nên phải xóa riêng
+                    adapter.updateImagesInShowImageAllAdapter(idImage);
+
+                    //update trạng thái ở database
+                    MainActivity.dataResource.updateStateImageHideIsTrue(idImage);
+                }
+                adapter.notifyDataSetChanged();
+                dialog.dismiss();
+                adapter.resetChooseSelection();
+                tv_choose.callOnClick();
+                Log.e("Hide","Size sau ẩn="+String.valueOf(images.size()));
+            }
+        });
 
     }
 

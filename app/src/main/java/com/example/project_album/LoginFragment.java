@@ -208,8 +208,13 @@ public class LoginFragment extends Fragment {
     private void getImageForLayouts(){
         for (int i = 0;i<MainActivity.images.size();i++){
             if(MainActivity.images.get(i).getDeleted().equals("F")){
-                AllLayout.images.add(MainActivity.images.get(i));
-                if(MainActivity.images.get(i).getFavorite().equals("T")){
+                if (MainActivity.images.get(i).getHide().equals(("T"))) {
+                    HideInAlbumLayoutFragment.images.add((MainActivity.images.get(i)));
+                }else{
+                    AllLayout.images.add(MainActivity.images.get(i));
+                }
+                if (MainActivity.images.get(i).getFavorite().equals("T")
+                        && MainActivity.images.get(i).getHide().equals("F")) {
                     FavoriteLayout.images.add(MainActivity.images.get(i));
                 }
             }

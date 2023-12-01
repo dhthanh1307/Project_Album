@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -30,6 +31,8 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
 
     private Button btnUnFavorite;
     private Button btnShare;
+
+    private Button btnCancelHide;
 
     private Fragment myFragment;
 
@@ -55,6 +58,9 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
         }else if(main.getIDItemBottomNavigationView() == R.id.action_favorite){
             btnUnFavorite = main.findViewById(R.id.btn_no_favorite);
             btnShare = main.findViewById(R.id.btn_share_in_favorite_layout);
+        }else if(main.getIDItemBottomNavigationView() == R.id.action_album){
+            //CHỗ này if nếu là nút ẩn trong action album thì đúng hơn
+            btnCancelHide=main.findViewById(R.id.btn_cancel_hide_chosen_image);
         }
 
         return new ViewHolder(view);
@@ -150,6 +156,38 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
                         Fragment fragment = new ViewPagerAllLayoutFragment(images, position);
                         ft.replace(R.id.replace_fragment_layout, fragment);
                         ft.commit();
+                    }
+                }
+                else if(main.getIDItemBottomNavigationView() == R.id.action_album){
+                    // Này là khi chọn nút ẩn, mà do chỉ có action_album là ẩn ở đây
+                    //nên là kiểm tra if đó được, nếu đúng thì if là if nếu là nút ẩn
+                    Log.e("DEBUG","Helllo");
+                    if (chooseSelection) {
+                        if (mSelectedArray.get(position)) {
+                            mSelectedArray.set(position, false);
+                            holder.cb.setChecked(false);
+                            holder.cb.setVisibility(View.INVISIBLE);
+                            count--;
+                            chosenArrayImages.remove(images.get(position));
+                        } else {
+                            chosenArrayImages.add(images.get(position));
+                            mSelectedArray.set(position, true);
+                            holder.cb.setChecked(true);
+                            holder.cb.setVisibility(View.VISIBLE);
+                            count++;
+                        }
+                        if (count > 0) {
+                            btnCancelHide.setText("Bỏ ẩn " + String.valueOf(count) + " ảnh");
+                        } else {
+                            btnCancelHide.setText("Bỏ ẩn tất cả");
+                        }
+                    } else {
+                        Toast.makeText(main, "Chọn big ẩn nhé", Toast.LENGTH_SHORT).show();
+//                        FragmentManager fragmentmanager = main.getSupportFragmentManager();
+//                        FragmentTransaction ft = fragmentmanager.beginTransaction();
+//                        Fragment fragment = new ViewPagerTrashCanFragment(images, position);
+//                        ft.replace(R.id.replace_fragment_layout, fragment);
+//                        ft.commit();
                     }
                 }
 

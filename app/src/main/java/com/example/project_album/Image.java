@@ -112,4 +112,12 @@ public class Image {
     public String GenerateName(){
         return System.currentTimeMillis() + ".jpeg";
     }
+    //hide
+    public void setHide(String is_hide) {
+        this.is_hide = is_hide;
+    }
+
+    public String getHide() {
+        return is_hide;
+    }
 }
