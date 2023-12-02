@@ -45,6 +45,7 @@ import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -79,6 +80,7 @@ import java.util.zip.ZipOutputStream;
 public class AllLayout extends Fragment {
 
     // TODO: Rename and change types of parameters
+    private final int STORAGE_PERMISSION_REQUEST_CODE = 1001;
     //khai báo biến cho dialog
     private Dialog dialog;
     private TextView tv_addtoAlbum;
@@ -280,7 +282,20 @@ public class AllLayout extends Fragment {
         tv_unzip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doUnzipImage();
+                //Ktra da cấp phát truyê truy cập external chưa
+                boolean writePermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED;
+                boolean readPermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED;
+
+                if (!writePermission || !readPermission) {
+                    // Yêu cầu cấp quyền WRITE và READ_EXTERNAL_STORAGE nếu chưa được cấp
+                    String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+                    ActivityCompat.requestPermissions(requireActivity(), permissions, STORAGE_PERMISSION_REQUEST_CODE);
+                } else {
+                    //Nếu cấp phát rồi thì unzip thôi
+                    doUnzipImage();
+                }
             }
         });
     }
@@ -305,17 +320,35 @@ public class AllLayout extends Fragment {
         tv_zip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (int i = 0; i < images.size(); i++) {
-                    Log.e("pathImage", "Path=" + images.get(i).getPath());
+                // Kiểm tra quyền truy cập lưu trữ - kiểm tra cả read va write lên external mặc dù ở đây chỉ cần
+                //read còn unzip mới cần cần đọc nhưng thôi kệ làm luôn lần
+                boolean writePermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED;
+                boolean readPermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED;
+
+                if (!writePermission || !readPermission) {
+                    // Yêu cầu cấp quyền WRITE và READ_EXTERNAL_STORAGE nếu chưa được cấp
+                    String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+                    ActivityCompat.requestPermissions(requireActivity(), permissions, STORAGE_PERMISSION_REQUEST_CODE);
+                } else {
+                    // Quyền đã được cấp, thực hiện các hành động cần thiết ở đây
+                    for (int i = 0; i < images.size(); i++) {
+                        Log.e("pathImage", "Path=" + images.get(i).getPath());
+                    }
+                    ArrayList<String> folder = new ArrayList<>();
+                    for (int i = 0; i < adapter.image_chosen.size(); i++) {
+                        folder.add(adapter.image_chosen.get(i).getPath());
+                    }
+                    doZipImage(folder);
+                    dialog.dismiss();
+                    adapter.resetChooseSelection();
+                    tv_choose.callOnClick();
+//                    Toast.makeText(main, "Tien hanh tao thu muc", Toast.LENGTH_SHORT).show();
+
                 }
-                ArrayList<String> folder = new ArrayList<>();
-                for (int i = 0; i < adapter.image_chosen.size(); i++) {
-                    folder.add(adapter.image_chosen.get(i).getPath());
-                }
-                doZipImage(folder);
-                dialog.dismiss();
-                adapter.resetChooseSelection();
-                tv_choose.callOnClick();
+
+
             }
         });
         tv_favorite.setOnClickListener(new View.OnClickListener() {
@@ -609,12 +642,23 @@ public class AllLayout extends Fragment {
         //getActivity().startActivityFromFragment(AllLayout.this, camera_intent, 123);
     }
 
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_CAMERA_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startCamera();
+            }
+        }
+        else if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Quyền truy cập lưu trữ đã được cấp, thực hiện các hành động cần thiết ở đây
+                Toast.makeText(main, "Quyền truy cập đc cấp", Toast.LENGTH_SHORT).show();
+            } else {
+                // Quyền truy cập lưu trữ bị từ chối, bạn có thể thông báo cho người dùng về việc này
+                Toast.makeText(main, "Quyền truy cập k đc cấp", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -742,6 +786,26 @@ public class AllLayout extends Fragment {
     }
 
     //=================== Quá trình zip =======================
+    // list ds đã zip bên trong thư mục ImagesZip
+    public ArrayList<String> getListOfFilesInDirectory(String directoryPath) {
+        ArrayList<String> fileList = new ArrayList<>();
+        File directory = new File(directoryPath);
+
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        fileList.add(file.getName());
+                    }
+                }
+            }
+        } else {
+            Log.e("Loi", "Thư mục không tồn tại hoặc không phải là thư mục.");
+        }
+
+        return fileList;
+    }
     public void doZipImage(ArrayList<String> folder) {
         Dialog mDialog = new Dialog(main);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -762,30 +826,43 @@ public class AllLayout extends Fragment {
             public void onClick(View view) {
                 if (edtNameZip.getText().toString().length() == 0) {
                     Toast.makeText(main, "Nhập tên file zip", Toast.LENGTH_SHORT).show();
-                } else{
-                    //Lấy đường dẫn thử mục Document
-                    File externalDir = Environment.getExternalStorageDirectory();
-                    String parentDirPath = externalDir.getPath() + "/Documents";
-                    File dir = new File(parentDirPath, "ImageZips");
-                    if (!dir.exists()) {
-                        dir.mkdir();
+                } else {
+                    //Lấy đường dẫn thử mục Download
+                    String folderPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+                    File folderZip = new File(folderPath);
+                    if (!folderZip.exists()) {
+                        folderZip.mkdirs(); // Tạo thư mục "Download" nếu chưa tồn tại
                     }
-                    ArrayList<String> fileList = getListOfFilesInDirectory(dir.getPath());
-                    if (fileList.contains(edtNameZip.getText().toString())){
-                        Toast.makeText(main, "Ten file da ton tai", Toast.LENGTH_SHORT).show();
+                    //Tạo thư mục MyImagesZip owe Download để chứa ảnh đã zip
+                    String newFolderName = "MyImageZips";
+                    File newFolder = new File(folderZip, newFolderName);
+                    if (!newFolder.exists()) {
+                        if (newFolder.mkdir()) { // Tạo thư mục mới "MyImageZips"
+                            Log.e("FolderCreation", "Có thể tạo thư mục MyImageZips");
+                        } else {
+                            // Không thể tạo thư mục mới
+                            Log.e("FolderCreation", "Không thể tạo thư mục MyImageZips");
+                        }
+                    } else {
+                        // Thư mục đã tồn tại
+                        Log.e("FolderCreation", "Thư mục MyImageZips đã tồn tại trước đó");
+                    }
+
+                    ArrayList<String> fileList = getListOfFilesInDirectory(newFolder.getPath());
+                    if (fileList.contains(edtNameZip.getText().toString())) {
+                        Toast.makeText(main, "Ten file da ton tai trong MyImageZips", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     //Lâ đường dẫn tên file cần zip
-                    Log.e("Loi", "Loi" + dir.getPath() + "   " + dir.getName());
-                    String fileNameZip = dir.getPath() + "/" + edtNameZip.getText().toString();
+//                    Log.e("Loi", "Loi" + dir.getPath() + "   " + dir.getName());
+                    String fileNameZip = newFolder.getPath() + "/" + edtNameZip.getText().toString();
                     try {
-                        zip(folder,fileNameZip);
+                        zip(folder, fileNameZip);
                         Toast.makeText(main, "Zip thành công", Toast.LENGTH_SHORT).show();
                         mDialog.dismiss();
                     } catch (IOException e) {
                         Toast.makeText(main, "Zip lỗi", Toast.LENGTH_SHORT).show();
                         mDialog.dismiss();
-                        Log.e("Path_file","Loi roi nhe");
                         throw new RuntimeException(e);
                     }
                 }
@@ -823,26 +900,6 @@ public class AllLayout extends Fragment {
 
 
     //=================== Quá trình unzip =======================
-    // list ds đã zip bên trong thư mục ImagesZip
-    public ArrayList<String> getListOfFilesInDirectory(String directoryPath) {
-        ArrayList<String> fileList = new ArrayList<>();
-        File directory = new File(directoryPath);
-
-        if (directory.exists() && directory.isDirectory()) {
-            File[] files = directory.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) {
-                        fileList.add(file.getName());
-                    }
-                }
-            }
-        } else {
-            Log.e("Loi", "Thư mục không tồn tại hoặc không phải là thư mục.");
-        }
-
-        return fileList;
-    }
 
     public void doUnzipImage() {
         Dialog mDialog = new Dialog(main);
@@ -855,8 +912,8 @@ public class AllLayout extends Fragment {
         btnCancelZip = mDialog.findViewById(R.id.btn_cancel_zip);
 
         txtTitleZip.setText("Unzip");
-        txtDetailZip.setText("Sau khi unzip tệp sẽ hiển thị ở theo đường dẫn \n Documents/ImageUnZips/TênFileZip");
-        edtNameZip.setHint("Nhập tên file cần unzip trong thư mục Documents/ImagesZips");
+        txtDetailZip.setText("Sau khi unzip tệp sẽ hiển thị ở theo đường dẫn \n Downloads/MyImageUnZips/TênFileZip");
+        edtNameZip.setHint("Nhập tên file đã zip trong thư mục Downloads/MyImageZips");
         btnCancelZip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -870,8 +927,10 @@ public class AllLayout extends Fragment {
                     Toast.makeText(main, "Nhập tên file cần unzip", Toast.LENGTH_SHORT).show();
                 } else {
                     //Lấy đường dẫn Zip truyền vào để UnZip
-                    File externalDir1 = Environment.getExternalStorageDirectory();
-                    String parentDirPath1 = externalDir1.getPath() + "/Documents/ImageZips";
+                    String pathDownload=Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS).toString();
+                    String parentDirPath1 = pathDownload+ "/MyImageZips";
+                    //Kiểm tra tên file zip có hợp lệ không
                     String zipFile = parentDirPath1 + "/" + edtNameZip.getText().toString();
                     ArrayList<String> fileList = getListOfFilesInDirectory(parentDirPath1);
                     if (!fileList.contains(edtNameZip.getText().toString())) {
@@ -879,15 +938,22 @@ public class AllLayout extends Fragment {
                         return;
                     }
 
-                    //Tạo thư mục UnZips
-                    File externalDir = Environment.getExternalStorageDirectory();
-                    String parentDirPath = externalDir.getPath() + "/Documents";
-                    File dir = new File(parentDirPath, "ImageUnZips");
-                    if (!dir.exists()) {
-                        dir.mkdir();
+                    //Tạo thư mục MyImagesUnZips
+                    String newFolderName = "MyImageUnZips";
+                    File newFolder = new File(pathDownload, newFolderName);
+                    if (!newFolder.exists()) {
+                        if (newFolder.mkdir()) { // Tạo thư mục mới "MyImageZips"
+                            Log.e("FolderCreation", "Có thể tạo thư mục MyImageZips");
+                        } else {
+                            // Không thể tạo thư mục mới
+                            Log.e("FolderCreation", "Không thể tạo thư mục MyImageZips");
+                        }
+                    } else {
+                        // Thư mục đã tồn tại
+                        Log.d("FolderCreation", "Thư mục MyImageZips đã tồn tại trước đó");
                     }
                     //Tạo thư mục chứa ảnh UnZip
-                    File dirChildNameZip = new File(dir, edtNameZip.getText().toString());
+                    File dirChildNameZip = new File(newFolder, edtNameZip.getText().toString());
                     if (!dirChildNameZip.exists()) {
                         dirChildNameZip.mkdir();
                     }
