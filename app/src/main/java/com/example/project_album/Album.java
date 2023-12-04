@@ -6,7 +6,7 @@ public class Album {
     private String name;
     private long id;
     private ArrayList<Image> images;
-    public Album(long id,String name,ArrayList<Image> images){
+    public Album(long id, String name, ArrayList<Image> images){
         this.name= name;
         this.images = images;
         this.id = id;
@@ -23,6 +23,9 @@ public class Album {
     }
     public ArrayList<Image> getImages(){
         return images;
+    }
+    public void setImages(ArrayList<Image> img){
+        images = img;
     }
     public Image get_image(int position){
         return images.get(position);
@@ -46,9 +49,6 @@ public class Album {
                 return;
             }
         }
-    }
-    public void setImages(ArrayList<Image> img){
-        images = img;
     }
     public void clear(){
         images = new ArrayList<>();

@@ -2,6 +2,7 @@ package com.example.project_album;
 
 
 import android.app.Dialog;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -63,8 +64,10 @@ public class AlbumLayout extends Fragment {
     private Dialog dialog;
 
     //Hiden
-    RelativeLayout rllHiden;
+    TextView tvHiden;
     TextView tvNumberHiden;
+    private LinearLayout ln_all;
+    private TextView tv_delete;
 
 
     private AlbumLayout(){
@@ -114,17 +117,19 @@ public class AlbumLayout extends Fragment {
         view_album_top = (ViewGroup)mainView.findViewById(R.id.ln_image_view_top);
         view_album_bottom = (ViewGroup)mainView.findViewById(R.id.ln_image_view_bottom);
 
+        ln_all = mainView.findViewById(R.id.view_for_tab_album);
         tv_album_big = mainView.findViewById(R.id.tv_album_big);
         tv_album_small = mainView.findViewById(R.id.tv_album_small);
         tv_all_my_album = mainView.findViewById(R.id.tv_all_my_album);
         btnAddAlbum = mainView.findViewById(R.id.btn_add_album);
         layout_icon = (RelativeLayout)mainView.findViewById(R.id.layout_icon);
         sv = (ScrollView)mainView.findViewById(R.id.sv_parent);
+        tv_delete = mainView.findViewById(R.id.tv_delete);
         //Hidden
-        rllHiden=mainView.findViewById(R.id.rll_hidden);
+        tvHiden=mainView.findViewById(R.id.tv_hide);
         tvNumberHiden=mainView.findViewById(R.id.tv_num_hiden);
         tvNumberHiden.setText(String.valueOf(HideInAlbumLayoutFragment.images.size()));
-        rllHiden.setOnClickListener(new View.OnClickListener() {
+        tvHiden.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goToFragmentPictureHidden();
@@ -136,11 +141,11 @@ public class AlbumLayout extends Fragment {
             public void onScrollChange(View view,int i, int i1, int i2, int i3) {
                 if(tv_album_big.getGlobalVisibleRect(new Rect()) == false){
                     tv_album_small.setTextSize(20);
-                    layout_icon.setBackground(getContext().getDrawable(R.color.black_1));
+                    layout_icon.setBackgroundColor(main.getColor(R.color.black_1));
                 }
                 else{
                     tv_album_small.setTextSize(0);
-                    layout_icon.setBackground(getContext().getDrawable(R.color.black));
+                    layout_icon.setBackgroundColor(main.mainColorBackground);
                 }
             }
         });
@@ -160,7 +165,7 @@ public class AlbumLayout extends Fragment {
                 AllMyAlbumClick();
             }
         });
-
+        setTheme(main.mainColorBackground,main.mainColorText);
         return mainView;
     }
 
@@ -260,6 +265,8 @@ public class AlbumLayout extends Fragment {
 
     private View createViewChildForAlbum(int position){
         View viewchild = getActivity().getLayoutInflater().inflate(R.layout.item_album,null);
+        LinearLayout ln = viewchild.findViewById(R.id.ln_parent);
+        ln.setBackgroundColor(main.mainColorBackground);
         viewchild.setId(position);
         ImageView img = viewchild.findViewById(R.id.image);
         TextView tvname = viewchild.findViewById(R.id.tv_album_name);
@@ -273,7 +280,8 @@ public class AlbumLayout extends Fragment {
             img.setScaleType(ImageView.ScaleType.CENTER);
         }
         CardView cv = (CardView) viewchild.findViewById(R.id.cv_album);
-        cv.setLayoutParams(new LinearLayout.LayoutParams(MainActivity.Width/2-150,MainActivity.Width/2-150));
+        cv.setLayoutParams(new LinearLayout.LayoutParams(
+                MainActivity.Width/2-150,MainActivity.Width/2-150));
         tvname.setText(albums.get(position).getName());
         tvlength.setText(String.valueOf(albums.get(position).length()));
         img.setOnClickListener(new View.OnClickListener() {
@@ -486,5 +494,20 @@ public class AlbumLayout extends Fragment {
     public void setTextNumberHide(int numberHide){
         tvNumberHiden.setText(String.valueOf(numberHide));
     }
+    private void setTheme(int backgroundColor, ColorStateList textColor){
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
 
+    private void setThemeText(ColorStateList textColor) {
+        tv_all_my_album.setTextColor(textColor);
+        tvHiden.setTextColor(textColor);
+        tv_delete.setTextColor(textColor);
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        ln_all.setBackgroundColor(backgroundColor);
+        btnAddAlbum.setBackgroundColor(backgroundColor);
+        layout_icon.setBackgroundColor(backgroundColor);
+    }
 }

@@ -4,13 +4,18 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/black"
     >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ln_all"
+        android:background="@color/black"
+        android:orientation="vertical">
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/black"
+
         >
         <LinearLayout
             android:padding="10dp"
@@ -18,7 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@color/black">
+            android:background="@color/black"
+>
             <androidx.cardview.widget.CardView
                 android:id="@+id/cv_album"
                 android:layout_width="150dp"
@@ -62,5 +68,5 @@
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
+    </LinearLayout>
 </LinearLayout>

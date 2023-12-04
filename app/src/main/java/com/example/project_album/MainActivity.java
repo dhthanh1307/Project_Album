@@ -1,6 +1,7 @@
 package com.example.project_album;
 
 import android.app.WallpaperManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -44,7 +45,8 @@ public class MainActivity extends FragmentActivity {
     public static int userID;
     public String username;
     public String password;
-    public String theme="Dark";
+    public int mainColorBackground;
+    public ColorStateList mainColorText;
     public int NUMCOLUMN = 3;
     public String typeSquare = "square";
     NavigationView navigationView;
@@ -64,7 +66,8 @@ public class MainActivity extends FragmentActivity {
         Log.e("MainActivity","onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ver2);
-
+        mainColorBackground = getColor(R.color.black);
+        mainColorText = getColorStateList(R.color.textview_form);
         if(images.size()>0 && images.get(0).getImgBitmap() == null) {
             Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
             myBackgroundThread.start();

@@ -178,11 +178,11 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
     private boolean checkLastRow(int position){
         if(activity.getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_PORTRAIT ){
-            if(position>= activity.NUMCOLUMN*(images.size()/activity.NUMCOLUMN))
+            if(position>= activity.NUMCOLUMN*((images.size()-1)/activity.NUMCOLUMN))
                 return true;
         }
         else {
-            if (position>=activity.NUMCOLUMN*2*(images.size()/activity.NUMCOLUMN*2)){
+            if (position>=activity.NUMCOLUMN*2*((images.size()-1)/activity.NUMCOLUMN*2)){
                 return true;
             }
         }

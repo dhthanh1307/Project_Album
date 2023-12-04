@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -76,6 +77,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import yuku.ambilwarna.AmbilWarnaDialog;
+
 
 public class AllLayout extends Fragment {
 
@@ -99,6 +102,9 @@ public class AllLayout extends Fragment {
     private TextView tv_type_square;
     private TextView tv_unzip;
     private View v_dialog_h;
+    private View v_text_color;
+    private View v_bg_color;
+    private TextView tv_text_color;
     Dialog dialog_header;
     //finish=======================================
 
@@ -203,7 +209,7 @@ public class AllLayout extends Fragment {
         EventViewHeader();
         //finish===================================================
         //View for header dialog
-        v_dialog_h = main.getLayoutInflater().inflate(R.layout.header_dialog, null);
+        v_dialog_h = main.getLayoutInflater().inflate(R.layout.header_dialog,null);
         tv_theme = v_dialog_h.findViewById(R.id.tv_theme);
         tv_size_square_small = v_dialog_h.findViewById(R.id.tv_size_small);
         tv_size_square_big = v_dialog_h.findViewById(R.id.tv_size_big);
@@ -211,6 +217,9 @@ public class AllLayout extends Fragment {
         tv_unzip = v_dialog_h.findViewById(R.id.tv_unzip);
         dialog_header = new Dialog(main);
         dialog_header.setContentView(v_dialog_h);
+        v_text_color = v_dialog_h.findViewById(R.id.v_text_color);
+        v_bg_color = v_dialog_h.findViewById(R.id.v_bg_color);
+        tv_text_color = v_dialog_h.findViewById(R.id.tv_text_color);
         EventViewDialogHeader();
 
         //view footer
@@ -245,7 +254,7 @@ public class AllLayout extends Fragment {
 
         spinner = view.findViewById(R.id.spinner);
         initSpinnerView();
-        setTheme();
+        setTheme(main.mainColorBackground,main.mainColorText);
 
         return view;
     }
@@ -255,6 +264,12 @@ public class AllLayout extends Fragment {
     }
 
     private void EventViewDialogHeader() {
+        if(main.mainColorBackground == main.getColor(R.color.black)){
+            tv_theme.setText("Chế độ sáng");
+        }
+        else{
+            tv_theme.setText("Chế độ tối");
+        }
         tv_theme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -282,20 +297,25 @@ public class AllLayout extends Fragment {
         tv_unzip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Ktra da cấp phát truyê truy cập external chưa
-                boolean writePermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED;
-                boolean readPermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED;
-
-                if (!writePermission || !readPermission) {
-                    // Yêu cầu cấp quyền WRITE và READ_EXTERNAL_STORAGE nếu chưa được cấp
-                    String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-                    ActivityCompat.requestPermissions(requireActivity(), permissions, STORAGE_PERMISSION_REQUEST_CODE);
-                } else {
-                    //Nếu cấp phát rồi thì unzip thôi
-                    doUnzipImage();
-                }
+                unzip();
+            }
+        });
+        v_text_color.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangeTextColor();
+            }
+        });
+        tv_text_color.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangeTextColor();
+            }
+        });
+        v_bg_color.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangeColorBackground();
             }
         });
     }
@@ -901,6 +921,21 @@ public class AllLayout extends Fragment {
 
     //=================== Quá trình unzip =======================
 
+    private void unzip(){
+        boolean writePermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean readPermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+
+        if (!writePermission || !readPermission) {
+            // Yêu cầu cấp quyền WRITE và READ_EXTERNAL_STORAGE nếu chưa được cấp
+            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+            ActivityCompat.requestPermissions(requireActivity(), permissions, STORAGE_PERMISSION_REQUEST_CODE);
+        } else {
+            //Nếu cấp phát rồi thì unzip thôi
+            doUnzipImage();
+        }
+    }
     public void doUnzipImage() {
         Dialog mDialog = new Dialog(main);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -1019,31 +1054,54 @@ public class AllLayout extends Fragment {
         }
     }
 
-    private void updateTheme() {
-        if (tv_theme.getText().toString().equals("Chế độ sáng")) {
+    private void updateTheme(){
+        if(tv_theme.getText().toString().equals("Chế độ sáng")){
             tv_theme.setText("Chế độ tối");
-            main.theme = "light";
+            main.mainColorBackground = main.getColor(R.color.light);
+            main.mainColorText = main.getColorStateList(R.color.textview_form2);
 
-        } else {
+        }
+        else{
             tv_theme.setText("Chế độ sáng");
-            main.theme = "dark";
+            main.mainColorBackground = main.getColor(R.color.black);
+            main.mainColorText = main.getColorStateList(R.color.textview_form);
         }
-        setTheme();
+        setTheme(main.mainColorBackground,main.mainColorText);
     }
+    private void setTheme(int backgroundColor, ColorStateList textColor){
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+    private void setThemeBackGround(int backgroundColor){
+        //LinearLayout dialog_header = v_dialog_h.findViewById(R.id.linear);
+        LinearLayout dialog_all = v_allInfo.findViewById(R.id.linear);
 
-    private void setTheme() {
-        LinearLayout dialog_header = v_dialog_h.findViewById(R.id.linear);
-        LinearLayout dialog_all = v_dialog_h.findViewById(R.id.linear);
-        if (main.theme.equals("light")) {
-            rl_background.setBackground(main.getDrawable(R.drawable.light_theme_background));
-            dialog_header.setBackground(main.getDrawable(R.drawable.light_theme_background));
-            dialog_all.setBackground(main.getDrawable(R.drawable.light_theme_background));
-        } else {
-            rl_background.setBackgroundColor(main.getColor(R.color.black_n));
-            dialog_all.setBackgroundColor(main.getColor(R.color.black_n));
-            dialog_header.setBackgroundColor(main.getColor(R.color.black_n));
+        //mau background va dialog
+        rl_background.setBackgroundColor(backgroundColor);
+        //dialog_header.setBackgroundColor(backgroundColor);
+        dialog_all.setBackgroundColor(backgroundColor);
 
-        }
+        v_bg_color.setBackgroundColor(backgroundColor);
+    }
+    private void setThemeText(ColorStateList textColor){
+        //Textview dialog footer======================
+        tv_addtoAlbum.setTextColor(textColor);
+        tv_favorite.setTextColor(textColor);
+        tv_blind.setTextColor(textColor);
+        tv_slider.setTextColor(textColor);
+        tv_zip.setTextColor(textColor);
+        tv_delete.setTextColor(textColor);
+
+        //view header dialog=========================
+        tv_theme.setTextColor(textColor);
+        tv_size_square_small.setTextColor(textColor);
+        tv_size_square_big.setTextColor(textColor);
+        tv_type_square.setTextColor(textColor);
+        tv_unzip.setTextColor(textColor);
+        tv_text_color.setTextColor(textColor);
+        v_text_color.setBackgroundColor(textColor.getDefaultColor());
+
+        tv_choose.setTextColor(textColor);
     }
 
     private void updateSizeSquareSmall() {
@@ -1081,6 +1139,57 @@ public class AllLayout extends Fragment {
             main.typeSquare = "square";
         }
         adapter.notifyDataSetChanged();
+    }
+    private void ChangeColorBackground(){
+        //dialog_header.dismiss();
+        ColorPicker(1);
+    }
+    private void ChangeTextColor(){
+        ColorPicker(2);
+    }
+    private void ColorPicker(int type){
+        int mcolor = -1;
+        if (type == 1){
+            mcolor = main.mainColorBackground;
+        }
+        else if(type ==2){
+            mcolor = main.mainColorText.getDefaultColor();
+        }
+        AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(main, mcolor,
+                new AmbilWarnaDialog.OnAmbilWarnaListener() {
+                    @Override
+                    public void onCancel(AmbilWarnaDialog dialog) {
+                    }
+
+                    @Override
+                    public void onOk(AmbilWarnaDialog dialog, int color) {
+                        if(type == 1){
+                            main.mainColorBackground = color;
+                            setThemeBackGround(main.mainColorBackground);
+                        }
+                        else if(type == 2){
+                            main.mainColorText = getColorStateList(color);
+                            setThemeText(main.mainColorText);
+                        }
+
+                    }
+                });
+        colorPicker.show();
+    }
+    private ColorStateList getColorStateList(int color){
+        int[][] states = new int[][] {
+                new int[] {-android.R.attr.state_pressed}, // unchecked
+                new int[] { android.R.attr.state_pressed}};
+        int[] mcolors = new int[] {
+                color,createDarkColor(color)
+        };
+        return new ColorStateList(states,mcolors);
+    }
+    private int createDarkColor(int color){
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.5;
+        return Color.HSVToColor(hsv);
     }
 
     @Override
