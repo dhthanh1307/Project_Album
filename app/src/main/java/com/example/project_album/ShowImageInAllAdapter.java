@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAdapter.ViewHolder> {
-    private ArrayList<Image> images;
+    public ArrayList<Image> images;
     private int idLayout;
     private MainActivity activity;
     private ArrayList<Boolean> ischoose = new ArrayList<>();
@@ -46,8 +46,7 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        activity.allLayout.setTextInfo(new SimpleDateFormat("MM/dd/yyyy")
-                .format(images.get(position).getDate()));
+        activity.allLayout.setTextInfo(images.get(position).getDate());
         if(activity.typeSquare.equals("square")) {
             holder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }

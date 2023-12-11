@@ -6,14 +6,16 @@ import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Image {
     private long id;
+    private String key;
     private String path;
     private String name;
     private float size;
-    private Date date;
+    private String date;
     private String type;
     private String describe;
     private String is_deleted;
@@ -24,7 +26,7 @@ public class Image {
         imgBitmap = null;
     }
 
-    public Image(Bitmap imgbitmap,String name) {
+    public Image(Bitmap imgbitmap, String name) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         imgbitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] imageInByte = stream.toByteArray();
@@ -33,12 +35,29 @@ public class Image {
         this.type = "";
         this.name=name;
         this.id=0;
-        this.date = new Date();
+        this.date = ConvertDate(new Date());
         this.describe = "";
         this.imgBitmap = imgbitmap;
         this.is_deleted="F";
         this.is_favorite="F";
         this.is_hide = "F";
+    }
+
+    public Image(DataFirebase.UploadImage upload, Bitmap imgbitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        imgbitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] imageInByte = stream.toByteArray();
+        this.size= imageInByte.length / 1024;
+        Log.e("Image",String.valueOf(size));
+        this.type = "";
+        this.name=upload.getName();
+        this.id=0;
+        this.date = upload.getDate();
+        this.describe = upload.getDescribe();
+        this.imgBitmap = imgbitmap;
+        this.is_deleted= upload.getDelete();
+        this.is_favorite=upload.getFavorite();
+        this.is_hide = upload.getHide();
     }
 
 
@@ -55,7 +74,7 @@ public class Image {
     public float getSize(){
         return size;
     }
-    public Date getDate(){
+    public String getDate(){
         return date;
     }
     public String getType(){
@@ -76,7 +95,7 @@ public class Image {
     public void setSize(float size){
         this.size = size;
     }
-    public void setDate(Date date){
+    public void setDate(String date){
         this.date = date;
     }
     public void setType(String type){
@@ -104,6 +123,14 @@ public class Image {
         return is_favorite;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     private Bitmap ChangeByteToBitmap(byte[] outImage ) {
         ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
         Bitmap theImage = BitmapFactory.decodeStream(imageStream);
@@ -119,5 +146,9 @@ public class Image {
 
     public String getHide() {
         return is_hide;
+    }
+    private String ConvertDate(Date d){
+        SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
+        return ft.format(d);
     }
 }

@@ -35,6 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NICKNAME = "nickname";
     public static final String COLUMN_NAME_ALBUM = "name_album";
     public static final String COLUMN_ID_IMAGE = "id_image";
+    public static final String COLUMN_KEY = "key";
 
     public static final String COLUMN_IS_DELETE = "is_delete";// chỗ này nếu true thì sẽ k hiển thị ở all layout
     //mà chỉ hiển thị ở trash can, biến này kiểu trong SQL là text
@@ -65,6 +66,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + " text not null, "
             + COLUMN_NAME
             + " text not null, "
+            + COLUMN_KEY
+            + " text not null, "
             + COLUMN_SIZE
             + " float, "
             + COLUMN_DATE
@@ -83,8 +86,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE_ALBUM = "create table " + TABLE_ALBUM + "( "
             + COLUMN_ID_ALBUM
             + " integer primary key autoincrement, "
-            + COLUMN_USER
-            + " integer, "
+            + COLUMN_KEY
+            + " text not null, "
             + COLUMN_NAME_ALBUM
             + " text not null);";
     private static final String DATABASE_CREATE_ALBUM_IMAGE = "create table " +

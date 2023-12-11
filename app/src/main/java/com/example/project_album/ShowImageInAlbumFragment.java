@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +38,6 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     private TextView tv_delete;
     private TextView tv_favorite;
     private TextView tv_copy;
-    private TextView tv_blind;
     private TextView tv_name;
     private TextView tv_move;
     private Dialog dialog;
@@ -60,9 +60,19 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         tv_delete = v_allInfo.findViewById(R.id.delete);
         tv_favorite = v_allInfo.findViewById(R.id.favorite);
         tv_copy = v_allInfo.findViewById(R.id.coppy);
-        tv_blind = v_allInfo.findViewById(R.id.blind);
         tv_add_to_album.setOnClickListener(this);
         tv_move = v_allInfo.findViewById(R.id.move);
+        if (album.getName().equals("Tất cả")){
+            tv_move.setEnabled(false);
+            tv_move.setTextColor(main.getColor(R.color.grey));
+            tv_delete.setEnabled(false);
+            tv_delete.setTextColor(main.getColor(R.color.grey));
+        }
+        if (album.getName().equals("Mục yêu thích")){
+            tv_move.setEnabled(false);
+            tv_move.setTextColor(main.getColor(R.color.grey));
+            tv_favorite.setText("Bỏ ưa thích");
+        }
         dialog = new Dialog(main);
         dialog.setContentView(v_allInfo);
         // finish view for all info dialog
@@ -78,7 +88,6 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         tv_choose.setOnClickListener(this);
         tv_move.setOnClickListener(this);
         tv_favorite.setOnClickListener(this);
-        tv_blind.setOnClickListener(this);
         tv_delete.setOnClickListener(this);
         tv_copy.setOnClickListener(this);
         tv_name = view.findViewById(R.id.tv_name);
@@ -144,22 +153,21 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         }
         else if (view.getId() == tv_add_to_album.getId()){
             dialog.cancel();
+            addToAlbum();
             Toast.makeText(main,"Đã thêm vào album",Toast.LENGTH_SHORT).show();
         }
         else if(view.getId() == tv_move.getId()){
             dialog.cancel();
-            AddToAlbum();
+            moveToAlbum();
         }
         else if (view.getId() == tv_copy.getId()){
             dialog.cancel();
-        }
-        else if (view.getId() == tv_blind.getId()){
-            dialog.cancel();
-            Toast.makeText(main,"Đã ẩn hình ảnh",Toast.LENGTH_SHORT).show();
+            coppyImage();
         }
         else if (view.getId() == tv_delete.getId()){
             dialog.cancel();
-            Toast.makeText(main,"Đã xóa hình ảnh",Toast.LENGTH_SHORT).show();
+            deleteImAb();
+            Toast.makeText(main,"Đã xóa hình ảnh khỏi album",Toast.LENGTH_SHORT).show();
         }
         else if (view.getId() == tv_favorite.getId()){
             dialog.cancel();
@@ -173,7 +181,8 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         }
     }
 
-    private void AddToAlbum() {
+    private void moveToAlbum() {
+        main.moveImAb = true;
         FragmentManager fragmentmanager = main.getSupportFragmentManager();
         FragmentTransaction ft = fragmentmanager.beginTransaction();
         Fragment fragment = new MyAlbumFragment(this);
@@ -191,29 +200,62 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
         dialog.show();
     }
+    private void addToAlbum(){
+        main.addImAb = true;
+        FragmentManager fragmentmanager = main.getSupportFragmentManager();
+        FragmentTransaction ft = fragmentmanager.beginTransaction();
+        Fragment fragment = new MyAlbumFragment(this);
+        ft.add(R.id.replace_fragment_layout,fragment);
+        ft.addToBackStack(fragment.getClass().getSimpleName());
+        ft.commit();
+    }
     public void AddToNewAlbum(long idAlbum,String name){
-        ArrayList<Image> imgs = new ArrayList<>();
-        imgs.addAll(image_adapter.image_chosen);
-        for(int j =2;j<AlbumLayout.albums.size();j++){
-            if (AlbumLayout.albums.get(j).getName().equals(album.getName())){
-                for(int i = 0;i<imgs.size();i++) {
-                    MainActivity.dataResource.deleteImageInAlbum(imgs.get(i),album.getId());
-                    AlbumLayout.albums.get(j).removeImage(imgs.get(i));
+        if (main.moveImAb) {
+            main.moveImAb = false;
+            ArrayList<Image> imgs = new ArrayList<>();
+            imgs.addAll(image_adapter.image_chosen);
+            for (int j = 2; j < AlbumLayout.albums.size(); j++) {
+                if (AlbumLayout.albums.get(j).getId() == album.getId()) {
+                    for (int i = 0; i < imgs.size(); i++) {
+                        MainActivity.dataResource.deleteImageInAlbum(imgs.get(i), album.getId());
+                        AlbumLayout.albums.get(j).removeImage(imgs.get(i));
+                    }
+                    album = AlbumLayout.albums.get(j);
+                    MainActivity.dataFirebase.updateAlbum(album);
+                    break;
                 }
-                album = AlbumLayout.albums.get(j);
-                break;
             }
-        }
 
-        for(int j =1;j<AlbumLayout.albums.size();j++){
-            if (AlbumLayout.albums.get(j).getName().equals(name)){
-                for(int i = 0;i<imgs.size();i++) {
-                    MainActivity.dataResource.InsertAlbumImage(idAlbum,imgs.get(i).getId());
-                    AlbumLayout.albums.get(j).addImage(imgs.get(i));
+            for (int j = 1; j < AlbumLayout.albums.size(); j++) {
+                if (AlbumLayout.albums.get(j).getId() == idAlbum) {
+                    for (int i = 0; i < imgs.size(); i++) {
+                        MainActivity.dataResource.InsertAlbumImage(idAlbum, imgs.get(i).getId());
+                        AlbumLayout.albums.get(j).addImage(imgs.get(i));
+                    }
+                    MainActivity.dataFirebase.updateAlbum(AlbumLayout.albums.get(j));
+                    break;
                 }
-                break;
             }
         }
+        else if(main.addImAb){
+            main.addImAb = false;
+            ArrayList<Image> imgs = new ArrayList<>();
+            imgs.addAll(image_adapter.image_chosen);
+            for (int j = 1; j < AlbumLayout.albums.size(); j++) {
+                if (AlbumLayout.albums.get(j).getId() == idAlbum) {
+                    for (int i = 0; i < imgs.size(); i++) {
+                        MainActivity.dataResource.InsertAlbumImage(idAlbum, imgs.get(i).getId());
+                        AlbumLayout.albums.get(j).addImage(imgs.get(i));
+                    }
+                    MainActivity.dataFirebase.updateAlbum(AlbumLayout.albums.get(j));
+                    break;
+                }
+            }
+        }
+        originalState();
+    }
+
+    private void originalState(){
         main.bottom_navigation_album.setVisibility(View.INVISIBLE);
         main.mBottomNavigationView.setVisibility(View.VISIBLE);
         tv_back_to_album.setVisibility(View.VISIBLE);
@@ -228,9 +270,52 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         for(int i = 0;i<imgs.size();i++){
             if(imgs.get(i).getFavorite().equals("F")){
                 //main.albumLayout.updateFavorite(imgs.get(i));
-                MainActivity.dataResource.likeImage(imgs.get(i).getId());
+                MainActivity.dataResource.likeImage(imgs.get(i).getId(),imgs.get(i).getKey());
             }
         }
     }
-
+    private void coppyImage(){
+        ArrayList<Image> imgs = new ArrayList<>();
+        imgs.addAll(image_adapter.image_chosen);
+        for (int j = 1; j < AlbumLayout.albums.size(); j++) {
+            if (AlbumLayout.albums.get(j).getId() == album.getId()) {
+                int nextk = Integer.parseInt(MainActivity.dataFirebase.findNextkey());
+                for (int i = 0; i < imgs.size(); i++) {
+                    Image copyImage = new Image(imgs.get(i).getImgBitmap(), main.GenerateName());
+                    MainActivity.dataFirebase.insertImage(copyImage);
+                    copyImage.setKey(String.valueOf(nextk+i));
+                    MainActivity.dataResource.InsertAlbumImage(album.getId(), copyImage.getId());
+                    AlbumLayout.albums.get(j).addImage(copyImage);
+                }
+                album = AlbumLayout.albums.get(j);
+                MainActivity.dataFirebase.updateAlbum(AlbumLayout.albums.get(j));
+                break;
+            }
+        }
+        main.bottom_navigation_album.setVisibility(View.INVISIBLE);
+        main.mBottomNavigationView.setVisibility(View.VISIBLE);
+        tv_back_to_album.setVisibility(View.VISIBLE);
+        image_adapter = new ShowImageInAlbumAdapter(main, R.layout.item_image, album.getImages());
+        recyclerView.setAdapter(image_adapter);
+        recyclerView.scrollToPosition(album.getImages().size());
+        tv_choose.setText("Chọn");
+        main.albumLayout.update();
+    }
+    private void deleteImAb(){
+        for (Image image : image_adapter.image_chosen) {
+            if(album.getName().equals("Mục yêu thích")){
+                image.setFavorite("F");
+                main.favoriteLayout.updateFavorite(image);
+                Log.e("Show",image.getId()+" "+image.getKey());
+                MainActivity.dataResource.unlikeImage(image.getId(),image.getKey());
+                album.removeImage(image);
+            }
+            else {
+                MainActivity.dataResource.deleteImageInAlbum(image, album.getId());
+                album.removeImage(image);
+                MainActivity.dataFirebase.updateAlbum(album);
+            }
+        }
+        originalState();
+    }
 }

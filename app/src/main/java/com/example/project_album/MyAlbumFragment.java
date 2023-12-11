@@ -30,6 +30,7 @@ public class MyAlbumFragment extends Fragment {
     private TextView tv_cancel;
     private boolean isaddtoalbum = false;
     private ShowImageInAlbumFragment showImageInAlbumFragment;
+    private AllLayout allLayout;
     public ArrayList<Album> albums = new ArrayList<>();
     private boolean isInit = false;
     public MyAlbumFragment(){
@@ -38,6 +39,10 @@ public class MyAlbumFragment extends Fragment {
     public MyAlbumFragment(ShowImageInAlbumFragment showImageInAlbumFragment){
         this.isaddtoalbum =true;
         this.showImageInAlbumFragment = showImageInAlbumFragment;
+    }
+    public MyAlbumFragment(AllLayout allLayout){
+        this.isaddtoalbum =true;
+        this.allLayout = allLayout;
     }
 
     @Override
@@ -77,7 +82,7 @@ public class MyAlbumFragment extends Fragment {
         //albums = null;
 
         if (isaddtoalbum){
-            for(int i = 1;i<AlbumLayout.albums.size();i++){
+            for(int i = 2;i<AlbumLayout.albums.size();i++){
                 albums.add(AlbumLayout.albums.get(i));
             }
             linear1.setVisibility(View.INVISIBLE);
@@ -102,8 +107,14 @@ public class MyAlbumFragment extends Fragment {
                     ft.commit();
                 }
                 else{
-                    showImageInAlbumFragment.AddToNewAlbum(albums.get(i).getId(),albums.get(i).getName());
-                    closeFragment();
+                    if (showImageInAlbumFragment!= null) {
+                        showImageInAlbumFragment.AddToNewAlbum(albums.get(i).getId(), albums.get(i).getName());
+                        closeFragment();
+                    }
+                    else if(allLayout!=null){
+                        allLayout.addToAlbum(albums.get(i).getId());
+                        closeFragment();
+                    }
                 }
             }
         });

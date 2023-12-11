@@ -1,4 +1,5 @@
 package com.example.project_album;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -10,8 +11,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-
-import java.io.IOException;
 import java.net.URL;
 
 public class UrlFragment extends DialogFragment {
@@ -66,14 +63,7 @@ public class UrlFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if(img!=null) {
-                            img.setId(main.dataResource.InsertImage(img, MainActivity.userID));
-                            AllLayout.images.add(img);
-                            MainActivity.images.add(img);
-                            Toast.makeText(main,"Đã tải về",Toast.LENGTH_SHORT).show();
-                            dismiss();
-                            main.allLayout.adapter.insert(img);
-                            main.allLayout.update();
-                            Log.e("Qdsf",String.valueOf(AllLayout.images.size()));
+                            MainActivity.dataFirebase.insertImage(img);
                         }
                         else{
                             Toast.makeText(main,"Không tìm thấy link",Toast.LENGTH_SHORT).show();
@@ -171,5 +161,8 @@ public class UrlFragment extends DialogFragment {
         Toast.makeText(getContext(), "Network is OK!", Toast.LENGTH_SHORT).show();
         return true;
     }
-
+    private void succesfull(){
+        Toast.makeText(main,"Đã tải về",Toast.LENGTH_SHORT).show();
+        dismiss();
+    }
 }

@@ -3,9 +3,9 @@ package com.example.project_album;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -30,9 +30,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
-
-import android.hardware.Camera;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -54,14 +51,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -84,7 +78,7 @@ public class AllLayout extends Fragment {
 
     // TODO: Rename and change types of parameters
     private final int STORAGE_PERMISSION_REQUEST_CODE = 1001;
-    //khai báo biến cho dialog
+    //khai báo biến cho dialog============================
     private Dialog dialog;
     private TextView tv_addtoAlbum;
     private TextView tv_delete;
@@ -95,7 +89,7 @@ public class AllLayout extends Fragment {
     private View v_allInfo;
     private boolean clicked = false;
 
-    //view header dialog
+    //view header dialog=============================
     private TextView tv_theme;
     private TextView tv_size_square_small;
     private TextView tv_size_square_big;
@@ -105,17 +99,19 @@ public class AllLayout extends Fragment {
     private View v_text_color;
     private View v_bg_color;
     private TextView tv_text_color;
+    private TextView tv_deleteCoppy;
+    private TextView tv_sort;
     Dialog dialog_header;
     //finish=======================================
 
     //finish
 
-    //view header
+    //view header ==================================
     private TextView tv_info, tv_choose;
     private Button btn_extend;
     //finish
 
-    //view footer
+    //view footer===================================
     private ImageView img_all_info;
     private TextView tv_numSelect;
     //finish
@@ -123,7 +119,7 @@ public class AllLayout extends Fragment {
     MainActivity main;
     Context context = null;
 
-    //khai báo của TA
+    //khai báo của TA ======================================
     ActivityResultLauncher<PickVisualMediaRequest> pickMultiImages;
     FloatingActionButton btnAdd, btnAddCamera, btnAddUrl, btnAddImage;
     private Animation rotateOpen;
@@ -131,6 +127,7 @@ public class AllLayout extends Fragment {
     private Animation fromBottom;
     private Animation toBottom;
     public static ArrayList<Image> images = new ArrayList<>();
+    private UrlFragment fragmenturl;
     //    ImageAdapter adapter;
     //GridView gridView;
     ShowImageInAllAdapter adapter;
@@ -146,6 +143,12 @@ public class AllLayout extends Fragment {
     EditText edtNameZip;
 
     //Xong zip
+    //Password for hide
+    private String myFilePasswordForHide = "user";
+    String key = "hidepass";
+    String pass = "";//này là lúc đọc lên
+    String value = "";// này là lúc lưu xuống
+
     public AllLayout() {
         debug("constructor, images.count = " + String.valueOf(images.size()));
         //images = MainActivity.dataResource.getAllImage();
@@ -179,6 +182,9 @@ public class AllLayout extends Fragment {
     public void onResume() {
         super.onResume();
         debug("onResume" + String.valueOf(images.size()));
+        for (int j = 0; j < images.size(); j++){
+            debug(images.get(j).getDate());
+        }
     }
 
     @Override
@@ -209,12 +215,14 @@ public class AllLayout extends Fragment {
         EventViewHeader();
         //finish===================================================
         //View for header dialog
-        v_dialog_h = main.getLayoutInflater().inflate(R.layout.header_dialog,null);
+        v_dialog_h = main.getLayoutInflater().inflate(R.layout.header_dialog, null);
         tv_theme = v_dialog_h.findViewById(R.id.tv_theme);
         tv_size_square_small = v_dialog_h.findViewById(R.id.tv_size_small);
         tv_size_square_big = v_dialog_h.findViewById(R.id.tv_size_big);
         tv_type_square = v_dialog_h.findViewById(R.id.tv_type_square);
         tv_unzip = v_dialog_h.findViewById(R.id.tv_unzip);
+        tv_deleteCoppy =v_dialog_h.findViewById(R.id.tv_delete_coppy);
+        tv_sort = v_dialog_h.findViewById(R.id.tv_sort);
         dialog_header = new Dialog(main);
         dialog_header.setContentView(v_dialog_h);
         v_text_color = v_dialog_h.findViewById(R.id.v_text_color);
@@ -252,10 +260,27 @@ public class AllLayout extends Fragment {
         recyclerView.scrollToPosition(images.size() - 1);
 
 
-        spinner = view.findViewById(R.id.spinner);
-        initSpinnerView();
-        setTheme(main.mainColorBackground,main.mainColorText);
+//        spinner = view.findViewById(R.id.spinner);
+//        initSpinnerView();
+        setTheme(main.mainColorBackground, main.mainColorText);
+        //Khởi tạo cho SharePrefence lần đầu cho cái Hide bên Album tức là nếu
+        //main.hidepass lần đầu chạy là null thì ghi vào file user pass là ""
+        //còn nếu đọc từ firebase có rồi thì thôi không cần ghi đè xuống
+        if (main.hidepass.equals("")) {
+            Log.e("MainHidePass","Lanull");
+            SharedPreferences myPrefContainer = main.getSharedPreferences(
+                    myFilePasswordForHide, Activity.MODE_PRIVATE);
+            SharedPreferences.Editor myPrefEditor = myPrefContainer.edit();
+            myPrefEditor.putString(key, "");
+            main.dataFirebase.setHidePassIntoFirebase("");
+            main.hidepass="";
+            myPrefEditor.commit();
+        }
+        for (int j = 0; j < images.size(); j++){
+            debug(images.get(j).getDate());
+        }
 
+        //Kết thúc
         return view;
     }
 
@@ -264,10 +289,9 @@ public class AllLayout extends Fragment {
     }
 
     private void EventViewDialogHeader() {
-        if(main.mainColorBackground == main.getColor(R.color.black)){
+        if (main.mainColorBackground == main.getColor(R.color.black)) {
             tv_theme.setText("Chế độ sáng");
-        }
-        else{
+        } else {
             tv_theme.setText("Chế độ tối");
         }
         tv_theme.setOnClickListener(new View.OnClickListener() {
@@ -316,6 +340,18 @@ public class AllLayout extends Fragment {
             @Override
             public void onClick(View view) {
                 ChangeColorBackground();
+            }
+        });
+        tv_sort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sortAction();
+            }
+        });
+        tv_deleteCoppy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteCoppy();
             }
         });
     }
@@ -380,7 +416,7 @@ public class AllLayout extends Fragment {
                         main.favoriteLayout.updateFavorite(adapter.image_chosen.get(i));
                         //main.albumLayout.updateFavorite(adapter.image_chosen.get(i));
                         MainActivity.dataResource.likeImage(adapter.image_chosen
-                                .get(i).getId());
+                                .get(i).getId(), adapter.image_chosen.get(i).getKey());
                     }
                 }
                 dialog.dismiss();
@@ -409,6 +445,7 @@ public class AllLayout extends Fragment {
 
                     //xoa image o allLayout
                     long idImage = adapter.image_chosen.get(i).getId();
+                    String key = adapter.image_chosen.get(i).getKey();
                     for (int i1 = 0; i1 < images.size(); i1++) {
                         if (images.get(i1).getId() == idImage) {
                             images.remove(i1);
@@ -422,7 +459,7 @@ public class AllLayout extends Fragment {
 //                    Log.e("DeleteAllLayout","Images size="+String.valueOf(images.size()));
 //                    Log.e("DeleteAllLayout","Adapter Size="+String.valueOf(adapter.images.size()));
                     //update trạng thái ở database
-                    MainActivity.dataResource.updateStateImageDeletedIsTrue(idImage);
+                    MainActivity.dataResource.updateStateImageDeletedIsTrue(idImage, key);
                 }
                 adapter.notifyDataSetChanged();
                 dialog.dismiss();
@@ -433,43 +470,125 @@ public class AllLayout extends Fragment {
         tv_blind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e("Hide","Size trước ẩn="+String.valueOf(images.size()));
-                for (int i = 0; i < adapter.image_chosen.size(); i++) {
+                //Đọc dữ liệu từ file myFilePasswordForHide
+                SharedPreferences myPrefContainer = main.getSharedPreferences(myFilePasswordForHide, Activity.MODE_PRIVATE);
 
-                    //Nếu chọn ẩn ảnh thì bắt buộc phải xóa ảnh đó khỏi favorite, mặc dù nó vẫn là ưa thích
-                    if (adapter.image_chosen.get(i).getFavorite().equals("T")) {
-                        //chỉ xóa khỏi imagesFavorite thôi, chứ k xóa tính chất ưa thích của nó
-                        main.favoriteLayout.removeImageOutFavorite(adapter.image_chosen.get(i));
+                if ((myPrefContainer != null) && myPrefContainer.contains(key)) {
+                    pass = myPrefContainer.getString(key, "");
+                }
+                //Nếu pass=="" tức là chưa đặt mật khẩu thì bắt đặt mật khẩu
+                if (pass.equals("")) {
+                    Dialog myDialog = new Dialog(main);
+                    myDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    myDialog.setContentView(R.layout.custom_add_password_for_hide);
+                    Window window = dialog.getWindow();
+                    if(window == null){
+                        return;
                     }
-                    //thay đổi tính chất ảnh đã được ẩn, là như này nó đã thay đổi bên main luôn rồi.
-                    adapter.image_chosen.get(i).setHide("T");
-
-                    //add vào images ở hide
-                    HideInAlbumLayoutFragment.images.add(adapter.image_chosen.get(i));
-
-                    //xoa image o allLayout
-                    long idImage = adapter.image_chosen.get(i).getId();
-                    for (int i1 = 0; i1 < images.size(); i1++) {
-                        if (images.get(i1).getId() == idImage) {
-                            images.remove(i1);
-                            break;
+                    window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    WindowManager.LayoutParams attribute = window.getAttributes();
+                    attribute.gravity =Gravity.CENTER;
+                    EditText passForHide = myDialog.findViewById(R.id.edt_pass_hide_in_all_layout);
+                    Button btnCancelSetPassHide = myDialog.findViewById(R.id.btn_cancel_set_password_hide);
+                    Button btnSaveSetPassHide = myDialog.findViewById(R.id.btn_save_password_hide);
+                    btnCancelSetPassHide.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            myDialog.dismiss();
                         }
-                    }
+                    });
+                    btnSaveSetPassHide.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //Tiến hành lưu lại vào file myFilePasswordForHide
+                            if (passForHide.getText().toString().equals("")) {
+                                Toast.makeText(main, "Nhập mật khẩu", Toast.LENGTH_SHORT).show();
+                            } else {
+                                value = passForHide.getText().toString();
+                                SharedPreferences.Editor myPrefEditor = myPrefContainer.edit();
+                                myPrefEditor.putString(key, value);
+                                //cập nhật pass lên firebase
+                                main.dataFirebase.setHidePassIntoFirebase(value);
+                                main.hidepass=value;
+                                myPrefEditor.commit();
+                            }
+                            myDialog.dismiss();
+                        }
+                    });
+                    myDialog.show();
+                } else {
+                    for (int i = 0; i < adapter.image_chosen.size(); i++) {
+
+                        //Nếu chọn ẩn ảnh thì bắt buộc phải xóa ảnh đó khỏi favorite, mặc dù nó vẫn là ưa thích
+                        if (adapter.image_chosen.get(i).getFavorite().equals("T")) {
+                            //chỉ xóa khỏi imagesFavorite thôi, chứ k xóa tính chất ưa thích của nó
+                            main.favoriteLayout.removeImageOutFavorite(adapter.image_chosen.get(i));
+                        }
+                        //thay đổi tính chất ảnh đã được ẩn, là như này nó đã thay đổi bên main luôn rồi.
+                        adapter.image_chosen.get(i).setHide("T");
+
+                        //add vào images ở hide
+                        HideInAlbumLayoutFragment.images.add(adapter.image_chosen.get(i));
+
+                        //xoa image o allLayout
+                        long idImage = adapter.image_chosen.get(i).getId();
+                        String key = adapter.image_chosen.get(i).getKey();
+                        for (int i1 = 0; i1 < images.size(); i1++) {
+                            if (images.get(i1).getId() == idImage) {
+                                images.remove(i1);
+                                break;
+                            }
+                        }
 
 //                    //xoa image ở adapter, do AllLayout chưa đồng bộ nên phải xóa riêng
-                    adapter.updateImagesInShowImageAllAdapter(idImage);
+                        adapter.updateImagesInShowImageAllAdapter(idImage);
 
-                    //update trạng thái ở database
-                    MainActivity.dataResource.updateStateImageHideIsTrue(idImage);
+                        //update trạng thái ở database
+                        MainActivity.dataResource.updateStateImageHideIsTrue(idImage, key);
+                    }
+                    adapter.notifyDataSetChanged();
+                    dialog.dismiss();
+                    adapter.resetChooseSelection();
+                    tv_choose.callOnClick();
+                    Log.e("Hide", "Size sau ẩn=" + String.valueOf(images.size()));
                 }
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
-                adapter.resetChooseSelection();
-                tv_choose.callOnClick();
-                Log.e("Hide","Size sau ẩn="+String.valueOf(images.size()));
             }
         });
 
+        tv_addtoAlbum.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            dialog.dismiss();
+            addToAlbumAction();
+        }
+        });
+
+    }
+    private void addToAlbumAction(){
+        FragmentManager fragmentmanager = main.getSupportFragmentManager();
+        FragmentTransaction ft = fragmentmanager.beginTransaction();
+        Fragment fragment = new MyAlbumFragment(this);
+        ft.add(R.id.replace_fragment_layout,fragment);
+        ft.addToBackStack(fragment.getClass().getSimpleName());
+        ft.commit();
+    }
+    public void addToAlbum(long idAlbum){
+        main.addImAb = false;
+        ArrayList<Image> imgs = new ArrayList<>();
+        imgs.addAll(adapter.image_chosen);
+        for (int j = 1; j < AlbumLayout.albums.size(); j++) {
+            if (AlbumLayout.albums.get(j).getId() == idAlbum) {
+                for (int i = 0; i < imgs.size(); i++) {
+                    MainActivity.dataResource.InsertAlbumImage(idAlbum, imgs.get(i).getId());
+                    AlbumLayout.albums.get(j).addImage(imgs.get(i));
+                }
+                MainActivity.dataFirebase.updateAlbum(AlbumLayout.albums.get(j));
+                break;
+            }
+        }
+        adapter.notifyDataSetChanged();
+        adapter.resetChooseSelection();
+        tv_choose.callOnClick();
     }
 
     //========================kết thúc bắt các sự kiện từ dialog
@@ -558,7 +677,9 @@ public class AllLayout extends Fragment {
         btnAddUrl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new UrlFragment().show(main.getSupportFragmentManager(), UrlFragment.Tag);
+                main.isURLdownload = true;
+                fragmenturl = new UrlFragment();
+                fragmenturl.show(main.getSupportFragmentManager(), UrlFragment.Tag);
             }
         });
         registerImageResultLauncher();
@@ -582,11 +703,12 @@ public class AllLayout extends Fragment {
                                 for (int i = 0; i < result.size(); i++) {
                                     Bitmap image = MediaStore.Images.Media.getBitmap(main.getContentResolver(), result.get(i));
                                     Image img = new Image(image, main.GenerateName());
-                                    img.setId(main.dataResource.InsertImage(img, MainActivity.userID));
-                                    AllLayout.images.add(img);
-                                    MainActivity.images.add(img);
-                                    main.allLayout.adapter.insert(img);
-                                    main.allLayout.update();
+                                    MainActivity.dataFirebase.insertImage(img);
+//                                    img.setId(main.dataResource.InsertImage(img));
+//                                    AllLayout.images.add(img);
+//                                    MainActivity.images.add(img);
+//                                    main.allLayout.adapter.insert(img);
+//                                    main.allLayout.update();
                                 }
                                 Log.d("PhotoPicker", "Number of items selected: " + result.size());
                             } catch (Exception e) {
@@ -670,8 +792,7 @@ public class AllLayout extends Fragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startCamera();
             }
-        }
-        else if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+        } else if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
 
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Quyền truy cập lưu trữ đã được cấp, thực hiện các hành động cần thiết ở đây
@@ -686,34 +807,36 @@ public class AllLayout extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
+            MainActivity.dataResource.open();
             if (requestCode == 123) {
                 Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-
+                Image img = new Image(bitmap, main.GenerateName());
+                MainActivity.dataFirebase.insertImage(img);
                 //TH1: Chuyển thành byte để lưu vào database
 //                ByteArrayOutputStream stream = new ByteArrayOutputStream();
 //                bitmap.compress(Bitmap.CompressFormat.JPEG, 40, stream);
 //                byte[] byteArray = stream.toByteArray();
 
                 //TH2: Lưu vào gallery
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH);
-                String filename = sdf.format(new Date());
-                File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                Log.i("Test", path.toString());
-                OutputStream fOut = null;
-                File file = new File(path, filename + ".jpg");
-
-                try {
-                    fOut = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 40, fOut);
-                    fOut.flush();
-                    fOut.close();
-
-                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    mediaScanIntent.setData(Uri.fromFile(file));
-                    main.sendBroadcast(mediaScanIntent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH);
+//                String filename = sdf.format(new Date());
+//                File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//                Log.i("Test", path.toString());
+//                OutputStream fOut = null;
+//                File file = new File(path, filename + ".jpg");
+//
+//                try {
+//                    fOut = new FileOutputStream(file);
+//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 40, fOut);
+//                    fOut.flush();
+//                    fOut.close();
+//
+//                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//                    mediaScanIntent.setData(Uri.fromFile(file));
+//                    main.sendBroadcast(mediaScanIntent);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
         }
     }
@@ -826,6 +949,7 @@ public class AllLayout extends Fragment {
 
         return fileList;
     }
+
     public void doZipImage(ArrayList<String> folder) {
         Dialog mDialog = new Dialog(main);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -921,7 +1045,7 @@ public class AllLayout extends Fragment {
 
     //=================== Quá trình unzip =======================
 
-    private void unzip(){
+    private void unzip() {
         boolean writePermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
         boolean readPermission = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -936,6 +1060,7 @@ public class AllLayout extends Fragment {
             doUnzipImage();
         }
     }
+
     public void doUnzipImage() {
         Dialog mDialog = new Dialog(main);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -962,9 +1087,9 @@ public class AllLayout extends Fragment {
                     Toast.makeText(main, "Nhập tên file cần unzip", Toast.LENGTH_SHORT).show();
                 } else {
                     //Lấy đường dẫn Zip truyền vào để UnZip
-                    String pathDownload=Environment.getExternalStoragePublicDirectory(
+                    String pathDownload = Environment.getExternalStoragePublicDirectory(
                             Environment.DIRECTORY_DOWNLOADS).toString();
-                    String parentDirPath1 = pathDownload+ "/MyImageZips";
+                    String parentDirPath1 = pathDownload + "/MyImageZips";
                     //Kiểm tra tên file zip có hợp lệ không
                     String zipFile = parentDirPath1 + "/" + edtNameZip.getText().toString();
                     ArrayList<String> fileList = getListOfFilesInDirectory(parentDirPath1);
@@ -1047,32 +1172,35 @@ public class AllLayout extends Fragment {
     //=======================Kết thúc unzip
     public void update() {
         try {
+            recyclerView.scrollToPosition(images.size() - 1);
             adapter.notifyDataSetChanged();
+            tv_bottom.setText(String.valueOf(images.size()) + " ảnh\nĐã đồng bộ với cloud");
             debug("update");
         } catch (Exception e) {
             debug(e.toString());
         }
     }
 
-    private void updateTheme(){
-        if(tv_theme.getText().toString().equals("Chế độ sáng")){
+    private void updateTheme() {
+        if (tv_theme.getText().toString().equals("Chế độ sáng")) {
             tv_theme.setText("Chế độ tối");
             main.mainColorBackground = main.getColor(R.color.light);
             main.mainColorText = main.getColorStateList(R.color.textview_form2);
 
-        }
-        else{
+        } else {
             tv_theme.setText("Chế độ sáng");
             main.mainColorBackground = main.getColor(R.color.black);
             main.mainColorText = main.getColorStateList(R.color.textview_form);
         }
-        setTheme(main.mainColorBackground,main.mainColorText);
+        setTheme(main.mainColorBackground, main.mainColorText);
     }
-    private void setTheme(int backgroundColor, ColorStateList textColor){
+
+    private void setTheme(int backgroundColor, ColorStateList textColor) {
         setThemeBackGround(backgroundColor);
         setThemeText(textColor);
     }
-    private void setThemeBackGround(int backgroundColor){
+
+    private void setThemeBackGround(int backgroundColor) {
         //LinearLayout dialog_header = v_dialog_h.findViewById(R.id.linear);
         LinearLayout dialog_all = v_allInfo.findViewById(R.id.linear);
 
@@ -1083,7 +1211,8 @@ public class AllLayout extends Fragment {
 
         v_bg_color.setBackgroundColor(backgroundColor);
     }
-    private void setThemeText(ColorStateList textColor){
+
+    private void setThemeText(ColorStateList textColor) {
         //Textview dialog footer======================
         tv_addtoAlbum.setTextColor(textColor);
         tv_favorite.setTextColor(textColor);
@@ -1100,6 +1229,8 @@ public class AllLayout extends Fragment {
         tv_unzip.setTextColor(textColor);
         tv_text_color.setTextColor(textColor);
         v_text_color.setBackgroundColor(textColor.getDefaultColor());
+        tv_sort.setTextColor(textColor);
+        tv_deleteCoppy.setTextColor(textColor);
 
         tv_choose.setTextColor(textColor);
     }
@@ -1140,19 +1271,21 @@ public class AllLayout extends Fragment {
         }
         adapter.notifyDataSetChanged();
     }
-    private void ChangeColorBackground(){
+
+    private void ChangeColorBackground() {
         //dialog_header.dismiss();
         ColorPicker(1);
     }
-    private void ChangeTextColor(){
+
+    private void ChangeTextColor() {
         ColorPicker(2);
     }
-    private void ColorPicker(int type){
+
+    private void ColorPicker(int type) {
         int mcolor = -1;
-        if (type == 1){
+        if (type == 1) {
             mcolor = main.mainColorBackground;
-        }
-        else if(type ==2){
+        } else if (type == 2) {
             mcolor = main.mainColorText.getDefaultColor();
         }
         AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(main, mcolor,
@@ -1163,11 +1296,10 @@ public class AllLayout extends Fragment {
 
                     @Override
                     public void onOk(AmbilWarnaDialog dialog, int color) {
-                        if(type == 1){
+                        if (type == 1) {
                             main.mainColorBackground = color;
                             setThemeBackGround(main.mainColorBackground);
-                        }
-                        else if(type == 2){
+                        } else if (type == 2) {
                             main.mainColorText = getColorStateList(color);
                             setThemeText(main.mainColorText);
                         }
@@ -1176,20 +1308,59 @@ public class AllLayout extends Fragment {
                 });
         colorPicker.show();
     }
-    private ColorStateList getColorStateList(int color){
-        int[][] states = new int[][] {
-                new int[] {-android.R.attr.state_pressed}, // unchecked
-                new int[] { android.R.attr.state_pressed}};
-        int[] mcolors = new int[] {
-                color,createDarkColor(color)
+
+    private ColorStateList getColorStateList(int color) {
+        int[][] states = new int[][]{
+                new int[]{-android.R.attr.state_pressed}, // unchecked
+                new int[]{android.R.attr.state_pressed}};
+        int[] mcolors = new int[]{
+                color, createDarkColor(color)
         };
-        return new ColorStateList(states,mcolors);
+        return new ColorStateList(states, mcolors);
     }
-    private int createDarkColor(int color){
+
+    private int createDarkColor(int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
         hsv[2] *= 0.5;
         return Color.HSVToColor(hsv);
+    }
+    private void sortAction(){
+        if (tv_sort.getText().toString().equals("Sắp xếp theo ngày")){
+            tv_sort.setText("Sắp xếp theo kích cỡ");
+            sortDate();
+        }
+        else if (tv_sort.getText().toString().equals("Sắp xếp theo size")){
+            tv_sort.setText("Sắp xếp theo ngày");
+            sortSize();
+        }
+    }
+    private void sortDate(){
+        int pos = 0;
+        for (int i = 0; i < MainActivity.images.size() - 1; i++) {
+            if (MainActivity.images.get(i).getDeleted()!="T" && MainActivity
+                    .images.get(i).getHide()!="T"){
+                images.set(pos++,MainActivity.images.get(i));
+            }
+        }
+        adapter.images = AllLayout.images;
+        adapter.notifyDataSetChanged();
+    }
+    private void sortSize(){
+        for (int i = 0; i < images.size() - 1; i++) {
+            for (int j = i + 1; j < images.size(); j++) {
+                if (images.get(i).getSize() > images.get(j).getSize()) {
+                    Image temp = images.get(i);
+                    images.set(i, images.get(j));
+                    images.set(j, temp);
+                }
+            }
+        }
+        adapter.images = images;
+        adapter.notifyDataSetChanged();
+    }
+    private void deleteCoppy(){
+
     }
 
     @Override
@@ -1202,5 +1373,10 @@ public class AllLayout extends Fragment {
     public void onStop() {
         super.onStop();
         debug("onStop " + String.valueOf(images.size()));
+    }
+
+    public void URLdownloadSuc() {
+        main.isURLdownload = false;
+        fragmenturl.dismiss();
     }
 }

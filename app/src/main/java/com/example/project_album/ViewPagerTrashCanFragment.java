@@ -3,6 +3,7 @@ package com.example.project_album;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ public class ViewPagerTrashCanFragment extends Fragment {
     Context context = null;
     ViewPagerInTrashCanAdapter mAdapter;
     int index = 0;//Vị trí được chọn hiện tại
+    RelativeLayout mainLayout;
 
     public ViewPagerTrashCanFragment(ArrayList<Image> imgs, int index) {
         this.images = imgs;
@@ -55,6 +58,7 @@ public class ViewPagerTrashCanFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_pager_trash_can, container, false);
+        mainLayout=view.findViewById(R.id.main_view_trashcan_layout);
         txtTimeDelete = view.findViewById(R.id.edt_time_delete);
         txtBack=view.findViewById(R.id.txt_back);
         txtNumberPerAll = view.findViewById(R.id.txt_number_per_all);
@@ -66,7 +70,8 @@ public class ViewPagerTrashCanFragment extends Fragment {
         mViewPager.setCurrentItem(index, false);
         txtNumberPerAll.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
         main.mBottomNavigationView.setVisibility(View.GONE);
-
+        //set Theme
+        setTheme(main.mainColorBackground,main.mainColorText);
 
 
         mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -87,8 +92,9 @@ public class ViewPagerTrashCanFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         long idImage = images.get(index).getId();
+                        String key = images.get(index).getKey();
                         //set trạng thái đã xóa là false ở data resource
-                        MainActivity.dataResource.updateStateImageDeletedIsFalse(idImage);
+                        MainActivity.dataResource.updateStateImageDeletedIsFalse(idImage,key);
                         //set trạng thái ảnh delete là F
                         images.get(index).setDeleted("F");
 
@@ -152,6 +158,8 @@ public class ViewPagerTrashCanFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         //Xóa dòng hình ảnh đó đó ở dataResource
                         MainActivity.dataResource.deleteImage(images.get(index));
+                        MainActivity.dataFirebase.deleteImage(images.get(index).getKey(),
+                                images.get(index).getName());
                         ////////////////////////
 //                        Log.e("Day la lo1","Anh index co id "+String.valueOf(images.get(index).getId())+" Voi index"+String.valueOf(index));
                         if (index == images.size() - 1) {
@@ -216,5 +224,21 @@ public class ViewPagerTrashCanFragment extends Fragment {
         } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
 
         }
+    }
+    //Set theme
+    private void setTheme(int backgroundColor, ColorStateList textColor) {
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        mainLayout.setBackgroundColor(backgroundColor);
+    }
+
+    private void setThemeText(ColorStateList textColor) {
+        txtTimeDelete.setTextColor(textColor);
+        txtNumberPerAll.setTextColor(textColor);
+        btnDeleteImmediately.setTextColor(textColor);
+        btnRestore.setTextColor(textColor);
     }
 }

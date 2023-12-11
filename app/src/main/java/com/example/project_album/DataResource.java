@@ -11,7 +11,6 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -19,10 +18,11 @@ public class DataResource {
     private SQLiteDatabase database,database1;
     private DatabaseHelper helper;
     private Context context;
-    private String[] allColumns = {DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_USER, DatabaseHelper.COLUMN_IMAGE
+    private String[] allColumns = {DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_IMAGE
             , DatabaseHelper.COLUMN_NAME, DatabaseHelper.COLUMN_SIZE, DatabaseHelper.COLUMN_DATE,
             DatabaseHelper.COLUMN_TYPE, DatabaseHelper.COLUMN_DESCRIBE,
-            DatabaseHelper.COLUMN_IS_DELETE,DatabaseHelper.COLUMN_IS_FAVORITE,DatabaseHelper.COLUMN_IS_HIDE};
+            DatabaseHelper.COLUMN_IS_DELETE,DatabaseHelper.COLUMN_IS_FAVORITE,
+            DatabaseHelper.COLUMN_IS_HIDE,DatabaseHelper.COLUMN_KEY};
 
     //    private String[] allColumns = {DatabaseHelper.COLUMN_ID,DatabaseHelper.COLUMN_IMAGE
 //        ,DatabaseHelper.COLUMN_DATE};
@@ -43,14 +43,14 @@ public class DataResource {
 
     //--------------------------- ALBUM SPACE----------------------------
 
-    public long InsertAlbum(String name,int idUser){
+    public long InsertAlbum(String name,String key){
         SQLiteDatabase db = database;
         db.beginTransaction();
         long id = -1;
         try{
             ContentValues values = new ContentValues();
             values.put(DatabaseHelper.COLUMN_NAME_ALBUM,name);
-            values.put(DatabaseHelper.COLUMN_USER,idUser);
+            values.put(DatabaseHelper.COLUMN_KEY,key);
             id = database.insert(DatabaseHelper.TABLE_ALBUM,
                     null,values);
             db.setTransactionSuccessful();
@@ -64,6 +64,14 @@ public class DataResource {
             db.endTransaction();
         }
         return id;
+    }
+    public void UpdateKeyAlbum(long id,int keyA){
+        ContentValues key = new ContentValues();
+        key.put(DatabaseHelper.COLUMN_KEY,keyA);
+        database.update(DatabaseHelper.TABLE_ALBUM,key,
+                DatabaseHelper.COLUMN_ID +" = "+
+                String.valueOf(id), null);
+
     }
 
     public long InsertAlbumImage(long idAlbum,long idImage){
@@ -88,11 +96,11 @@ public class DataResource {
         return id;
     }
 
-    public ArrayList<Album> getAllAlbum(int idUser){
+    public ArrayList<Album> getAllAlbum(){
         ArrayList<Album> albums = new ArrayList<>();
-        String columnAlbum[] = {DatabaseHelper.COLUMN_NAME_ALBUM,DatabaseHelper.COLUMN_ID_ALBUM};
-        Cursor cursor = database.query(DatabaseHelper.TABLE_ALBUM,columnAlbum,
-                DatabaseHelper.COLUMN_USER+" = "+String.valueOf(idUser),
+        String columnAlbum[] = {DatabaseHelper.COLUMN_NAME_ALBUM,DatabaseHelper.COLUMN_ID_ALBUM
+        ,DatabaseHelper.COLUMN_KEY};
+        Cursor cursor = database.query(DatabaseHelper.TABLE_ALBUM,columnAlbum, null,
                 null, null, null, null);
         debug(String.valueOf(cursor.getCount()));
         cursor.moveToFirst();
@@ -105,10 +113,10 @@ public class DataResource {
     }
 
     private Album cursorToAlbum(Cursor cursor){
-        return getAlbum(cursor.getLong(1),cursor.getString(0));
+        return getAlbum(cursor.getLong(1),cursor.getString(0),cursor.getString(2));
     }
 
-    public Album getAlbum(long id,String name){
+    public Album getAlbum(long id,String name,String key){
         debug(name);
         ArrayList<Image> images = new ArrayList<>();
         String columnImage_id[] = {DatabaseHelper.COLUMN_ID_IMAGE};
@@ -124,7 +132,9 @@ public class DataResource {
             cursor.moveToNext();
 
         }
-        return new Album(id,name,images);
+        Album al = new Album(id,name,images);
+        al.setKey(key);
+        return al;
     }
 
     public boolean deleteImageInAlbum(Image image,long idAlbum){
@@ -145,7 +155,7 @@ public class DataResource {
 
     }
 
-    public boolean deleteAlbum(long idAlbum){
+    public boolean deleteAlbum(long idAlbum,String key){
         database.beginTransaction();
         try {
             database.delete(DatabaseHelper.TABLE_ALBUM,
@@ -156,11 +166,12 @@ public class DataResource {
                     DatabaseHelper.COLUMN_ID_ALBUM
                             + " = " + String.valueOf(idAlbum),
                     null);
+            MainActivity.dataFirebase.deleteAlbum(key);
             database.setTransactionSuccessful();
             return true;
         }
         catch (Exception ex){
-            debug("Exception with album "+String.valueOf(idAlbum));
+            debug(ex.toString());
             return false;
         }
         finally {
@@ -168,12 +179,11 @@ public class DataResource {
         }
 
     }
-    public void updateName(String oldName,String newName,int idUser){
+    public void updateName(String oldName,String newName){
         ContentValues key = new ContentValues();
         key.put(DatabaseHelper.COLUMN_NAME_ALBUM,newName);
         database.update(DatabaseHelper.TABLE_ALBUM,key,
-                DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'"
-                        +" and "+ DatabaseHelper.COLUMN_USER +" = "+String.valueOf(idUser),
+                DatabaseHelper.COLUMN_NAME_ALBUM +" = '"+oldName+"'",
                 null);
     }
     //-------------------------------finish album space------------------------------------
@@ -182,10 +192,11 @@ public class DataResource {
         try {
             ContentValues values = new ContentValues();
             values.put(DatabaseHelper.COLUMN_USERNAME, user.getUsername());
-            values.put(DatabaseHelper.COLUMN_PASSWORD, user.getPass());
+            values.put(DatabaseHelper.COLUMN_PASSWORD, user.getPassword());
             values.put(DatabaseHelper.COLUMN_PHONE, user.getPhone());
             values.put(DatabaseHelper.COLUMN_EMAIL,user.getEmail());
             values.put(DatabaseHelper.COLUMN_NICKNAME,user.getUsername());
+
             long insertId = database.insert(DatabaseHelper.TABLE_USERS,
                     null, values);
             return insertId;
@@ -193,16 +204,15 @@ public class DataResource {
             return -1;
         }
     }
-    public long InsertImage(Image image, int USER) {
+    public long InsertImage(Image image) {
         try {
             ContentValues values = new ContentValues();
-            values.put(DatabaseHelper.COLUMN_USER, USER);
             values.put(DatabaseHelper.COLUMN_IMAGE, helper.PATH+"/"+image.getName());
             values.put(DatabaseHelper.COLUMN_NAME, image.getName());
             values.put(DatabaseHelper.COLUMN_SIZE, image.getSize());
+            values.put(DatabaseHelper.COLUMN_KEY,image.getKey());
 
-            SimpleDateFormat ft = new SimpleDateFormat("MM/dd/yyyy");
-            values.put(DatabaseHelper.COLUMN_DATE, ft.format(image.getDate()));
+            values.put(DatabaseHelper.COLUMN_DATE, image.getDate());
             values.put(DatabaseHelper.COLUMN_TYPE, image.getType());
             values.put(DatabaseHelper.COLUMN_DESCRIBE, image.getDescribe());
             values.put(DatabaseHelper.COLUMN_IS_DELETE, image.getDeleted());
@@ -222,36 +232,51 @@ public class DataResource {
                     image.getImgBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
                     fos.flush();
                     fos.close();
+                    image.setPath(helper.PATH+"/"+image.getName());
                 } catch (java.io.IOException e) {
+                    debug(e.toString());
                     e.printStackTrace();
                 }
             }
 
             return insertId;
         } catch (Exception ex) {
+            debug(ex.toString());
             return -1;
         }
     }
-    public void unlikeImage(long id){
+    public void UpdateKeyImage(long id,int keyI){
+        ContentValues key = new ContentValues();
+        key.put(DatabaseHelper.COLUMN_KEY,keyI);
+        database.update(DatabaseHelper.TABLE_ALBUM,key,
+                DatabaseHelper.COLUMN_ID +" = "+
+                        String.valueOf(id), null);
+
+    }
+    public void unlikeImage(long id,String key){
+        MainActivity.dataFirebase.updateImage(key,"favorite","F");
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
                 +DatabaseHelper.COLUMN_IS_FAVORITE + " = 'F'" +
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
         database.execSQL(que);
     }
-    public void likeImage(long id){
+    public void likeImage(long id,String key){
+        MainActivity.dataFirebase.updateImage(key,"favorite","T");
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
                 +DatabaseHelper.COLUMN_IS_FAVORITE + " = 'T'" +
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
         database.execSQL(que);
     }
     // này là update trạng thái trong database khi chuyển từ all sang Hide bên album thôi
-    public void updateStateImageHideIsTrue(long id){
+    public void updateStateImageHideIsTrue(long id,String key){
+        MainActivity.dataFirebase.updateImage(key,"hide","T");
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
                 +DatabaseHelper.COLUMN_IS_HIDE+ " = 'T'" +
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
         database.execSQL(que);
     }
-    public void updateStateImageHideIsFalse(long id){
+    public void updateStateImageHideIsFalse(long id,String key){
+        MainActivity.dataFirebase.updateImage(key,"hide","F");
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
                 +DatabaseHelper.COLUMN_IS_HIDE+ " = 'F'" +
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
@@ -259,13 +284,15 @@ public class DataResource {
     }
     ////////////////////
     // này là update trạng thái trong database khi chuyển từ all sang trash thôi
-    public void updateStateImageDeletedIsTrue(long id){
+    public void updateStateImageDeletedIsTrue(long id,String key){
+        MainActivity.dataFirebase.updateImage(key,"delete","T");
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
                 +DatabaseHelper.COLUMN_IS_DELETE+ " = 'T'" +
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
         database.execSQL(que);
     }
-    public void updateStateImageDeletedIsFalse(long id){
+    public void updateStateImageDeletedIsFalse(long id,String key){
+        MainActivity.dataFirebase.updateImage(key,"delete","F");
         String que= "UPDATE " +DatabaseHelper.TABLE_PICTURE +" SET "
                 +DatabaseHelper.COLUMN_IS_DELETE+ " = 'F'" +
                 " WHERE " +DatabaseHelper.COLUMN_ID +" = "+String.valueOf(id);
@@ -281,6 +308,7 @@ public class DataResource {
             file.delete();
             database.delete(DatabaseHelper.TABLE_PICTURE, DatabaseHelper.COLUMN_ID + " = " + id,
                     null);
+
             return true;
         }
         catch (Exception ex){
@@ -288,10 +316,9 @@ public class DataResource {
         }
 
     }
-    public ArrayList<Image> getAllImage(int userID) {
+    public ArrayList<Image> getAllImage() {
         ArrayList<Image> list = new ArrayList<Image>();
-        Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns,
-                DatabaseHelper.COLUMN_USER+" = "+String.valueOf(userID),
+        Cursor cursor = database.query(DatabaseHelper.TABLE_PICTURE, allColumns,null,
                 null, null, null, null);
 //        Cursor c = database.rawQuery("select ")
         cursor.moveToFirst();
@@ -306,20 +333,16 @@ public class DataResource {
         ;
         Image image = new Image();
         image.setId(cursor.getLong(0));
-        image.setName(cursor.getString(3));
-        image.setSize(cursor.getFloat(4));
-        image.setPath(cursor.getString(2));
-        image.setType(cursor.getString(6));
-        image.setDescribe(cursor.getString(7));
-        image.setDeleted(cursor.getString(8));
-        image.setFavorite(cursor.getString(9));
-        image.setHide(cursor.getString(10));
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-        try {
-            image.setDate(df.parse(cursor.getString(5)));
-        } catch (Exception ex) {
-            Log.e("DataResource", "oke");
-        }
+        image.setName(cursor.getString(2));
+        image.setSize(cursor.getFloat(3));
+        image.setPath(cursor.getString(1));
+        image.setType(cursor.getString(5));
+        image.setDescribe(cursor.getString(6));
+        image.setDeleted(cursor.getString(7));
+        image.setFavorite(cursor.getString(8));
+        image.setHide(cursor.getString(9));
+        image.setDate(cursor.getString(4));
+        image.setKey(cursor.getString(10));
         return image;
     }
 
@@ -382,6 +405,16 @@ public class DataResource {
         int count= cursor.getCount();
         cursor.close();
         return count;
+    }
+    public void clearTable(){
+        database.execSQL("DROP TABLE IF EXISTS " + DatabaseHelper.TABLE_PICTURE);
+        database.execSQL("DROP TABLE IF EXISTS " + DatabaseHelper.TABLE_USERS);
+        database.execSQL("DROP TABLE IF EXISTS " + DatabaseHelper.TABLE_ALBUM);
+        database.execSQL("DROP TABLE IF EXISTS " + DatabaseHelper.TABLE_ALBUM_IMAGE);
+        for (File child : helper.directory.listFiles()) {
+            child.delete();
+        }
+        helper.onCreate(database);
     }
 
     private void debug(String str) {

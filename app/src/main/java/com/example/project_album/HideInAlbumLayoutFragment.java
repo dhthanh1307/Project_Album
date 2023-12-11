@@ -3,6 +3,7 @@ package com.example.project_album;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,7 +38,7 @@ public class HideInAlbumLayoutFragment extends Fragment {
     Bundle myOriginalMemoryBundle;
     LinearLayout lastLinear;
     ImageView imgBack;
-
+    LinearLayout mainLayout;
     public HideInAlbumLayoutFragment() {
     }
 
@@ -71,6 +72,7 @@ public class HideInAlbumLayoutFragment extends Fragment {
         // Inflate the layout for this fragment
         Log.e("Hide", "onCreateView of Hide");
         View mView = inflater.inflate(R.layout.fragment_hide_in_album_layout, container, false);
+        mainLayout=mView.findViewById(R.id.main_layout_hide);
         mGridView = mView.findViewById(R.id.grid_view_hide);
         imgBack = mView.findViewById(R.id.img_back_in_hide);
         txtTotalHide = mView.findViewById(R.id.txt_display_total_picture_hide);
@@ -89,7 +91,7 @@ public class HideInAlbumLayoutFragment extends Fragment {
         mGridView.scrollToPosition(mGridAdapter.getItemCount() - 1);
         //Toast.makeText(main, "DAY LA CREATEVIEW", Toast.LENGTH_SHORT).show();
 
-
+        setTheme(main.mainColorBackground,main.mainColorText);
         doBtnChooseWhenIsCancel();
 
         //Khi Click vào choose ảnh để xóa
@@ -146,8 +148,9 @@ public class HideInAlbumLayoutFragment extends Fragment {
                         }
                         for (int i = 0; i < mGridAdapter.chosenArrayImages.size(); i++) {
                             long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
+                            String key = mGridAdapter.chosenArrayImages.get(i).getKey();
                             //set trạng thái đã hide là false ở data resource
-                            MainActivity.dataResource.updateStateImageHideIsFalse(idImage);
+                            MainActivity.dataResource.updateStateImageHideIsFalse(idImage,key);
 
                             // set trạng thái Hide là False
                             for (int j = 0; j < images.size(); j++) {
@@ -253,6 +256,22 @@ public class HideInAlbumLayoutFragment extends Fragment {
         } else if (newOrientation == Configuration.ORIENTATION_PORTRAIT) {
             mGridView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         }
+    }
+    //set theme
+    private void setTheme(int backgroundColor, ColorStateList textColor) {
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        mainLayout.setBackgroundColor(backgroundColor);
+    }
+
+    private void setThemeText(ColorStateList textColor) {
+        txtTotalHide.setTextColor(textColor);
+        txtHideRecently.setTextColor(textColor);
+        btnChoose.setTextColor(textColor);
+        btnCancelHideChosenImages.setTextColor(textColor);
     }
 
 }

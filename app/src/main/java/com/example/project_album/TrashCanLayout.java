@@ -3,26 +3,18 @@ package com.example.project_album;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,6 +35,7 @@ public class TrashCanLayout extends Fragment {
 
     Bundle myOriginalMemoryBundle;
     LinearLayout lastLinear;
+    LinearLayout mainLayout;
 
     public TrashCanLayout() {
         Log.e("TrashCanLayout", "constructor");
@@ -104,6 +97,7 @@ public class TrashCanLayout extends Fragment {
         txtDeleteRecently = mView.findViewById(R.id.txt_delete_recently);
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         mGridView = mView.findViewById(R.id.grid_view_trashcan);
+        mainLayout = mView.findViewById(R.id.main_trash_layout);
         mGridAdapter = new ShowImageAdapter(main, R.layout.item_image, images, this);
         mGridView.setAdapter(mGridAdapter);
 //        Toast.makeText(main, "helllo", Toast.LENGTH_SHORT).show();
@@ -113,7 +107,7 @@ public class TrashCanLayout extends Fragment {
         mGridView.scrollToPosition(mGridAdapter.getItemCount() - 1);
         //Toast.makeText(main, "DAY LA CREATEVIEW", Toast.LENGTH_SHORT).show();
 
-
+        setTheme(main.mainColorBackground,main.mainColorText);
         doBtnChooseWhenIsCancel();
 
         //Khi Click vào choose ảnh để xóa
@@ -160,7 +154,10 @@ public class TrashCanLayout extends Fragment {
                         for (int i = 0; i < mGridAdapter.chosenArrayImages.size(); i++) {
                             //Xóa dòng hình ảnh đó đó ở dataResource
                             MainActivity.dataResource.deleteImage(mGridAdapter.chosenArrayImages.get(i));
-
+                            MainActivity.dataFirebase.deleteImage(
+                            mGridAdapter.chosenArrayImages.get(i).getKey(),
+                                    mGridAdapter.chosenArrayImages.get(i).getName()
+                            );
                             long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
                             // xóa ở images hiện hành
                             for (int i1 = 0; i1 < images.size(); i1++) {
@@ -216,8 +213,9 @@ public class TrashCanLayout extends Fragment {
                         }
                         for (int i = 0; i < mGridAdapter.chosenArrayImages.size(); i++) {
                             long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
+                            String key  = mGridAdapter.chosenArrayImages.get(i).getKey();
                             //set trạng thái đã xóa là false ở data resource
-                            MainActivity.dataResource.updateStateImageDeletedIsFalse(idImage);
+                            MainActivity.dataResource.updateStateImageDeletedIsFalse(idImage,key);
 
                             // set trạng thái delete là False
                             for (int j = 0; j < images.size(); j++) {
@@ -338,6 +336,23 @@ public class TrashCanLayout extends Fragment {
             images.remove(img);
         }
 
+    }
+    //set theme
+    private void setTheme(int backgroundColor, ColorStateList textColor) {
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        mainLayout.setBackgroundColor(backgroundColor);
+    }
+
+    private void setThemeText(ColorStateList textColor) {
+        txtTotal.setTextColor(textColor);
+        txtDeleteRecently.setTextColor(textColor);
+        btnChoose.setTextColor(textColor);
+        btnDeleteChosenImages.setTextColor(textColor);
+        btnRestoreChosenImages.setTextColor(textColor);
     }
 
 }

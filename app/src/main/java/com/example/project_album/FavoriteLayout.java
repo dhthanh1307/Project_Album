@@ -3,6 +3,7 @@ package com.example.project_album;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +44,7 @@ public class FavoriteLayout extends Fragment {
 
     Bundle myOriginalMemoryBundle;
     LinearLayout lastLinear;
+    LinearLayout mainLayout;
 
     public FavoriteLayout(ArrayList<Image> imgs) {
         this.images=imgs;
@@ -87,6 +89,7 @@ public class FavoriteLayout extends Fragment {
 //        }
         Log.e("DEBUG", "onCreateView of TrashCan");
         View mView = inflater.inflate(R.layout.fragment_favorite_layout, container, false);
+        mainLayout = mView.findViewById(R.id.main_favorite_layout);
         mGridView = mView.findViewById(R.id.grid_view_favorite);
         txtTotal = mView.findViewById(R.id.txt_display_total_picture_favorite);
         btnChoose = mView.findViewById(R.id.btn_choose_in_favorite);
@@ -104,6 +107,9 @@ public class FavoriteLayout extends Fragment {
         //set hinhf anh ở cuối
         mGridView.scrollToPosition(mGridAdapter.getItemCount() - 1);
         //Toast.makeText(main, "DAY LA CREATEVIEW", Toast.LENGTH_SHORT).show();
+
+        //set theme
+        setTheme(main.mainColorBackground,main.mainColorText);
 
         doBtnChooseWhenIsCancel();
 
@@ -150,7 +156,9 @@ public class FavoriteLayout extends Fragment {
                         }
                         for (int i = 0; i < mGridAdapter.chosenArrayImages.size(); i++) {
                             //unlike ở database
-                            MainActivity.dataResource.unlikeImage(mGridAdapter.chosenArrayImages.get(i).getId());
+                            MainActivity.dataResource.unlikeImage(
+                            mGridAdapter.chosenArrayImages.get(i).getId(),
+                            mGridAdapter.chosenArrayImages.get(i).getKey());
 
                             long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
 
@@ -277,5 +285,23 @@ public class FavoriteLayout extends Fragment {
     }
     public void updateIndex(int index){
         mGridView.scrollToPosition(index);
+    }
+    //Set theme
+    private void setTheme(int backgroundColor, ColorStateList textColor) {
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        mainLayout.setBackgroundColor(backgroundColor);
+    }
+
+    private void setThemeText(ColorStateList textColor) {
+        txtTotal.setTextColor(textColor);
+        txtFavoriteRecently.setTextColor(textColor);
+
+        btnChoose.setTextColor(textColor);
+        btnUnFavoriteChosenImages.setTextColor(textColor);
+        btnShareChosenImages.setTextColor(textColor);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.project_album;
 
 import android.app.WallpaperManager;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -13,9 +14,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.View;
-import android.content.Intent;
-import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,11 +30,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity {
+
+    //tham chieu hanh dong
+    public boolean isURLdownload = false;
+    public boolean isAddAlbum = false;
+    public boolean addImAb = false;
+    public boolean moveImAb = false;
+    public String hidepass = null;
+
     public static DataResource dataResource;
+    public static DataFirebase dataFirebase;
     public static ArrayList<Image> images = new ArrayList<>();
     private WallpaperManager wallpaperManager;
     private byte[] wallpaperImage;
@@ -45,6 +51,9 @@ public class MainActivity extends FragmentActivity {
     public static int userID;
     public String username;
     public String password;
+    public String userkey;
+    public String phone;
+    public String email;
     public int mainColorBackground;
     public ColorStateList mainColorText;
     public int NUMCOLUMN = 3;
@@ -60,24 +69,34 @@ public class MainActivity extends FragmentActivity {
 
     BottomNavigationView mBottomNavigationView;
     ConstraintLayout bottom_navigation_album;
-    int id_item=R.id.action_all_picture;
+    int id_item= R.id.action_all_picture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.e("MainActivity","onCreate");
         super.onCreate(savedInstanceState);
+        Intent data = getIntent();
+        Bundle bundle = data.getExtras();
+        username = bundle.getString("username");
+        password = bundle.getString("password");
+        userkey = bundle.getString("keyUser");
+        email = bundle.getString("email");
+        phone = bundle.getString("phone");
+        hidepass = bundle.getString("hidepass");
+        if(hidepass!= null)
+            Log.e("MainActivitySa",hidepass);
+        else{
+            Log.e("MainActivitySa","Hidepass null");
+        }
+        dataFirebase = new DataFirebase(userkey,this);
         setContentView(R.layout.activity_main_ver2);
         mainColorBackground = getColor(R.color.black);
         mainColorText = getColorStateList(R.color.textview_form);
-        if(images.size()>0 && images.get(0).getImgBitmap() == null) {
-            Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
-            myBackgroundThread.start();
-        }
-        Intent data = getIntent();
-        Bundle bundle = data.getExtras();
-        userID = bundle.getInt("userID");
-        username = bundle.getString("username");
-        password = bundle.getString("password");
-
+//        if(images.size()>0 && images.get(0).getImgBitmap() == null) {
+//            Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
+//            myBackgroundThread.start();
+//        }
+        Thread myBackgroundThread = new Thread(image_bitmap_backgroundTask);
+        myBackgroundThread.start();
 //        dataResource = new DataResource(this);
 //        dataResource.open();
         wallpaperManager = WallpaperManager.getInstance(getApplicationContext());

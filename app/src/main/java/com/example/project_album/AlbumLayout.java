@@ -2,6 +2,7 @@ package com.example.project_album;
 
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -33,6 +34,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class AlbumLayout extends Fragment {
     MainActivity main;
@@ -52,7 +54,7 @@ public class AlbumLayout extends Fragment {
     private Button btnAddAlbum;
     private ScrollView sv;
     private RelativeLayout layout_icon;
-    private boolean isInit = false;
+    public boolean isInit = false;
     private EditText txtTitle;
     private Button btnSave;
     private Button btnCancel;
@@ -64,6 +66,9 @@ public class AlbumLayout extends Fragment {
     private Dialog dialog;
 
     //Hiden
+    private String myFilePasswordForHide="user";
+    String key = "hidepass";
+    String passGetFromSharePre="";
     TextView tvHiden;
     TextView tvNumberHiden;
     private LinearLayout ln_all;
@@ -72,7 +77,7 @@ public class AlbumLayout extends Fragment {
 
     private AlbumLayout(){
         debug("constructor");
-        albums = MainActivity.dataResource.getAllAlbum(MainActivity.userID);
+        albums = MainActivity.dataResource.getAllAlbum();
         myAlbumFragment = new MyAlbumFragment();
     }
     public static AlbumLayout newInstance(String strArg){
@@ -345,21 +350,21 @@ public class AlbumLayout extends Fragment {
                                     update();
                                     dialog.cancel();
                                     MainActivity.dataResource.updateName(albums.get(position).getName(),
-                                            name, MainActivity.userID);
+                                            name);
                                     albums.get(position).setName(name);
+                                    MainActivity.dataFirebase.updateAlbum(albums.get(position));
                                     UpdateConfiguration(getResources().getConfiguration());
                                 }
                             });
                         }
                     });
 
-//                dialog.registerForContextMenu(getLayoutInflater().inflate(R.layout.item_image,null));
-//                dialog.openOptionsMenu();
                     dialog1.show();
                     tv_delete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            MainActivity.dataResource.deleteAlbum(albums.get(position).getId());
+                            MainActivity.dataResource.deleteAlbum(albums.get(position).getId(),
+                                    albums.get(position).getKey());
                             albums.remove(position);
                             dialog1.cancel();
                             UpdateConfiguration(getResources().getConfiguration());
@@ -373,23 +378,23 @@ public class AlbumLayout extends Fragment {
     }
     private void InitAlbums() {
         if(!isInit) {
-            if (albums.size() == 0 && main.username.equals("admin")
-                    &&main.password.equals("admin")) {
-                ArrayList<Integer> ids = new ArrayList<>();
-                long id = MainActivity.dataResource.InsertAlbum("Airplane",MainActivity.userID);
-//            MainActivity.dataResource.InsertAlbum("Holiday",MainActivity.userID);
-                debug(String.valueOf(id));
-                for (int i = 0; i < 4; i++) {
-                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
-                            AllLayout.images.get(i).getId());
-                }
-                id = MainActivity.dataResource.InsertAlbum("Fruit",MainActivity.userID);
-                for (int i = 5; i < 7; i++) {
-                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
-                            AllLayout.images.get(i).getId());
-                }
-                albums = MainActivity.dataResource.getAllAlbum(MainActivity.userID);
-            }
+//            if (albums.size() == 0 && main.username.equals("admin")
+//                    &&main.password.equals("admin")) {
+//                ArrayList<Integer> ids = new ArrayList<>();
+//                long id = MainActivity.dataResource.InsertAlbum("Airplane","1");
+////            MainActivity.dataResource.InsertAlbum("Holiday",MainActivity.userID);
+//                debug(String.valueOf(id));
+//                for (int i = 0; i < 4; i++) {
+//                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
+//                            AllLayout.images.get(i).getId());
+//                }
+//                id = MainActivity.dataResource.InsertAlbum("Fruit","1");
+//                for (int i = 5; i < 7; i++) {
+//                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
+//                            AllLayout.images.get(i).getId());
+//                }
+//                albums = MainActivity.dataResource.getAllAlbum();
+//            }
             ArrayList<Image> images3;
             images3 = FavoriteLayout.images;
             Album a2 = new Album(-1,"Mục yêu thích", images3);
@@ -402,6 +407,7 @@ public class AlbumLayout extends Fragment {
             ConvertAlbum();
         }
         else{
+            albums.get(1).setImages(FavoriteLayout.images);
             albums.get(0).setImages(AllLayout.images);
         }
 
@@ -411,15 +417,21 @@ public class AlbumLayout extends Fragment {
             debug(albums.get(i).getName()+" "+albums.get(i).getImages().size());
             for(int j = 0;j<albums.get(i).getImages().size();j++){
                 debug(String.valueOf(i));
-                albums.get(i).getImages().set(j,
-                        getImage(albums.get(i).getImages().get(j).getId()));
+                Image img = getImage(albums.get(i).getImages().get(j).getId());
+                if(img == null){
+                    albums.get(i).removeImage(j);
+                    j--;
+                }
+                else {
+                    albums.get(i).getImages().set(j, img);
+                }
             }
         }
 
     }
     private Image getImage(long id){
         for(int i = 0;i<MainActivity.images.size();i++){
-            if(id == MainActivity.images.get(i).getId()){
+            if(id == MainActivity.images.get(i).getId() && MainActivity.images.get(i).getDeleted().equals("F")){
                 return MainActivity.images.get(i);
             }
         }
@@ -443,13 +455,8 @@ public class AlbumLayout extends Fragment {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Image> image = new ArrayList<Image>();
-                Album album = new Album(-3,txtTitle.getText().toString(),image);
-                albums.add(album);
-                long id = MainActivity.dataResource.InsertAlbum(album.getName(),MainActivity.userID);
-                album.setId(id);
-                dialog.cancel();
-                update();
+                main.isAddAlbum = true;
+                MainActivity.dataFirebase.insertAlbum(txtTitle.getText().toString());
                 //MyAlbumFragment.gridViewAlbumAdapter.notifyDataSetChanged();
             }
         });
@@ -484,16 +491,154 @@ public class AlbumLayout extends Fragment {
             }
         }
     }
-    //Hidden
+    //=========================Ẩn==================
     public  void goToFragmentPictureHidden(){
-        FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
-        HideInAlbumLayoutFragment hideFragment=new HideInAlbumLayoutFragment();
-        ft.replace(R.id.replace_fragment_layout, hideFragment);
-        ft.commit();
+
+        //Lấy mật khẩu từ SharePreferences
+        SharedPreferences myPrefContainer = main.getSharedPreferences(myFilePasswordForHide, MainActivity.MODE_PRIVATE);
+        if (( myPrefContainer != null ) && myPrefContainer.contains(key)){
+            passGetFromSharePre = myPrefContainer.getString(key, "");
+        }
+        // Hiện diaglog nhập mật khẩu
+        Dialog dialogEnterIntoHide = new Dialog(main);
+        dialogEnterIntoHide.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogEnterIntoHide.setContentView(R.layout.custom_enter_password_hide);
+        EditText edtPassIntoHide=dialogEnterIntoHide.findViewById(R.id.edt_pass_into_hide);
+        TextView txtForgotPass=dialogEnterIntoHide.findViewById(R.id.txt_forgot_pass);
+        TextView txtResetPass=dialogEnterIntoHide.findViewById(R.id.txt_reset_pass);
+        Button btnIntoHide=dialogEnterIntoHide.findViewById(R.id.btn_enter_hide);
+        Button btnCancelIntoHide=dialogEnterIntoHide.findViewById(R.id.btn_cancel_enter_hide);
+        btnIntoHide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!edtPassIntoHide.getText().toString().equals(passGetFromSharePre)){
+                    Toast.makeText(main, "Mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                }else{
+                    FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
+                    HideInAlbumLayoutFragment hideFragment=new HideInAlbumLayoutFragment();
+                    ft.replace(R.id.replace_fragment_layout, hideFragment);
+                    ft.commit();
+                    dialogEnterIntoHide.dismiss();
+                }
+            }
+        });
+        btnCancelIntoHide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogEnterIntoHide.dismiss();
+            }
+        });
+        dialogEnterIntoHide.show();
+
+        //Nếu quên mật khẩu
+        txtForgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogEnterIntoHide.dismiss();
+                //Hiển thị dialog mới
+                displayDialogForgotPass();
+
+            }
+        });
+        //Nếu muốn set lại mật khẩu
+        txtResetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogEnterIntoHide.dismiss();
+                //Hiển thị dialog mới
+                displayDialogResetPass(passGetFromSharePre);
+
+            }
+        });
+
     }
     public void setTextNumberHide(int numberHide){
         tvNumberHiden.setText(String.valueOf(numberHide));
     }
+    public void displayDialogForgotPass(){
+        Dialog dialogForgot = new Dialog(main);
+        dialogForgot.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogForgot.setContentView(R.layout.custom_forgot_pass_for_hide);
+        TextView txtTitleForgot=dialogForgot.findViewById(R.id.title_forgot_pass_hide);
+        TextView txtFirstText=dialogForgot.findViewById(R.id.txt_first_text);
+        EditText edtOldPass=dialogForgot.findViewById(R.id.edt_old_pass);
+        EditText edtNewPass=dialogForgot.findViewById(R.id.edt_new_pass);
+        EditText edtVerifyPass=dialogForgot.findViewById(R.id.edt_verify_pass);
+        Button btnCancel=dialogForgot.findViewById(R.id.btn_cancel_forgot);
+        Button btnChangePass=dialogForgot.findViewById(R.id.btn_change_pass);
+        txtTitleForgot.setText("Quên mật khẩu?");
+        txtFirstText.setText("Mật khẩu login");
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogForgot.dismiss();
+            }
+        });
+        btnChangePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!edtOldPass.getText().toString().equals(main.password)
+                        ||edtNewPass.getText().toString().equals("")
+                        || !edtVerifyPass.getText().toString().equals(edtNewPass.getText().toString())){
+                    Toast.makeText(main, "Nhập sai, hãy nhập lại", Toast.LENGTH_SHORT).show();
+                }else{
+                    //Cập nhật pass mới và quay lại goToFragmentPictureHidden
+                    SharedPreferences myPrefContainer = main.getSharedPreferences(myFilePasswordForHide, MainActivity.MODE_PRIVATE);
+                    SharedPreferences.Editor myPrefEditor = myPrefContainer.edit();
+                    myPrefEditor.putString(key, edtNewPass.getText().toString());
+                    main.dataFirebase.setHidePassIntoFirebase(edtNewPass.getText().toString());
+                    main.hidepass=edtNewPass.getText().toString();
+                    myPrefEditor.commit();
+                    goToFragmentPictureHidden();
+                    dialogForgot.dismiss();
+                }
+            }
+        });
+        dialogForgot.show();
+
+    }
+    public void displayDialogResetPass(String txtPassFromPre){
+        Dialog dialogReset = new Dialog(main);
+        dialogReset.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogReset.setContentView(R.layout.custom_forgot_pass_for_hide);
+        TextView txtTitleForgot=dialogReset.findViewById(R.id.title_forgot_pass_hide);
+        TextView txtFirstText=dialogReset.findViewById(R.id.txt_first_text);
+        EditText edtOldPass=dialogReset.findViewById(R.id.edt_old_pass);
+        EditText edtNewPass=dialogReset.findViewById(R.id.edt_new_pass);
+        EditText edtVerifyPass=dialogReset.findViewById(R.id.edt_verify_pass);
+        Button btnCancel=dialogReset.findViewById(R.id.btn_cancel_forgot);
+        Button btnChangePass=dialogReset.findViewById(R.id.btn_change_pass);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogReset.dismiss();
+            }
+        });
+        btnChangePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!edtOldPass.getText().toString().equals(txtPassFromPre)
+                        ||edtNewPass.getText().toString().equals("")
+                        || !edtVerifyPass.getText().toString().equals(edtNewPass.getText().toString())){
+                    Toast.makeText(main, "Nhập sai, hãy nhập lại", Toast.LENGTH_SHORT).show();
+                }else{
+                    //Cập nhật pass mới và quay lại goToFragmentPictureHidden
+                    SharedPreferences myPrefContainer = main.getSharedPreferences(myFilePasswordForHide, MainActivity.MODE_PRIVATE);
+                    SharedPreferences.Editor myPrefEditor = myPrefContainer.edit();
+                    myPrefEditor.putString(key, edtNewPass.getText().toString());
+                    main.dataFirebase.setHidePassIntoFirebase(edtNewPass.getText().toString());
+                    main.hidepass=edtNewPass.getText().toString();
+                    myPrefEditor.commit();
+                    goToFragmentPictureHidden();
+                    dialogReset.dismiss();
+                }
+
+            }
+        });
+        dialogReset.show();
+
+    }
+    //=========================Ẩn==================
     private void setTheme(int backgroundColor, ColorStateList textColor){
         setThemeBackGround(backgroundColor);
         setThemeText(textColor);
@@ -509,5 +654,15 @@ public class AlbumLayout extends Fragment {
         ln_all.setBackgroundColor(backgroundColor);
         btnAddAlbum.setBackgroundColor(backgroundColor);
         layout_icon.setBackgroundColor(backgroundColor);
+    }
+    public void addToDatabase(String key,String name){
+        ArrayList<Image> image = new ArrayList<Image>();
+        Album album = new Album(-3,name,image);
+        album.setKey(key);
+        albums.add(album);
+        long id = MainActivity.dataResource.InsertAlbum(name,key);
+        album.setId(id);
+        dialog.dismiss();
+        update();
     }
 }

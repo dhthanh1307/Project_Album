@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,7 +70,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     private boolean isSlider = false;
     private Handler handler = new Handler();
     int index = 0;//Vị trí được chọn hiện tại
-
+    RelativeLayout mainLayout;
 
     public ViewPagerAllLayoutFragment(ArrayList<Image> imgs, int index) {
         this.images = imgs;
@@ -133,6 +135,8 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             txtShare = view.findViewById(R.id.txt_share);
             txtEdit = view.findViewById(R.id.txt_edit);
             imgBack = view.findViewById(R.id.img_back);
+            mainLayout=view.findViewById(R.id.main_layout);
+            setTheme(main.mainColorBackground,main.mainColorText);
             onPageChange();
 
             EventForAll();
@@ -344,7 +348,8 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                         //Set hình ảnh đã xóa là True
                         images.get(index).setDeleted("T");
                         //Set ở dataResource là True đã xóa
-                        MainActivity.dataResource.updateStateImageDeletedIsTrue(images.get(index).getId());
+                        MainActivity.dataResource.updateStateImageDeletedIsTrue(
+                        images.get(index).getId(),images.get(index).getKey());
 
                         // cap nhật ở trashcan. them vao trash can
                         main.trashCanLayout.updateTrashCan(images.get(index));
@@ -399,7 +404,8 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                     //khả năng chỗ ni là nó đã set luôn o AllLayout là F
                     images.get(index).setFavorite("F");
                     txtFavorite.setImageResource(R.drawable.icon_favorite_in_alllayout);
-                    MainActivity.dataResource.unlikeImage(images.get(index).getId());
+                    MainActivity.dataResource.unlikeImage(images.get(index).getId()
+                    ,images.get(index).getKey());
 
 
                     if (main.getIDItemBottomNavigationView() == R.id.action_all_picture) {
@@ -443,7 +449,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                     //Thêm Favorite vào album
                     //main.albumLayout.updateFavorite(images.get(index));
                     txtFavorite.setImageResource(R.drawable.icon_fill_favorite_in_all_layout);
-                    MainActivity.dataResource.likeImage(images.get(index).getId());
+                    MainActivity.dataResource.likeImage(images.get(index).getId(),images.get(index).getKey());
                     main.favoriteLayout.images.add(images.get(index));
 
                 }
@@ -488,5 +494,19 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 main.mBottomNavigationView.setVisibility(View.VISIBLE);
             }
         });
+    }
+    //Set theme
+    private void setTheme(int backgroundColor, ColorStateList textColor) {
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        mainLayout.setBackgroundColor(backgroundColor);
+        mViewPager.setBackgroundColor(backgroundColor);
+    }
+
+    private void setThemeText(ColorStateList textColor) {
+        txtTimeCapture.setTextColor(textColor);
     }
 }

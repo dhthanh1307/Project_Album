@@ -5,11 +5,20 @@ import java.util.ArrayList;
 public class Album {
     private String name;
     private long id;
+    private String key;
     private ArrayList<Image> images;
     public Album(long id, String name, ArrayList<Image> images){
         this.name= name;
         this.images = images;
         this.id = id;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public long getId(){

@@ -1,9 +1,11 @@
 package com.example.project_album;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +17,11 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AccountLayout extends Fragment {
     MainActivity main;
@@ -60,9 +66,9 @@ public class AccountLayout extends Fragment {
         btnSaveChange = view.findViewById(R.id.btnEditAccount);
         btnLogout = view.findViewById(R.id.btnLogout);
 
-        accountInfo = MainActivity.dataResource.getAccountInfo(MainActivity.userID);
 
-        editNickname.setText(accountInfo.get(0));
+        editNickname.setText(main.username);
+        editNickname.setEnabled(false);
         editPassword.setText("");
         editNewPassword.setText("");
         editRetypeNewPassword.setText("");
@@ -70,11 +76,14 @@ public class AccountLayout extends Fragment {
         btnSaveChange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (editPassword.getText().toString().compareTo(accountInfo.get(1))!=0) {
+                if (editPassword.getText().toString().compareTo(main.password)!=0) {
                     Toast.makeText(main, "Wrong password!", Toast.LENGTH_SHORT).show();
                 }
                 else if (editNewPassword.getText().toString().compareTo(editRetypeNewPassword.getText().toString())!=0) {
                     Toast.makeText(main, "New password and retyped new password are not matched!", Toast.LENGTH_SHORT).show();
+                }
+                else if(editNewPassword.getText().toString().equals("")){
+                    Toast.makeText(main, "password không được để trống", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(main);
@@ -82,14 +91,11 @@ public class AccountLayout extends Fragment {
                     alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            String newNickname = editNickname.getText().toString();
                             String newPassword = editNewPassword.getText().toString();
-                            if (newPassword.length() == 0) {
-                                newPassword = accountInfo.get(1);
-                            }
-                            MainActivity.dataResource.updateAccountInfo(MainActivity.userID, newNickname, newPassword);
-                            accountInfo = MainActivity.dataResource.getAccountInfo(MainActivity.userID);
-                            editPassword.setText(accountInfo.get(1));
+                            Map<String,Object> map = new HashMap<>();
+                            map.put("password",newPassword);
+                            FirebaseFirestore fbf = FirebaseFirestore.getInstance();
+                            fbf.collection("user").document(main.userkey).update(map);
                             editPassword.setText("");
                             editNewPassword.setText("");
                             editRetypeNewPassword.setText("");
@@ -112,6 +118,13 @@ public class AccountLayout extends Fragment {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                main.albumLayout.isInit = false;
+                MainActivity.images.clear();
+                AlbumLayout.albums.clear();
+                MainActivity.dataResource.clearTable();
+                SharedPreferences myPrefContainer = main.getSharedPreferences(
+                        "user", Activity.MODE_PRIVATE);
+                myPrefContainer.edit().clear().commit();
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);
                 main.finish();
