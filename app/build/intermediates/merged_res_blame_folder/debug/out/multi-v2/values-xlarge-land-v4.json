@@ -4,7 +4,7 @@
             "outputFile": "com.example.project_album.app-mergeDebugResources-34:/values-xlarge-land-v4/values-xlarge-land-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\HUYNH QUOC HUY\\.gradle\\caches\\transforms-3\\0fb5766e1b8b7f5534d2212c64b0f715\\transformed\\jetified-ambilwarna-2.0.1\\res\\values-xlarge-land\\values-xlarge-land.xml",
+                    "source": "C:\\Users\\Admin\\.gradle\\caches\\transforms-3\\0fb5766e1b8b7f5534d2212c64b0f715\\transformed\\jetified-ambilwarna-2.0.1\\res\\values-xlarge-land\\values-xlarge-land.xml",
                     "from": {
                         "startLines": "4,5",
                         "startColumns": "4,4",

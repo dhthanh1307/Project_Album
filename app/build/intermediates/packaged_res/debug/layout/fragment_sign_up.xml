@@ -27,7 +27,7 @@
             android:textSize="45dp"
             android:textStyle="bold"
             android:layout_marginBottom="50dp"
-            android:text="Sign up" />
+            android:text="Đăng ký" />
 
         <TextView
             android:id="@+id/textView3"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:textSize="20dp"
             android:textColor="#8285E8"
-            android:text="Enter your email address" />
+            android:text="Nhập địa chỉ email" />
 
         <EditText
             android:id="@+id/editEmail"
@@ -70,7 +70,7 @@
                     android:textSize="20dp"
                     android:textColor="#8285E8"
 
-                    android:text="User name" />
+                    android:text="Tên đăng nhập" />
 
                 <EditText
                     android:id="@+id/editUserName"
@@ -82,7 +82,7 @@
                     android:background="@drawable/custom_signup"
                     android:textColorHint="@color/white"
 
-                    android:hint="Name" />
+                    android:hint="Tên đăng nhập" />
             </LinearLayout>
 
             <LinearLayout
@@ -99,7 +99,7 @@
                     android:textSize="20dp"
                     android:textColor="#8285E8"
 
-                    android:text="Phone number" />
+                    android:text="Số điện thoại" />
 
                 <EditText
                     android:id="@+id/editPhone"
@@ -111,7 +111,7 @@
                     android:background="@drawable/custom_signup"
                     android:textColorHint="@color/white"
 
-                    android:hint="Phone" />
+                    android:hint="Số điện thoại" />
             </LinearLayout>
 
         </LinearLayout>
@@ -123,15 +123,16 @@
             android:textSize="20dp"
             android:textColor="#8285E8"
 
-            android:text="Enter your password" />
+            android:text="Nhập mật khẩu" />
 
         <EditText
             android:id="@+id/editPassword"
             android:layout_width="match_parent"
             android:layout_height="45dp"
+            android:textColor="@color/white"
             android:background="@drawable/custom_signup"
             android:layout_marginBottom="50dp"
-            android:hint="Password"
+            android:hint="Mật khẩu"
             android:textColorHint="@color/white"
             android:inputType="textPassword" />
 
@@ -142,16 +143,17 @@
             android:textSize="20dp"
             android:textColor="#8285E8"
 
-            android:text="Confirm password" />
+            android:text="Nhập lại mật khẩu" />
 
         <EditText
             android:id="@+id/editPassword2"
             android:layout_width="match_parent"
             android:layout_height="45dp"
+            android:textColor="@color/white"
             android:textSize="20dp"
             android:background="@drawable/custom_signup"
             android:layout_marginBottom="50dp"
-            android:hint="Password"
+            android:hint="Mật khẩu"
             android:textColorHint="@color/white"
             android:inputType="textPassword" />
 
@@ -161,6 +163,6 @@
             android:layout_height="45dp"
             android:background="@drawable/custom_signup"
             android:layout_gravity="center"
-            android:text="Sign up" />
+            android:text="Đăng ký" />
     </LinearLayout>
 </ScrollView>

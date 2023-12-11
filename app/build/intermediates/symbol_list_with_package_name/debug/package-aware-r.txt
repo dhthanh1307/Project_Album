@@ -2958,6 +2958,7 @@ drawable ambilwarna_hue
 drawable ambilwarna_target
 drawable avd_hide_password
 drawable avd_show_password
+drawable baseline_settings_24
 drawable bottom_navigation_border
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
@@ -2996,6 +2997,7 @@ drawable custom_edittext_album
 drawable custom_input
 drawable custom_signup
 drawable custtom_button
+drawable default_avatar
 drawable design_fab_background
 drawable design_ic_visibility
 drawable design_ic_visibility_off
@@ -3166,6 +3168,7 @@ id accessibility_custom_action_6
 id accessibility_custom_action_7
 id accessibility_custom_action_8
 id accessibility_custom_action_9
+id accountLayout
 id actionDown
 id actionDownUp
 id actionUp

@@ -30,6 +30,7 @@ drawable add_image
 drawable album_icon_foreground
 drawable all_icon_foreground
 drawable all_info_icon
+drawable baseline_settings_24
 drawable bottom_navigation_border
 drawable check_24
 drawable close_24
@@ -41,6 +42,7 @@ drawable custom_edittext_album
 drawable custom_input
 drawable custom_signup
 drawable custtom_button
+drawable default_avatar
 drawable draw
 drawable favorite_icon_foreground
 drawable filter
@@ -70,6 +72,7 @@ drawable rotate_left_24
 drawable rotate_right_24
 drawable trash_can_icon_foreground
 id NavigationView
+id accountLayout
 id action_account
 id action_album
 id action_all_picture

@@ -2,8 +2,10 @@ package com.example.project_album;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -26,7 +28,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -61,12 +62,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -135,7 +133,8 @@ public class AllLayout extends Fragment {
     Spinner spinner;
     private RelativeLayout rl_background;
     ArrayAdapter<String> spinnerAdapter;
-    private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
+    private static final int REQUEST_CAMERA_PERMISSION_CODE = 123;
+    private ArrayList<Image> copyImages = new ArrayList<>();
 
     //Zip
     Button btnOkZip, btnCancelZip;
@@ -349,7 +348,7 @@ public class AllLayout extends Fragment {
         tv_deleteCoppy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteCoppy();
+                deleteCopy();
             }
         });
     }
@@ -1304,8 +1303,77 @@ public class AllLayout extends Fragment {
         adapter.images = images;
         adapter.notifyDataSetChanged();
     }
-    private void deleteCoppy(){
+    private void deleteCopy(){
+        copyImages.clear();
+        for (int i = 0; i < images.size(); i++) {
+            for (int j = i + 1; j < images.size(); j++) {
+                if (copyImages.contains(images.get(i)) || copyImages.contains(images.get(j))) {
+                    continue;
+                }
+                if (compareBitmap(images.get(i).getImgBitmap(), images.get(j).getImgBitmap())) {
+                    copyImages.add(images.get(j));
+                    Log.e("Copy Images Location", Integer.toString(j));
+                    Log.e("Copy Images ID", Long.toString(images.get(j).getId()));
+                }
+            }
+        }
+        Log.e("Copy Images", Integer.toString(copyImages.size()));
+        if (copyImages.size() == 0) {
+            Toast.makeText(main, "Không tìm thấy ảnh trùng nhau!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(main);
+        alertDialogBuilder.setMessage("Tìm thấy " + copyImages.size() + " ảnh trùng, có muốn chuyển vào thùng rác?");
+        alertDialogBuilder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for (int i = 0; i < copyImages.size(); i++) {
+                    copyImages.get(i).setDeleted("T");
 
+                    main.trashCanLayout.updateTrashCan(copyImages.get(i));
+
+                    long idImage = copyImages.get(i).getId();
+                    String key = copyImages.get(i).getKey();
+                    for (int j = 0; j < images.size(); j++) {
+                        if (images.get(j).getId() == idImage) {
+                            images.remove(j);
+                            break;
+                        }
+                    }
+
+                    adapter.updateImagesInShowImageAllAdapter(idImage);
+                    MainActivity.dataResource.updateStateImageDeletedIsTrue(idImage, key);
+                }
+                adapter.notifyDataSetChanged();
+                adapter.resetChooseSelection();
+                Toast.makeText(main, "Đã chuyển vào thùng rác!", Toast.LENGTH_SHORT).show();
+                copyImages.clear();
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                copyImages.clear();
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    private static boolean compareBitmap(Bitmap b1, Bitmap b2) {
+        if (b1.getWidth() == b2.getWidth() && b1.getHeight() == b2.getHeight()) {
+            int[] pixels1 = new int[b1.getWidth() * b1.getHeight()];
+            int[] pixels2 = new int[b2.getWidth() * b2.getHeight()];
+
+            b1.getPixels(pixels1, 0, b1.getWidth(), 0, 0, b1.getWidth(), b1.getHeight());
+            b2.getPixels(pixels2, 0, b2.getWidth(), 0, 0, b2.getWidth(), b2.getHeight());
+
+            return Arrays.equals(pixels1, pixels2);
+        } else {
+            return false;
+        }
     }
 
     @Override
