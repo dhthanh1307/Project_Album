@@ -132,7 +132,7 @@ public class FavoriteLayout extends Fragment {
         txtFavoriteRecently.setText("Chọn ảnh");
         lastLinear.setVisibility(View.VISIBLE);
         btnUnFavoriteChosenImages.setVisibility(View.VISIBLE);
-        btnShareChosenImages.setVisibility(View.VISIBLE);
+
         mGridAdapter.setChooseSelection(true);
         btnChoose.setText("Hủy");
         btnUnFavoriteChosenImages.setText("Bỏ thích tất cả");
@@ -215,7 +215,6 @@ public class FavoriteLayout extends Fragment {
         txtFavoriteRecently.setText("Ưa thích gần đây");
         lastLinear.setVisibility(View.GONE);
         btnUnFavoriteChosenImages.setVisibility(View.GONE);
-        btnShareChosenImages.setVisibility(View.GONE);
         btnChoose.setText("Chọn");
         main.mBottomNavigationView.setVisibility(View.VISIBLE);
         mGridAdapter.setChooseSelection(false);

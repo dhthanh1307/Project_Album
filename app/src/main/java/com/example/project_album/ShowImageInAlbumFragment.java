@@ -172,6 +172,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         else if (view.getId() == tv_favorite.getId()){
             dialog.cancel();
             if (album.getName().equals("Mục yêu thích")){
+                unFavorite();
                 Toast.makeText(main,"Đã bỏ yêu thích",Toast.LENGTH_SHORT).show();
             }
             else{
@@ -267,28 +268,50 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     }
 
     private void updateFavorite(ArrayList<Image> imgs){
-        for(int i = 0;i<imgs.size();i++){
-            if(imgs.get(i).getFavorite().equals("F")){
+        for(Image image : imgs){
+            if(image.getFavorite().equals("F")){
                 //main.albumLayout.updateFavorite(imgs.get(i));
-                MainActivity.dataResource.likeImage(imgs.get(i).getId(),imgs.get(i).getKey());
+                MainActivity.dataResource.likeImage(image.getId(),image.getKey());
+                FavoriteLayout.images.add(image);
             }
         }
+        originalState();
+    }
+    private void unFavorite(){
+        for(Image image :image_adapter.image_chosen){
+            MainActivity.dataResource.likeImage(image.getId(),image.getKey());
+            FavoriteLayout.images.remove(image);
+        }
+        originalState();
     }
     private void coppyImage(){
         ArrayList<Image> imgs = new ArrayList<>();
         imgs.addAll(image_adapter.image_chosen);
-        for (int j = 1; j < AlbumLayout.albums.size(); j++) {
+        for (int j = 0; j < AlbumLayout.albums.size(); j++) {
             if (AlbumLayout.albums.get(j).getId() == album.getId()) {
                 int nextk = Integer.parseInt(MainActivity.dataFirebase.findNextkey());
                 for (int i = 0; i < imgs.size(); i++) {
                     Image copyImage = new Image(imgs.get(i).getImgBitmap(), main.GenerateName());
-                    MainActivity.dataFirebase.insertImage(copyImage);
                     copyImage.setKey(String.valueOf(nextk+i));
-                    MainActivity.dataResource.InsertAlbumImage(album.getId(), copyImage.getId());
+                    if(album.getName().equals("Mục yêu thích")){
+                        copyImage.setFavorite("T");
+                    }
+                    if(!album.getName().equals("Tất cả") && !album.
+                            getName().equals("Mục yêu thích")) {
+                        MainActivity.dataResource.InsertAlbumImage(album.getId(), copyImage.getId());
+                    }
+                    MainActivity.dataFirebase.insertImage(copyImage);
                     AlbumLayout.albums.get(j).addImage(copyImage);
+                    MainActivity.images.add(copyImage);
+                    if(!album.getName().equals("Tất cả")) {
+                        AllLayout.images.add(copyImage);
+                    }
                 }
                 album = AlbumLayout.albums.get(j);
-                MainActivity.dataFirebase.updateAlbum(AlbumLayout.albums.get(j));
+                if(!album.getName().equals("Tất cả") && !album.
+                        getName().equals("Mục yêu thích")){
+                    MainActivity.dataFirebase.updateAlbum(AlbumLayout.albums.get(j));
+                }
                 break;
             }
         }

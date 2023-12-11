@@ -73,6 +73,7 @@ public class AlbumLayout extends Fragment {
     TextView tvNumberHiden;
     private LinearLayout ln_all;
     private TextView tv_delete;
+    private TextView tv_numdelete;
 
 
     private AlbumLayout(){
@@ -130,6 +131,14 @@ public class AlbumLayout extends Fragment {
         layout_icon = (RelativeLayout)mainView.findViewById(R.id.layout_icon);
         sv = (ScrollView)mainView.findViewById(R.id.sv_parent);
         tv_delete = mainView.findViewById(R.id.tv_delete);
+        tv_numdelete = mainView.findViewById(R.id.tv_num_delete);
+        tv_numdelete.setText(String.valueOf(TrashCanLayout.images.size()));
+        tv_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToTrashcanFragment();
+            }
+        });
         //Hidden
         tvHiden=mainView.findViewById(R.id.tv_hide);
         tvNumberHiden=mainView.findViewById(R.id.tv_num_hiden);
@@ -378,23 +387,6 @@ public class AlbumLayout extends Fragment {
     }
     private void InitAlbums() {
         if(!isInit) {
-//            if (albums.size() == 0 && main.username.equals("admin")
-//                    &&main.password.equals("admin")) {
-//                ArrayList<Integer> ids = new ArrayList<>();
-//                long id = MainActivity.dataResource.InsertAlbum("Airplane","1");
-////            MainActivity.dataResource.InsertAlbum("Holiday",MainActivity.userID);
-//                debug(String.valueOf(id));
-//                for (int i = 0; i < 4; i++) {
-//                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
-//                            AllLayout.images.get(i).getId());
-//                }
-//                id = MainActivity.dataResource.InsertAlbum("Fruit","1");
-//                for (int i = 5; i < 7; i++) {
-//                    long id1 = MainActivity.dataResource.InsertAlbumImage(id,
-//                            AllLayout.images.get(i).getId());
-//                }
-//                albums = MainActivity.dataResource.getAllAlbum();
-//            }
             ArrayList<Image> images3;
             images3 = FavoriteLayout.images;
             Album a2 = new Album(-1,"Mục yêu thích", images3);
@@ -474,23 +466,7 @@ public class AlbumLayout extends Fragment {
         UpdateConfiguration(getResources().getConfiguration());
         myAlbumFragment.update();
     }
-//    public void updateFavorite(Image img){
-//        if(isInit) {
-//            if (img.getFavorite().equals("T")) {
-//                albums.get(1).getImages().add(img);
-//            } else {
-//                albums.get(1).removeImage(img);
-//            }
-//            update();
-//        }
-//    }
-    public void updateArrayFavorite(ArrayList<Image> imgs){
-        for(int i = 0;i<imgs.size();i++){
-            if (imgs.get(i).getFavorite().equals("F")){
-                albums.get(1).getImages().add(imgs.get(i));
-            }
-        }
-    }
+
     //=========================Ẩn==================
     public  void goToFragmentPictureHidden(){
 
@@ -639,6 +615,13 @@ public class AlbumLayout extends Fragment {
 
     }
     //=========================Ẩn==================
+
+    private void goToTrashcanFragment(){
+        main.mBottomNavigationView.setSelectedItemId(R.id.action_bin);
+        FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.replace_fragment_layout, main.trashCanLayout);
+        ft.commit();
+    }
     private void setTheme(int backgroundColor, ColorStateList textColor){
         setThemeBackGround(backgroundColor);
         setThemeText(textColor);

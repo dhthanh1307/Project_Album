@@ -293,5 +293,12 @@ public class MainActivity extends FragmentActivity {
             catch (InterruptedException e) { }
         }
     };
-
+    public void getFavoriteImages(){
+        FavoriteLayout.images.clear();
+        for(int i = 0;i<images.size();i++){
+            if(images.get(i).getFavorite().equals("T")) {
+                FavoriteLayout.images.add(images.get(i));
+            }
+        }
+    }
 }

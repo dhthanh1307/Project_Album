@@ -260,8 +260,6 @@ public class AllLayout extends Fragment {
         recyclerView.scrollToPosition(images.size() - 1);
 
 
-//        spinner = view.findViewById(R.id.spinner);
-//        initSpinnerView();
         setTheme(main.mainColorBackground, main.mainColorText);
         //Khởi tạo cho SharePrefence lần đầu cho cái Hide bên Album tức là nếu
         //main.hidepass lần đầu chạy là null thì ghi vào file user pass là ""
@@ -465,6 +463,7 @@ public class AllLayout extends Fragment {
                 dialog.dismiss();
                 adapter.resetChooseSelection();
                 tv_choose.callOnClick();
+                tv_bottom.setText(String.valueOf(images.size()) + " ảnh");
             }
         });
         tv_blind.setOnClickListener(new View.OnClickListener() {
@@ -552,6 +551,7 @@ public class AllLayout extends Fragment {
                     tv_choose.callOnClick();
                     Log.e("Hide", "Size sau ẩn=" + String.valueOf(images.size()));
                 }
+                tv_bottom.setText(String.valueOf(images.size()) + " ảnh");
             }
         });
 
@@ -721,61 +721,6 @@ public class AllLayout extends Fragment {
                 });
     }
 
-    private void initSpinnerView() {
-        ArrayList<String> data = new ArrayList<>();
-        data.add("Default");
-        data.add("ID");
-        data.add("Date");
-        spinnerAdapter = new ArrayAdapter<>(main, android.R.layout.simple_spinner_item, data);
-        spinner.setAdapter(spinnerAdapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = data.get(position);
-                if (selectedItem.equals("Date")) {
-                    debug("date");
-                    // Xử lý sự kiện khi chọn mục "Date"
-                    for (int i = 0; i < images.size() - 1; i++) {
-                        for (int j = i + 1; j < images.size(); j++) {
-                            if (images.get(i).getDate().compareTo(images.get(j).getDate()) < 0) {
-                                Image temp = images.get(i);
-                                images.set(i, images.get(j));
-                                images.set(j, temp);
-                            }
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                } else if (selectedItem.equals("ID")) {
-                    debug("12");
-                    for (int i = 0; i < images.size() - 1; i++) {
-                        for (int j = i + 1; j < images.size(); j++) {
-                            if (images.get(i).getId() < images.get(j).getId()) {
-                                Image temp = images.get(i);
-                                images.set(i, images.get(j));
-                                images.set(j, temp);
-                            }
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                } else if (selectedItem.equals("Default")) {
-                    images = new ArrayList<>();
-                    for (int i = 0; i < MainActivity.images.size(); i++) {
-                        if (MainActivity.images.get(i).getDeleted().equals("F")) {
-                            images.add(MainActivity.images.get(i));
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                    debug1();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                debug("11");
-                // Xử lý sự kiện khi không có mục nào được chọn
-            }
-        });
-    }
 
     public void startCamera() {
         Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

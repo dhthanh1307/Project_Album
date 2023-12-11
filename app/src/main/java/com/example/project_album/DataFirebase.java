@@ -93,8 +93,6 @@ public class DataFirebase {
     //insert===================================================================
     public void insertImage(Image image){
         debug("1");
-        UploadImage uploadImage = new UploadImage();
-        debug("2");
         Uri uri = getUri(image.getImgBitmap());
         debug("3");
         StorageReference fileReference = mStoreageRef.child(
@@ -107,6 +105,7 @@ public class DataFirebase {
                     @Override
                     public void onSuccess(Uri uri) {
                         UploadImage upload = new UploadImage(uri.toString(),fileReference.getPath());
+                        upload.setFavorite(image.getFavorite());
                         String nextkey = findNextkey();
                         upload.setKey(nextkey);
                         image.setKey(nextkey);
