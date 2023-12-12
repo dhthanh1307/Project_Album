@@ -1274,20 +1274,20 @@ public class AllLayout extends Fragment {
             tv_sort.setText("Sắp xếp theo kích cỡ");
             sortDate();
         }
-        else if (tv_sort.getText().toString().equals("Sắp xếp theo size")){
+        else if (tv_sort.getText().toString().equals("Sắp xếp theo kích cỡ")){
             tv_sort.setText("Sắp xếp theo ngày");
             sortSize();
         }
     }
     private void sortDate(){
         int pos = 0;
-        for (int i = 0; i < MainActivity.images.size() - 1; i++) {
+        for (int i = 0; i < MainActivity.images.size(); i++) {
             if (MainActivity.images.get(i).getDeleted()!="T" && MainActivity
                     .images.get(i).getHide()!="T"){
                 images.set(pos++,MainActivity.images.get(i));
             }
         }
-        adapter.images = AllLayout.images;
+        adapter.images = images;
         adapter.notifyDataSetChanged();
     }
     private void sortSize(){

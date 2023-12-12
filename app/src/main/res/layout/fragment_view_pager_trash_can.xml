@@ -12,6 +12,7 @@
         android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/teal_700"
         android:orientation="horizontal">
         <ImageView
             android:id="@+id/txt_back"

@@ -34,7 +34,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class AlbumLayout extends Fragment {
     MainActivity main;
@@ -399,8 +398,17 @@ public class AlbumLayout extends Fragment {
             ConvertAlbum();
         }
         else{
-            albums.get(1).setImages(FavoriteLayout.images);
-            albums.get(0).setImages(AllLayout.images);
+//            albums.get(1).setImages(FavoriteLayout.images);
+//            albums.get(0).setImages(AllLayout.images);
+            for(int i =2;i<albums.size();i++){
+                ArrayList<Image> temp = albums.get(i).getImages();
+                for(int j =0;j<temp.size();j++){
+                    if (temp.get(j).getDeleted().equals("T") ||
+                    temp.get(j).getHide().equals("T")){
+                        temp.remove(temp.get(j));
+                    }
+                }
+            }
         }
 
     }
@@ -463,6 +471,7 @@ public class AlbumLayout extends Fragment {
         Log.e("Album Layout",k);
     }
     public void update(){
+        InitAlbums();
         UpdateConfiguration(getResources().getConfiguration());
         myAlbumFragment.update();
     }
@@ -647,5 +656,12 @@ public class AlbumLayout extends Fragment {
         album.setId(id);
         dialog.dismiss();
         update();
+    }
+    public void deleteImAbDatabase(Image image){
+        for (Album album : albums){
+            MainActivity.dataResource.deleteImageInAlbum(image,album.getId());
+            album.removeImage(image);
+            MainActivity.dataFirebase.updateAlbum(album);
+        }
     }
 }

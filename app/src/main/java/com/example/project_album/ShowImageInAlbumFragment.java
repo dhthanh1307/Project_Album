@@ -1,6 +1,7 @@
 package com.example.project_album;
 
 import android.app.Dialog;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -41,6 +43,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     private TextView tv_name;
     private TextView tv_move;
     private Dialog dialog;
+    private ConstraintLayout constraintLayout;
     public ShowImageInAlbumFragment(Album album){
         this.album = album;
     }
@@ -78,6 +81,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         // finish view for all info dialog
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_image_in_album);
+        constraintLayout = (ConstraintLayout)view.findViewById(R.id.contrant1);
         DoSthWithOrientation(getResources().getConfiguration().orientation);
         tv_back_to_album = view.findViewById(R.id.tv_back);
         tv_choose = view.findViewById(R.id.tv_choose);
@@ -96,7 +100,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
 
         img_all_info = main.bottom_navigation_album.findViewById(R.id.img_all_info);
         img_all_info.setOnClickListener(this);
-
+        setTheme(main.mainColorBackground,main.mainColorText);
         return view;
     }
     @Override
@@ -279,7 +283,7 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
     }
     private void unFavorite(){
         for(Image image :image_adapter.image_chosen){
-            MainActivity.dataResource.likeImage(image.getId(),image.getKey());
+            MainActivity.dataResource.unlikeImage(image.getId(),image.getKey());
             FavoriteLayout.images.remove(image);
         }
         originalState();
@@ -340,5 +344,28 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
             }
         }
         originalState();
+    }
+    private void setTheme(int backgroundColor, ColorStateList textColor){
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+
+    private void setThemeText(ColorStateList textColor) {
+        tv_back_to_album.setTextColor(textColor);
+        tv_choose.setTextColor(textColor);
+        tv_add_to_album.setTextColor(textColor);
+        tv_favorite.setTextColor(textColor);
+        tv_copy.setTextColor(textColor);
+        tv_name.setTextColor(textColor);
+        if (!album.getName().equals("Tất cả") && album.getName().equals("Mục yêu thích")){
+            tv_move.setTextColor(textColor);
+        }
+        if (!album.getName().equals("Mục yêu thích")){
+            tv_delete.setTextColor(textColor);
+        }
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        constraintLayout.setBackgroundColor(backgroundColor);
     }
 }

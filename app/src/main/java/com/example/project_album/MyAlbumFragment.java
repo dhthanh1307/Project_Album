@@ -1,7 +1,7 @@
 package com.example.project_album;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,6 +126,7 @@ public class MyAlbumFragment extends Fragment {
             }
         });
         gridViewMyAlbum.setAdapter(gridViewAlbumAdapter);
+        setTheme(main.mainColorBackground,main.mainColorText);
         return view;
     }
 
@@ -153,6 +154,22 @@ public class MyAlbumFragment extends Fragment {
             albums = AlbumLayout.albums;
             gridViewAlbumAdapter.notifyDataSetChanged();
         }
+    }
+    private void setTheme(int backgroundColor, ColorStateList textColor){
+        setThemeBackGround(backgroundColor);
+        setThemeText(textColor);
+    }
+
+    private void setThemeText(ColorStateList textColor) {
+        tvEdit.setTextColor(textColor);
+        tvBack.setTextColor(textColor);
+        tv_cancel.setTextColor(textColor);
+
+    }
+
+    private void setThemeBackGround(int backgroundColor) {
+        linear1.setBackgroundColor(backgroundColor);
+        linear2.setBackgroundColor(backgroundColor);
     }
 
 }

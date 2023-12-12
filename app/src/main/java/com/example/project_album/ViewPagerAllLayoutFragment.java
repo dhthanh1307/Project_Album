@@ -8,15 +8,11 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -30,14 +26,10 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.fragment.app.FragmentActivity;
-
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
-
-import com.google.android.material.tabs.TabLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -141,17 +133,17 @@ public class ViewPagerAllLayoutFragment extends Fragment {
 
             EventForAll();
         }
-        //view paper dung de tao slide
+        //view paper dung de tao slide================================================
         else {
             mViewPager.animate().setDuration(500);
             tv_animate = view.findViewById(R.id.tv_animate);
             tv_animate.setTextColor(Color.MAGENTA);
             tv_animate.animate().setDuration(1000);
             tv_animate.setVisibility(View.VISIBLE);
-//            mViewPager.setClipToPadding(false);
-//            mViewPager.setClipChildren(false);
-//            mViewPager.setOffscreenPageLimit(3);
-//            mViewPager.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
+            mViewPager.setClipToPadding(false);
+            mViewPager.setClipChildren(false);
+            mViewPager.setOffscreenPageLimit(3);
+            mViewPager.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
 
             CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
             compositePageTransformer.addTransformer(new MarginPageTransformer(40));
@@ -312,7 +304,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     }
 
     private void shareImageUri(Uri uri) {
-        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setType("image/*");
@@ -337,34 +329,34 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Nếu xóa thì thay đổi ảnh là unlike ở favorite và ở albumfavorite
-                        if (images.get(index).getFavorite().equals("T")) {
-                            images.get(index).setFavorite("F");
-                            main.favoriteLayout.updateFavorite(images.get(index));
+                        Image image = images.get(index);
+                        if (image.getFavorite().equals("T")) {
+                            image.setFavorite("F");
+                            main.favoriteLayout.updateFavorite(image);
                             // main.albumLayout.updateFavorite(images.get(index));
                         }
 
                         //
-                        long idImageDelete = images.get(index).getId();
+                        long idImageDelete = image.getId();
                         //Set hình ảnh đã xóa là True
-                        images.get(index).setDeleted("T");
+                        image.setDeleted("T");
                         //Set ở dataResource là True đã xóa
                         MainActivity.dataResource.updateStateImageDeletedIsTrue(
-                        images.get(index).getId(),images.get(index).getKey());
+                                image.getId(),image.getKey());
 
                         // cap nhật ở trashcan. them vao trash can
-                        main.trashCanLayout.updateTrashCan(images.get(index));
+                        main.trashCanLayout.updateTrashCan(image);
 
                         //xóa ở images cua viewpager, k hiểu tại sao cái này nó lại xóa luôn
                         //bên adapter của AllLayout nữa
                         if (index == images.size() - 1) {
-                            images.remove(index);
                             index = images.size() - 1;
                         } else if (index == 0) {
-                            images.remove(0);
                             index = 0;
-                        } else {
-                            images.remove(index);
                         }
+                        images.remove(image);
+                        //nay la phong truong hop adapter truyen vao ko phai adapter cua all
+                        AllLayout.images.remove(image);
                         if (images.size() == 0) {
                             imgBack.callOnClick();
                         }
@@ -372,15 +364,14 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                         mViewPager.setAdapter(mAdapter);
                         mViewPager.setCurrentItem(index, false);
                         txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
-
                         //xoa image o allLayout
-                        for (int i = 0; i < AllLayout.images.size(); i++) {
-                            if (AllLayout.images.get(i).getId() == idImageDelete) {
-                                AllLayout.images.remove(i);
-                                Log.e("TestAll", "---------------------");
-                                break;
-                            }
-                        }
+//                        for (int i = 0; i < AllLayout.images.size(); i++) {
+//                            if (AllLayout.images.get(i).getId() == idImageDelete) {
+//                                AllLayout.images.remove(i);
+//                                Log.e("TestAll", "---------------------");
+//                                break;
+//                            }
+//                        }
                     }
                 });
 
@@ -438,9 +429,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                         }
 
                     } else {
-                        //Nếu là albumAction
-                        //.....................
-                        //Nhớ cập nhật cả ưa thich o favorite
+                        main.favoriteLayout.images.remove(images.get(index));
                     }
 
 
@@ -489,6 +478,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 }
                 if (main.getIDItemBottomNavigationView() == R.id.action_album) {
                     ft.replace(R.id.replace_fragment_layout, main.albumLayout);
+                    main.albumLayout.update();
                 }
                 ft.commit();
                 main.mBottomNavigationView.setVisibility(View.VISIBLE);
