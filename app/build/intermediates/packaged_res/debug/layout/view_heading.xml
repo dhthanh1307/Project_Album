@@ -10,6 +10,12 @@
     app:layout_constraintTop_toTopOf="parent"
     android:gravity="center_vertical">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/search_icon"
+        android:id="@+id/search_button"
+        />
     <TextView
         android:id="@+id/tv_choose"
         android:layout_width="wrap_content"
@@ -22,11 +28,13 @@
         android:textSize="20dp" />
 
     <TextView
-        android:layout_centerVertical="true"
         android:id="@+id/tv_info"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="44dp"
+        android:layout_toStartOf="@+id/tv_choose"
+        android:layout_toEndOf="@+id/search_button"
         android:text="11/11/2023"
         android:textColor="@color/white"
         android:textSize="30dp" />

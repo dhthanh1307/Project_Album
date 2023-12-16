@@ -3115,6 +3115,7 @@ drawable notify_panel_notification_icon_bg
 drawable remove
 drawable rotate_left_24
 drawable rotate_right_24
+drawable search_icon
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -3379,6 +3380,7 @@ id edt_new_pass
 id edt_old_pass
 id edt_pass_hide_in_all_layout
 id edt_pass_into_hide
+id edt_search
 id edt_time_capture
 id edt_time_delete
 id edt_verify_pass
@@ -3998,6 +4000,7 @@ layout fragment_image_in_album
 layout fragment_layout_solo_picture_in_trashcan
 layout fragment_login
 layout fragment_my_album
+layout fragment_search
 layout fragment_sign_up
 layout fragment_trash_can_layout
 layout fragment_url

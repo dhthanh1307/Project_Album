@@ -52,6 +52,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.mlkit.vision.text.TextRecognizer;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -107,6 +108,7 @@ public class AllLayout extends Fragment {
     //view header ==================================
     private TextView tv_info, tv_choose;
     private Button btn_extend;
+    private FloatingActionButton btn_search;
     //finish
 
     //view footer===================================
@@ -118,6 +120,7 @@ public class AllLayout extends Fragment {
     Context context = null;
 
     //khai báo của TA ======================================
+
     ActivityResultLauncher<PickVisualMediaRequest> pickMultiImages;
     FloatingActionButton btnAdd, btnAddCamera, btnAddUrl, btnAddImage;
     private Animation rotateOpen;
@@ -210,6 +213,7 @@ public class AllLayout extends Fragment {
         tv_info = view.findViewById(R.id.tv_info);
         tv_choose = view.findViewById(R.id.tv_choose);
         btn_extend = view.findViewById(R.id.btn_many);
+        btn_search = view.findViewById(R.id.search_button);
 
         EventViewHeader();
         //finish===================================================
@@ -629,6 +633,14 @@ public class AllLayout extends Fragment {
                 attribute.y = getResources().getDisplayMetrics().heightPixels - 40;
                 attribute.gravity = Gravity.RIGHT | Gravity.BOTTOM;
                 dialog_header.show();
+            }
+        });
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.replace_fragment_layout, new searchFragment());
+                ft.commit();
             }
         });
     }

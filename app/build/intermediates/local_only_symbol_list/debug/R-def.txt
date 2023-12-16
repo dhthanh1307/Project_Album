@@ -70,6 +70,7 @@ drawable link
 drawable remove
 drawable rotate_left_24
 drawable rotate_right_24
+drawable search_icon
 drawable trash_can_icon_foreground
 id NavigationView
 id accountLayout
@@ -144,6 +145,7 @@ id edt_new_pass
 id edt_old_pass
 id edt_pass_hide_in_all_layout
 id edt_pass_into_hide
+id edt_search
 id edt_time_capture
 id edt_time_delete
 id edt_verify_pass
@@ -208,6 +210,7 @@ id rlt_layout
 id rv_image_in_album
 id rv_image_in_all
 id save
+id search_button
 id slider
 id spinner
 id srcollview
@@ -310,6 +313,7 @@ layout fragment_image_in_album
 layout fragment_layout_solo_picture_in_trashcan
 layout fragment_login
 layout fragment_my_album
+layout fragment_search
 layout fragment_sign_up
 layout fragment_trash_can_layout
 layout fragment_url

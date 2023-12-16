@@ -21,7 +21,7 @@ public class ShowImageInAllAdapter extends RecyclerView.Adapter<ShowImageInAllAd
     public ArrayList<Image> images;
     private int idLayout;
     private MainActivity activity;
-    private ArrayList<Boolean> ischoose = new ArrayList<>();
+    public ArrayList<Boolean> ischoose = new ArrayList<>();
     public ArrayList<Image> image_chosen = new ArrayList<>();
     private boolean choose_selection;
     public int count = 0;
