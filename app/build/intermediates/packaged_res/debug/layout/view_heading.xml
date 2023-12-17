@@ -46,8 +46,7 @@
         android:shadowRadius="1.5"
         android:shadowDx="0"
         android:shadowDy="0"
-        android:typeface="sans"
-        android:background="@android:color/transparent"/>
+        android:typeface="sans" />
     <Button
         android:id="@+id/btn_many"
         android:layout_width="40dp"

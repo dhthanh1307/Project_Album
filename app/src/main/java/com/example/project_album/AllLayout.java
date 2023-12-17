@@ -248,6 +248,7 @@ public class AllLayout extends Fragment {
 
         btnAdd = view.findViewById(R.id.btn_add);
         btnAddCamera = view.findViewById(R.id.btn_add_Camera);
+        btnAddCamera.setVisibility(View.GONE);
         btnAddUrl = view.findViewById(R.id.btn_add_Url);
         btnAddImage = view.findViewById(R.id.btn_add_Images);
         EventViewAddPicture();
@@ -841,11 +842,17 @@ public class AllLayout extends Fragment {
             btnAddCamera.setAnimation(fromBottom);
             btnAddUrl.setAnimation(fromBottom);
             btnAddImage.setAnimation(fromBottom);
+            btnAddCamera.setEnabled(true);
+            btnAddUrl.setEnabled(true);
+            btnAddImage.setEnabled(true);
         } else {
             btnAdd.setAnimation(rotateClose);
             btnAddCamera.setAnimation(toBottom);
             btnAddUrl.setAnimation(toBottom);
             btnAddImage.setAnimation(toBottom);
+            btnAddCamera.setEnabled(false);
+            btnAddUrl.setEnabled(false);
+            btnAddImage.setEnabled(false);
         }
     }
 

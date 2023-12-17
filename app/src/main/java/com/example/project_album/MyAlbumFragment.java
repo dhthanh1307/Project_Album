@@ -164,7 +164,6 @@ public class MyAlbumFragment extends Fragment {
         tvEdit.setTextColor(textColor);
         tvBack.setTextColor(textColor);
         tv_cancel.setTextColor(textColor);
-
     }
 
     private void setThemeBackGround(int backgroundColor) {
