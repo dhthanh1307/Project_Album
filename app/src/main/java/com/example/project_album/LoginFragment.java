@@ -21,12 +21,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.checkerframework.checker.units.qual.A;
 
@@ -64,6 +68,7 @@ public class LoginFragment extends Fragment {
     private SharedPreferences myPrefContainer;
     private String PREFNAME = "user";
     ProgressDialog dialog;
+    int count= 0;
 
     public static LoginFragment newInstance(String strArg) {
         LoginFragment fragment = new LoginFragment();
@@ -278,40 +283,61 @@ public class LoginFragment extends Fragment {
         Thread thread = new Thread(new Runnable() {
         @Override
         public void run() {
+            StorageReference mStoreageRef = FirebaseStorage.getInstance().getReference("Picture/"+userkey);
             for(DataFirebase.UploadImage upload:imgs){
-            try {
-                URL url = new URL(upload.getImageUrl());
-                Bitmap bitmap = BitmapFactory.decodeStream(url.
-                    openConnection().getInputStream());
-                Image image = new Image(upload,bitmap);
-                image.setKey(upload.getKey());
-                image.setId(MainActivity.dataResource.InsertImage(image));
-                MainActivity.images.add(image);
-
-            } catch(IOException e) {
-                Log.e("Loginfragment",e.toString());
-            }
-            }
-            // tao album
-            FirebaseFirestore fbf = FirebaseFirestore.getInstance();
-            fbf.collection("user").document(userkey)
-            .collection("Album").get().addOnCompleteListener(
-            new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    ArrayList<DataFirebase.UploadAlbum> albums =new ArrayList<>();
-                    for(QueryDocumentSnapshot document:task.getResult()){
-                        albums.add(new DataFirebase.UploadAlbum(document.getData()));
+                File newfile = MainActivity.dataResource.createNewFile(upload.getName());
+                mStoreageRef.child(upload.getName()).getFile(newfile)
+                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        count++;
+                        MainActivity.dataResource.insertImage(upload);
+                        if(count == imgs.size()){
+                            MainActivity.images = MainActivity.dataResource.getAllImage();
+                            getImageForLayouts();
+                            createAlbum();
+                            thread_background();
+                        }
                     }
-                    saveAbToDatabase(albums);
-                    Log.e("LoginFrament",String.valueOf(albums.size()));
-                }
+                });
+//            try {
+//                URL url = new URL(upload.getImageUrl());
+//                Bitmap bitmap = BitmapFactory.decodeStream(url.
+//                    openConnection().getInputStream());
+//                Image image = new Image(upload,bitmap);
+//                image.setKey(upload.getKey());
+//                image.setId(MainActivity.dataResource.InsertImage(image));
+//                MainActivity.images.add(image);
+//
+//            } catch(IOException e) {
+//                Log.e("Loginfragment",e.toString());
+//            }
             }
-            );
-            getImageForLayouts();
+            if(imgs.size() == 0){
+                dialog.dismiss();
+                gotoMainActivity();
+            }
         }
         });
         thread.start();
+    }
+    private void createAlbum(){
+        // tao album
+        FirebaseFirestore fbf = FirebaseFirestore.getInstance();
+        fbf.collection("user").document(userkey)
+        .collection("Album").get().addOnCompleteListener(
+        new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<DataFirebase.UploadAlbum> albums =new ArrayList<>();
+                for(QueryDocumentSnapshot document:task.getResult()){
+                    albums.add(new DataFirebase.UploadAlbum(document.getData()));
+                }
+                saveAbToDatabase(albums);
+                Log.e("LoginFrament",String.valueOf(albums.size()));
+            }
+        }
+        );
     }
     private void saveAbToDatabase(ArrayList<DataFirebase.UploadAlbum> albums){
         for(DataFirebase.UploadAlbum album:albums){
@@ -328,8 +354,6 @@ public class LoginFragment extends Fragment {
                 MainActivity.dataResource.InsertAlbumImage(idalbum,id);
             }
         }
-        dialog.dismiss();
-        gotoMainActivity();
     }
     private void StartUpUser(){
         DataFirebase.open();

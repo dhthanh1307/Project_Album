@@ -245,6 +245,24 @@ public class DataResource {
             return -1;
         }
     }
+    public long insertImage(DataFirebase.UploadImage image){
+        ContentValues values = new ContentValues();
+        File file = new File(helper.PATH+"/"+image.getName());
+        values.put(DatabaseHelper.COLUMN_IMAGE, helper.PATH+"/"+image.getName());
+        values.put(DatabaseHelper.COLUMN_NAME, image.getName());
+        values.put(DatabaseHelper.COLUMN_SIZE, file.length()/1024);
+        values.put(DatabaseHelper.COLUMN_KEY,image.getKey());
+
+        values.put(DatabaseHelper.COLUMN_DATE, image.getDate());
+        values.put(DatabaseHelper.COLUMN_TYPE, "");
+        values.put(DatabaseHelper.COLUMN_DESCRIBE, image.getDescribe());
+        values.put(DatabaseHelper.COLUMN_IS_DELETE, image.getDelete());
+        values.put(DatabaseHelper.COLUMN_IS_FAVORITE, image.getFavorite());
+        values.put(DatabaseHelper.COLUMN_IS_HIDE, image.getHide());
+
+        long insertId = database.insert(DatabaseHelper.TABLE_PICTURE, null, values);
+        return insertId;
+    }
     public void UpdateKeyImage(long id,int keyI){
         ContentValues key = new ContentValues();
         key.put(DatabaseHelper.COLUMN_KEY,keyI);
@@ -415,6 +433,9 @@ public class DataResource {
             child.delete();
         }
         helper.onCreate(database);
+    }
+    public File createNewFile(String filename){
+        return new File(helper.directory,filename);
     }
 
     private void debug(String str) {

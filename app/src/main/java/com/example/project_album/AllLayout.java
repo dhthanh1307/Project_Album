@@ -1297,8 +1297,8 @@ public class AllLayout extends Fragment {
     private void sortDate(){
         int pos = 0;
         for (int i = 0; i < MainActivity.images.size(); i++) {
-            if (MainActivity.images.get(i).getDeleted()!="T" && MainActivity
-                    .images.get(i).getHide()!="T"){
+            if (MainActivity.images.get(i).getDeleted().equals("F") && MainActivity
+                    .images.get(i).getHide().equals("F")){
                 images.set(pos++,MainActivity.images.get(i));
             }
         }

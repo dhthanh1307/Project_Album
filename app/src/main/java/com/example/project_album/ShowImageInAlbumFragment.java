@@ -357,10 +357,10 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         tv_favorite.setTextColor(textColor);
         tv_copy.setTextColor(textColor);
         tv_name.setTextColor(textColor);
-        if (!album.getName().equals("Tất cả") && album.getName().equals("Mục yêu thích")){
+        if (!album.getName().equals("Tất cả") && !album.getName().equals("Mục yêu thích")){
             tv_move.setTextColor(textColor);
         }
-        if (!album.getName().equals("Mục yêu thích")){
+        if (!album.getName().equals("Tất cả")){
             tv_delete.setTextColor(textColor);
         }
     }
