@@ -30,7 +30,7 @@
             android:layout_weight="5"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="Thứ Hai \n 16:11"
+            android:text="Ảnh đã xóa gần đây"
             android:textColor="@color/white" />
     </LinearLayout>
     <androidx.viewpager2.widget.ViewPager2
