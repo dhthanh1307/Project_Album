@@ -214,6 +214,7 @@ public class AllLayout extends Fragment {
         tv_choose = view.findViewById(R.id.tv_choose);
         btn_extend = view.findViewById(R.id.btn_many);
         btn_search = view.findViewById(R.id.search_button);
+        btn_search.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(main, R.color.blue)));
 
         EventViewHeader();
         //finish===================================================

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
+<!--        <ImageView
             android:id="@+id/imageButton"
             android:layout_width="46dp"
             android:layout_height="53dp"
@@ -20,7 +20,7 @@
             android:clickable="true"
             android:src="@drawable/baseline_settings_24"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />-->
 
         <Button
             android:id="@+id/btnLogout"

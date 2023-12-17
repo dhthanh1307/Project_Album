@@ -1375,6 +1375,7 @@ int color common_google_signin_btn_text_light_disabled 0x7f05003a
 int color common_google_signin_btn_text_light_focused 0x7f05003b
 int color common_google_signin_btn_text_light_pressed 0x7f05003c
 int color common_google_signin_btn_tint 0x7f05003d
+int color dark_blue 0x7f050302
 int color design_bottom_navigation_shadow_color 0x7f05003e
 int color design_box_stroke_color 0x7f05003f
 int color design_dark_default_color_background 0x7f050040
@@ -2070,6 +2071,7 @@ int color secondary_text_default_material_dark 0x7f0502f1
 int color secondary_text_default_material_light 0x7f0502f2
 int color secondary_text_disabled_material_dark 0x7f0502f3
 int color secondary_text_disabled_material_light 0x7f0502f4
+int color shadow_color 0x7f050303
 int color switch_thumb_disabled_material_dark 0x7f0502f5
 int color switch_thumb_disabled_material_light 0x7f0502f6
 int color switch_thumb_material_dark 0x7f0502f7
@@ -2968,6 +2970,7 @@ int drawable btn_radio_off_to_on_mtrl_animation 0x7f07008f
 int drawable btn_radio_on_mtrl 0x7f070090
 int drawable btn_radio_on_to_off_mtrl_animation 0x7f070091
 int drawable check_24 0x7f070092
+int drawable circle_background 0x7f07012b
 int drawable close_24 0x7f070093
 int drawable common_full_open_on_phone 0x7f070094
 int drawable common_google_signin_btn_icon_dark 0x7f070095
@@ -3061,6 +3064,7 @@ int drawable material_ic_keyboard_arrow_previous_black_24dp 0x7f0700ec
 int drawable material_ic_keyboard_arrow_right_black_24dp 0x7f0700ed
 int drawable material_ic_menu_arrow_down_black_24dp 0x7f0700ee
 int drawable material_ic_menu_arrow_up_black_24dp 0x7f0700ef
+int drawable more 0x7f07012a
 int drawable mtrl_bottomsheet_drag_handle 0x7f0700f0
 int drawable mtrl_checkbox_button 0x7f0700f1
 int drawable mtrl_checkbox_button_checked_unchecked 0x7f0700f2
@@ -3445,7 +3449,6 @@ int id ifRoom 0x7f080142
 int id ignore 0x7f080143
 int id ignoreRequest 0x7f080144
 int id image 0x7f080145
-int id imageButton 0x7f080146
 int id imageView 0x7f080147
 int id img 0x7f080148
 int id img_all_info 0x7f080149

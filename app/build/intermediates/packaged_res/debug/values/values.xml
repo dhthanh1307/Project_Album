@@ -6,6 +6,7 @@
     <color name="blue">#2752EF</color>
     <color name="blue_press">#612752EF</color>
     <color name="color_check">#F1E7E9</color>
+    <color name="dark_blue">#B22752EF</color>
     <color name="green">#5FE401</color>
     <color name="grey">#61FFFFFF</color>
     <color name="light">#F4DDEF</color>
@@ -14,6 +15,7 @@
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="red">#EC092C</color>
+    <color name="shadow_color">#FFFFFF</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="white">#FFFFFFFF</color>
