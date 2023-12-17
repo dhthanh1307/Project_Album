@@ -639,7 +639,9 @@ public class AllLayout extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.replace_fragment_layout, new searchFragment());
+                Fragment fragment = new searchFragment();
+                ft.add(R.id.replace_fragment_layout,fragment);
+                ft.addToBackStack(fragment.getClass().getSimpleName());
                 ft.commit();
             }
         });

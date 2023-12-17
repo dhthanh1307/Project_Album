@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
@@ -115,7 +116,7 @@ public class searchFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == tv_back.getId()){
-
+            closeFragment();
         }
     }
     void updateImage(){
@@ -164,5 +165,17 @@ public class searchFragment extends Fragment implements View.OnClickListener {
         }catch (Exception e){
             Toast.makeText(main,"Failed due to:" +e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+    private void closeFragment(){
+        FragmentTransaction transaction = main.getSupportFragmentManager().beginTransaction();
+        main.getSupportFragmentManager().popBackStack();
+        transaction.remove(this);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+        transaction.commit();
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        main.allLayout.update();
     }
 }

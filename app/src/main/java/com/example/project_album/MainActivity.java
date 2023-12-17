@@ -74,6 +74,7 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.e("MainActivity","onCreate");
         super.onCreate(savedInstanceState);
+
         Intent data = getIntent();
         Bundle bundle = data.getExtras();
         username = bundle.getString("username");

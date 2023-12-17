@@ -367,7 +367,9 @@ public class EditFragment extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                images.get(index).setImgBitmap(originalBitmap);
+                //images.get(index).setImgBitmap(originalBitmap);
+                Image image = new Image(originalBitmap,main.GenerateName());
+                MainActivity.dataFirebase.insertImage(image);
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
                 ViewPagerAllLayoutFragment newFragment=new ViewPagerAllLayoutFragment(images,index);

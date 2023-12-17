@@ -81,13 +81,18 @@ public class AlbumLayout extends Fragment {
         myAlbumFragment = new MyAlbumFragment();
     }
     public static AlbumLayout newInstance(String strArg){
-        if (instance == null){
-            instance =  new AlbumLayout();
-            Bundle args = new Bundle();
-            args.putString("strArg1", strArg);
-            instance.setArguments(args);
-        }
-        return instance;
+//        if (instance == null){
+//            instance =  new AlbumLayout();
+//            Bundle args = new Bundle();
+//            args.putString("strArg1", strArg);
+//            instance.setArguments(args);
+//        }
+//        return instance;
+        AlbumLayout fragment = new AlbumLayout();
+        Bundle args = new Bundle();
+        args.putString("strArg1", strArg);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
