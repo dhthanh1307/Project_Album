@@ -344,6 +344,7 @@ public class AlbumLayout extends Fragment {
 
                     TextView tv_rename = v.findViewById(R.id.tv_rename);
                     TextView tv_delete = v.findViewById(R.id.tv_delete);
+                    TextView tv_slider = v.findViewById(R.id.tv_slider);
 
                     tv_rename.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -383,6 +384,19 @@ public class AlbumLayout extends Fragment {
                             UpdateConfiguration(getResources().getConfiguration());
                         }
                     });
+                    tv_slider.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
+                            FragmentTransaction ft = fragmentmanager.beginTransaction();
+                            Fragment fragment = new ViewPagerAllLayoutFragment(albums.get(position).getImages());
+                            ft.add(R.id.replace_fragment_layout, fragment);
+                            ft.addToBackStack(fragment.getClass().getSimpleName());
+                            ft.commit();
+                            dialog1.dismiss();
+                        }
+                    });
+
                 }
                 return true;
             }
