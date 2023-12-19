@@ -314,6 +314,7 @@ public class LoginFragment extends Fragment {
 //            }
             }
             if(imgs.size() == 0){
+                getImageForLayouts();
                 dialog.dismiss();
                 gotoMainActivity();
             }
