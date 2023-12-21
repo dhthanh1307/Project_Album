@@ -23,6 +23,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +39,8 @@ public class EditFragment extends Fragment {
     MainActivity main;
     ImageView imageView;
     Bitmap originalBitmap ;
+    Bitmap tempfilter;
+    ImageView filter1,filter2,filter3,filter4,filter5,filter6,filter7,filter8;
     int size=5;
 
     ArrayList<Image> images = new ArrayList<>();
@@ -88,23 +91,30 @@ public class EditFragment extends Fragment {
         ImageView cancel=view.findViewById(R.id.cancel);
         ImageView save=view.findViewById(R.id.save);
         HorizontalScrollView scrollView=view.findViewById(R.id.srcollview);
-        ImageView filter1=view.findViewById(R.id.filter1);
-        ImageView filter2=view.findViewById(R.id.filter2);
-        ImageView filter3=view.findViewById(R.id.filter3);
-        ImageView filter4=view.findViewById(R.id.filter4);
-        ImageView filter5=view.findViewById(R.id.filter5);
-        ImageView filter6=view.findViewById(R.id.filter6);
-        ImageView filter7=view.findViewById(R.id.filter7);
-        ImageView filter8=view.findViewById(R.id.filter8);
+        filter1=view.findViewById(R.id.filter1);
+        filter2=view.findViewById(R.id.filter2);
+        filter3=view.findViewById(R.id.filter3);
+        filter4=view.findViewById(R.id.filter4);
+        filter5=view.findViewById(R.id.filter5);
+        filter6=view.findViewById(R.id.filter6);
+        filter7=view.findViewById(R.id.filter7);
+        filter8=view.findViewById(R.id.filter8);
 
 
-        LinearLayout color=view.findViewById(R.id.color);
-        ImageView color1=view.findViewById(R.id.color1);
-        ImageView color2=view.findViewById(R.id.color2);
-        ImageView color3=view.findViewById(R.id.color3);
-        ImageView color4=view.findViewById(R.id.color4);
-        ImageView color5=view.findViewById(R.id.color5);
-        ImageView color6=view.findViewById(R.id.color6);
+        LinearLayout color_layout=view.findViewById(R.id.color);
+        SeekBar sb_red = view.findViewById(R.id.seekBar_red);
+        SeekBar sb_green = view.findViewById(R.id.seekBar_green);
+        SeekBar sb_blue = view.findViewById(R.id.seekBar_blue);
+        View view1 = view.findViewById(R.id.view_color);
+        int color = Color.argb(255,sb_red.getProgress()*255/100,
+                sb_green.getProgress()*255/100,sb_blue.getProgress()*255/100);
+        view1.setBackgroundColor(color);
+//        ImageView color1=view.findViewById(R.id.color1);
+//        ImageView color2=view.findViewById(R.id.color2);
+//        ImageView color3=view.findViewById(R.id.color3);
+//        ImageView color4=view.findViewById(R.id.color4);
+//        ImageView color5=view.findViewById(R.id.color5);
+//        ImageView color6=view.findViewById(R.id.color6);
         ImageView increase=view.findViewById(R.id.increase);
         ImageView decrease=view.findViewById(R.id.decrease);
 
@@ -114,38 +124,16 @@ public class EditFragment extends Fragment {
         paint = new Paint();
         paint.setStrokeWidth(5);
         paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(color);
 
+        initFilter();
 
-
-
-
-        Bitmap tempfilter=originalBitmap;
-        filter1.setImageBitmap(tempfilter);
-
-        tempfilter=setfilter1(originalBitmap,0.5f);
-        filter2.setImageBitmap(tempfilter);
-
-        tempfilter=setfilter2(originalBitmap,0.33333f);
-        filter3.setImageBitmap(tempfilter);
-
-        tempfilter=setfilter3(originalBitmap,-1.0f);
-        filter4.setImageBitmap(tempfilter);
-
-        tempfilter=setfilter2(originalBitmap,0.1f);
-        filter5.setImageBitmap(tempfilter);
-
-        tempfilter=setfilter1(originalBitmap,1.2f);
-        filter6.setImageBitmap(tempfilter);
-
-        tempfilter=setfilter2(originalBitmap,1.5f);
-        filter7.setImageBitmap(tempfilter);
-
-        tempfilter=setfilter1(originalBitmap,0.75f);
-        filter8.setImageBitmap(tempfilter);
 
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                imageView.setEnabled(false);
+                color_layout.setVisibility(View.INVISIBLE);
                 Matrix matrix = new Matrix();
                 matrix.postRotate(90);
                 Bitmap rightBitmap = Bitmap.createBitmap(originalBitmap, 0, 0,
@@ -153,12 +141,14 @@ public class EditFragment extends Fragment {
                 //image.setImgBitmap(rotatedBitmap);
                 originalBitmap=rightBitmap;
                 imageView.setImageBitmap(rightBitmap);
-
+                initFilter();
             }
         });
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                imageView.setEnabled(false);
+                color_layout.setVisibility(View.INVISIBLE);
                 Matrix matrix = new Matrix();
                 matrix.postRotate(-90);
                 Bitmap leftBitmap = Bitmap.createBitmap(originalBitmap, 0, 0,
@@ -166,12 +156,14 @@ public class EditFragment extends Fragment {
                 //image.setImgBitmap(rotatedBitmap);
                 originalBitmap=leftBitmap;
                 imageView.setImageBitmap(leftBitmap);
-
+                initFilter();
             }
         });
         flip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                imageView.setEnabled(false);
+                color_layout.setVisibility(View.INVISIBLE);
                 Matrix matrix = new Matrix();
                 matrix.postScale(-1,1);
                 Bitmap flipdBitmap = Bitmap.createBitmap(originalBitmap, 0, 0,
@@ -179,7 +171,7 @@ public class EditFragment extends Fragment {
                 //image.setImgBitmap(rotatedBitmap);
                 originalBitmap=flipdBitmap;
                 imageView.setImageBitmap(flipdBitmap);
-
+                initFilter();
             }
         });
         draw.setOnClickListener(new View.OnClickListener() {
@@ -187,7 +179,8 @@ public class EditFragment extends Fragment {
             public void onClick(View view) {
                 Toast.makeText(main, "Draw", Toast.LENGTH_SHORT).show();
                 scrollView.setVisibility(View.INVISIBLE);
-                color.setVisibility(view.VISIBLE);
+                color_layout.setVisibility(view.VISIBLE);
+                imageView.setEnabled(true);
                 imageView.setOnTouchListener(new View.OnTouchListener() {
                     float startX, startY;
                     @Override
@@ -216,6 +209,7 @@ public class EditFragment extends Fragment {
                                 startX = endX;
                                 startY = endY;
                                 imageView.setImageBitmap(originalBitmap);
+                                initFilter();
                                 break;
 
                         }
@@ -227,44 +221,102 @@ public class EditFragment extends Fragment {
 
             }
         });
-        color1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                paint.setColor(Color.WHITE);
-            }
-        });
-        color2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                paint.setColor(Color.BLACK);
-            }
-        });
-        color3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                paint.setColor(Color.RED);
-            }
-        });
-        color4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                paint.setColor(Color.GREEN);
-            }
-        });
-        color5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                paint.setColor(Color.parseColor("#FF69B4"));
-            }
-        });
-        color6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                paint.setColor(Color.parseColor("#FFFF00"));
-            }
-        });
 
+        sb_red.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int color = Color.argb(255,sb_red.getProgress()*255/100,
+                        sb_green.getProgress()*255/100,sb_blue.getProgress()*255/100);
+                view1.setBackgroundColor(color);
+                paint.setColor(color);
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        sb_green.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int color = Color.argb(255,sb_red.getProgress()*255/100,
+                        sb_green.getProgress()*255/100,sb_blue.getProgress()*255/100);
+                view1.setBackgroundColor(color);
+                paint.setColor(color);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        sb_blue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int color = Color.argb(255,sb_red.getProgress()*255/100,
+                        sb_green.getProgress()*255/100,sb_blue.getProgress()*255/100);
+                view1.setBackgroundColor(color);
+                paint.setColor(color);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+//        color1.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                paint.setColor(Color.WHITE);
+//            }
+//        });
+//        color2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                paint.setColor(Color.BLACK);
+//            }
+//        });
+//        color3.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                paint.setColor(Color.RED);
+//            }
+//        });
+//        color4.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                paint.setColor(Color.GREEN);
+//            }
+//        });
+//        color5.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                paint.setColor(Color.parseColor("#FF69B4"));
+//            }
+//        });
+//        color6.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                paint.setColor(Color.parseColor("#FFFF00"));
+//            }
+//        });
+//
+//
         increase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -285,7 +337,8 @@ public class EditFragment extends Fragment {
             public void onClick(View view) {
                 Toast.makeText(main, "Filter", Toast.LENGTH_SHORT).show();
                 scrollView.setVisibility(View.VISIBLE);
-                color.setVisibility(view.INVISIBLE);
+                imageView.setEnabled(false);
+                color_layout.setVisibility(View.INVISIBLE);
 
             }
         });
@@ -388,8 +441,45 @@ public class EditFragment extends Fragment {
             }
         });
 
+        //set tintcolor
+        right.setImageTintList(main.mainColorText);
+        left.setImageTintList(main.mainColorText);
+        flip.setImageTintList(main.mainColorText);
+        draw.setImageTintList(main.mainColorText);
+        filter.setImageTintList(main.mainColorText);
+        cancel.setImageTintList(main.mainColorText);
+        save.setImageTintList(main.mainColorText);
+        increase.setImageTintList(main.mainColorText);
+        decrease.setImageTintList(main.mainColorText);
         return view;
     }
+
+    private void initFilter() {
+        tempfilter=originalBitmap;
+        filter1.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter1(originalBitmap,0.5f);
+        filter2.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter2(originalBitmap,0.33333f);
+        filter3.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter3(originalBitmap,-1.0f);
+        filter4.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter2(originalBitmap,0.1f);
+        filter5.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter1(originalBitmap,1.2f);
+        filter6.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter2(originalBitmap,1.5f);
+        filter7.setImageBitmap(tempfilter);
+
+        tempfilter=setfilter1(originalBitmap,0.75f);
+        filter8.setImageBitmap(tempfilter);
+    }
+
     public Bitmap setfilter1(Bitmap originalBitmap,float x){
         // chuyển sang bitmap có thể thay đổi
         originalBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);

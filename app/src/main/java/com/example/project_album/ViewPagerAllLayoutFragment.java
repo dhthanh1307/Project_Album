@@ -63,7 +63,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     ImageView txtEdit;
     ImageView txtConvertText;
     TextView tv_animate;
-
+    View view1;
     MainActivity main;
     Context context = null;
     ViewPagerInTrashCanAdapter mAdapter;
@@ -125,6 +125,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         ln_top = view.findViewById(R.id.top);
         ln_bottom = view.findViewById(R.id.bottom);
         mViewPager = view.findViewById(R.id.viewpager_in_all_layout);
+        view1 = view.findViewById(R.id.view1);
         // chỗ nay tan dung lai Adapter ben TrashCan khoi can tao moi
         mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
         mViewPager.setAdapter(mAdapter);
@@ -554,9 +555,20 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     private void setThemeBackGround(int backgroundColor) {
         mainLayout.setBackgroundColor(backgroundColor);
         mViewPager.setBackgroundColor(backgroundColor);
+        ln_top.setBackgroundColor(backgroundColor);
+        ln_bottom.setBackgroundColor(backgroundColor);
     }
 
     private void setThemeText(ColorStateList textColor) {
         txtTimeCapture.setTextColor(textColor);
+        imgBack.setImageTintList(textColor);
+        txtConvertText.setImageTintList(textColor);
+        txtShare.setImageTintList(textColor);
+        txtEdit.setImageTintList(textColor);
+        txtFavorite.setImageTintList(textColor);
+        txtSetWallPaper.setImageTintList(textColor);
+        txtDeleteIntoTrashCan.setImageTintList(textColor);
+        txtTimeCapture.setTextColor(textColor);
+        view1.setBackgroundColor(textColor.getDefaultColor());
     }
 }
