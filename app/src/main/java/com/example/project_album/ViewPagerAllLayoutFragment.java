@@ -1,6 +1,7 @@
 package com.example.project_album;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,6 +32,15 @@ import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +52,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     ArrayList<Image> images = new ArrayList<>();
     ViewPager2 mViewPager;
     TextView txtTimeCapture;
-    ImageView txtInformation;
+    ImageView txtSetWallPaper;
 
     ImageView txtDeleteIntoTrashCan;
     ImageView imgBack;
@@ -51,11 +61,13 @@ public class ViewPagerAllLayoutFragment extends Fragment {
     ImageView txtShare;
 
     ImageView txtEdit;
+    ImageView txtConvertText;
     TextView tv_animate;
 
     MainActivity main;
     Context context = null;
     ViewPagerInTrashCanAdapter mAdapter;
+    private TextRecognizer recognizer;
 
     private LinearLayout ln_top;
     private LinearLayout ln_bottom;
@@ -81,6 +93,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
+            recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
 
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
@@ -123,9 +136,10 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             txtTimeCapture = view.findViewById(R.id.edt_time_capture);
             txtDeleteIntoTrashCan = view.findViewById(R.id.txt_delete_into_trashcan);
             txtFavorite = view.findViewById(R.id.txt_favorite);
-            txtInformation = view.findViewById(R.id.txt_information);
+            txtSetWallPaper = view.findViewById(R.id.txt_setWallpaper);
             txtShare = view.findViewById(R.id.txt_share);
             txtEdit = view.findViewById(R.id.txt_edit);
+            txtConvertText = view.findViewById(R.id.txt_convertText);
             imgBack = view.findViewById(R.id.img_back);
             mainLayout=view.findViewById(R.id.main_layout);
             setTheme(main.mainColorBackground,main.mainColorText);
@@ -446,10 +460,10 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             }
         });
 
-        txtInformation.setOnClickListener(new View.OnClickListener() {
+        txtSetWallPaper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(main, "Information", Toast.LENGTH_SHORT).show();
+                Toast.makeText(main, "Set Wallpaper", Toast.LENGTH_SHORT).show();
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 images.get(mViewPager.getCurrentItem()
                 ).getImgBitmap().compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -484,6 +498,52 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 main.mBottomNavigationView.setVisibility(View.VISIBLE);
             }
         });
+        txtConvertText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recognizeTextFromImage(images.get(index));
+            }
+        });
+    }
+    private void recognizeTextFromImage(Image img){
+        Bitmap bitmap = img.getImgBitmap();
+        if (bitmap == null){
+            Log.e("TextRecognition", "Bitmap is null.");
+            return;
+        }
+        try {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(main);
+            dialog.setNegativeButton("Xong", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+            InputImage image = InputImage.fromBitmap(bitmap,0);
+            Log.e("ssss", "-------------------------");
+            Task<Text> textTaskResult = recognizer.process(image)
+                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+                        @Override
+                        public void onSuccess(Text text) {
+                            String recognizedText = text.getText().toString();
+                            if (recognizedText.equals("")){
+                                dialog.setMessage("[Không tìm thấy text trên ảnh]");
+                            }
+                            Log.e("No text", "123" +recognizedText + "312");
+                            dialog.setMessage(recognizedText);
+                            dialog.create().show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            dialog.setMessage("[Đã xảy ra lỗi]");
+                            dialog.create().show();
+                        }
+                    });
+        }catch (Exception e){
+            Toast.makeText(main,"Failed due to:" +e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
     //Set theme
     private void setTheme(int backgroundColor, ColorStateList textColor) {
