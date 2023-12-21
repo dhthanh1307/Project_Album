@@ -2,6 +2,8 @@ package com.example.project_album;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -513,25 +515,38 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             return;
         }
         try {
+            final String[] recognizedText = new String[1]; // Use an array to hold the recognized text
             AlertDialog.Builder dialog = new AlertDialog.Builder(main);
-            dialog.setNegativeButton("Xong", new DialogInterface.OnClickListener() {
+
+            // Define the positive button, but don't set it yet because 'recognizedText' is not known
+            DialogInterface.OnClickListener copyButtonListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
+                    ClipboardManager clipboard = (ClipboardManager) main.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("recognizedText", recognizedText[0]);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(main, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
                 }
-            });
+            };
+
             InputImage image = InputImage.fromBitmap(bitmap,0);
-            Log.e("ssss", "-------------------------");
             Task<Text> textTaskResult = recognizer.process(image)
                     .addOnSuccessListener(new OnSuccessListener<Text>() {
                         @Override
                         public void onSuccess(Text text) {
-                            String recognizedText = text.getText().toString();
-                            if (recognizedText.equals("")){
+                            recognizedText[0] = text.getText().toString();
+                            if (recognizedText[0].equals("")){
                                 dialog.setMessage("[Không tìm thấy text trên ảnh]");
+                            } else {
+                                dialog.setMessage(recognizedText[0]);
                             }
-                            Log.e("No text", "123" +recognizedText + "312");
-                            dialog.setMessage(recognizedText);
+                            dialog.setPositiveButton("Copy", copyButtonListener);
+                            dialog.setNegativeButton("Xong", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
                             dialog.create().show();
                         }
                     })
