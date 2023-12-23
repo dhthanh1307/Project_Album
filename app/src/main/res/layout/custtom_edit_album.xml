@@ -5,13 +5,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingHorizontal="30dp"
+    android:backgroundTint="@color/blue"
     app:cardCornerRadius="20dp"
     >
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="20dp"
+        android:layout_margin="1dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/black_n">
+        android:background="@color/black"
+        android:paddingHorizontal="30dp">
         <include layout="@layout/item_album" />
         <LinearLayout
             android:padding="10dp"
@@ -20,6 +27,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
+                android:gravity="center"
                 android:id="@+id/tv_rename"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -29,6 +37,7 @@
                 />
 
             <TextView
+                android:gravity="center"
                 android:layout_marginTop="10dp"
                 android:id="@+id/tv_delete"
                 android:layout_width="match_parent"
@@ -37,6 +46,7 @@
                 android:textColor="@color/textview_form"
                 android:textSize="20dp" />
             <TextView
+                android:gravity="center"
                 android:layout_marginTop="10dp"
                 android:id="@+id/tv_slider"
                 android:layout_width="match_parent"
@@ -46,5 +56,5 @@
                 android:textSize="20dp" />
         </LinearLayout>
     </LinearLayout>
-
+    </androidx.cardview.widget.CardView>
 </androidx.cardview.widget.CardView>

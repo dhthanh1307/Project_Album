@@ -89,7 +89,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:src="@drawable/icon_share_in_all_layout"
-                android:scaleType="fitCenter"
+                android:scaleType="center"
                 android:gravity="center"/>
             <ImageView
                 android:id="@+id/txt_favorite"
@@ -97,7 +97,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:src="@drawable/icon_favorite_in_alllayout"
-                android:scaleType="fitCenter"
+                android:scaleType="center"
                 android:gravity="center"/>
 
             <ImageView
@@ -106,7 +106,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:src="@drawable/set_background_icon"
-                android:scaleType="fitCenter"
+                android:scaleType="center"
                 android:gravity="center"/>
             <ImageView
                 android:id="@+id/txt_edit"
@@ -114,7 +114,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:src="@drawable/icon_edit_in_alllayout"
-                android:scaleType="fitCenter"
+                android:scaleType="center"
                 android:gravity="center"/>
             <ImageView
                 android:id="@+id/txt_delete_into_trashcan"
@@ -124,7 +124,7 @@
                 android:src="@drawable/icon_delete_in_alllayout"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:scaleType="fitCenter"
+                android:scaleType="center"
                 android:gravity="center"/>
             <ImageView
                 android:id="@+id/txt_convertText"
@@ -132,7 +132,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:src="@drawable/image_to_text"
-                android:scaleType="fitCenter"
+                android:scaleType="center"
                 android:gravity="center"/>
 
         </LinearLayout>

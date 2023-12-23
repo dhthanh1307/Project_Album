@@ -158,6 +158,7 @@ public class TrashCanLayout extends Fragment {
                             mGridAdapter.chosenArrayImages.get(i).getKey(),
                                     mGridAdapter.chosenArrayImages.get(i).getName()
                             );
+                            //MainActivity.dataResource.deleteImageInAlbum(mGridAdapter.chosenArrayImages.get(i));
                             long idImage = mGridAdapter.chosenArrayImages.get(i).getId();
                             // xóa ở images hiện hành
                             for (int i1 = 0; i1 < images.size(); i1++) {
