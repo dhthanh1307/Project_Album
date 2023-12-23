@@ -41,6 +41,9 @@ public class HideInAlbumLayoutFragment extends Fragment {
     LinearLayout mainLayout;
     public HideInAlbumLayoutFragment() {
     }
+    public HideInAlbumLayoutFragment(ArrayList<Image> mImages){
+        images=mImages;
+    }
 
     public static HideInAlbumLayoutFragment newInstance(String strArg) {
         HideInAlbumLayoutFragment fragment = new HideInAlbumLayoutFragment();

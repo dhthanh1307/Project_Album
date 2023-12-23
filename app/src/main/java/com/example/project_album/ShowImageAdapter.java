@@ -185,9 +185,8 @@ public class ShowImageAdapter extends RecyclerView.Adapter<ShowImageAdapter.View
                         //Toast.makeText(main, "Chọn big ẩn nhé", Toast.LENGTH_SHORT).show();
                         FragmentManager fragmentmanager = main.getSupportFragmentManager();
                         FragmentTransaction ft = fragmentmanager.beginTransaction();
-                        Fragment fragment = new ViewPagerAllLayoutFragment(images, position);
-                        ft.add(R.id.replace_fragment_layout, fragment);
-                        ft.addToBackStack(fragment.getClass().getSimpleName());
+                        Fragment fragment = new ViewPagerHideFragment(images, position);
+                        ft.replace(R.id.replace_fragment_layout, fragment);
                         ft.commit();
                     }
                 }
