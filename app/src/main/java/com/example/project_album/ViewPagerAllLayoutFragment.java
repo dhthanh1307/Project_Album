@@ -332,7 +332,6 @@ public class ViewPagerAllLayoutFragment extends Fragment {
         txtShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(main, "Share", Toast.LENGTH_SHORT).show();
                 Uri UriToShare = saveImage(images.get(index).getImgBitmap());
                 shareImageUri(UriToShare);
             }

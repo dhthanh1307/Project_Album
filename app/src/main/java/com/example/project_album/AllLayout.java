@@ -45,6 +45,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -85,6 +86,7 @@ public class AllLayout extends Fragment {
     private TextView tv_blind;
     private TextView tv_slider;
     private TextView tv_zip;
+    private TextView tv_share_multiple;
     private View v_allInfo;
     private boolean clicked = false;
 
@@ -205,6 +207,7 @@ public class AllLayout extends Fragment {
         tv_slider = v_allInfo.findViewById(R.id.slider);
         tv_blind = v_allInfo.findViewById(R.id.blind);
         tv_zip = v_allInfo.findViewById(R.id.zip);
+        tv_share_multiple = v_allInfo.findViewById(R.id.share_multiple);
         dialog = new Dialog(main);
         dialog.setContentView(v_allInfo);
         EventViewDialog();
@@ -567,6 +570,17 @@ public class AllLayout extends Fragment {
             dialog.dismiss();
             addToAlbumAction();
         }
+        });
+
+        tv_share_multiple.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArrayList<Uri> uris = new ArrayList<>();
+                for (int i = 0; i < adapter.image_chosen.size(); i++) {
+                    uris.add(saveImage(adapter.image_chosen.get(i).getImgBitmap(), i));
+                }
+                shareImageUri(uris);
+            }
         });
 
     }
@@ -1186,6 +1200,7 @@ public class AllLayout extends Fragment {
         tv_blind.setTextColor(textColor);
         tv_slider.setTextColor(textColor);
         tv_zip.setTextColor(textColor);
+        tv_share_multiple.setTextColor(textColor);
         tv_delete.setTextColor(textColor);
 
         //view header dialog=========================
@@ -1414,6 +1429,31 @@ public class AllLayout extends Fragment {
         } else {
             return false;
         }
+    }
+
+    private Uri saveImage(Bitmap image, int index) {
+        File imagesFolder = new File(main.getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imagesFolder.mkdirs();
+            File file = new File(imagesFolder, "shared_image_" + index + ".png");
+            FileOutputStream stream = new FileOutputStream(file);
+            image.compress(Bitmap.CompressFormat.PNG, 90, stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(main, "com.example.fileprovider", file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return uri;
+    }
+
+    private void shareImageUri(ArrayList<Uri> uris) {
+        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setType("image/*");
+        main.startActivity(intent);
     }
 
     @Override
