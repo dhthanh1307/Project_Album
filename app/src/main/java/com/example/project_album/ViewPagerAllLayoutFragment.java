@@ -51,7 +51,7 @@ import java.util.Random;
 
 public class ViewPagerAllLayoutFragment extends Fragment {
 
-    ArrayList<Image> images = new ArrayList<>();
+    ArrayList<Image> images;
     ViewPager2 mViewPager;
     TextView txtTimeCapture;
     ImageView txtSetWallPaper;
@@ -347,6 +347,7 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         //Nếu xóa thì thay đổi ảnh là unlike ở favorite và ở albumfavorite
                         Image image = images.get(index);
+                        Log.e("asda",image.getDate());
                         if (image.getFavorite().equals("T")) {
                             image.setFavorite("F");
                             main.favoriteLayout.updateFavorite(image);
@@ -364,20 +365,19 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                         // cap nhật ở trashcan. them vao trash can
                         main.trashCanLayout.updateTrashCan(image);
 
+
                         //xóa ở images cua viewpager, k hiểu tại sao cái này nó lại xóa luôn
                         //bên adapter của AllLayout nữa
-                        if (index == images.size() - 1) {
-                            index = images.size() - 1;
-                        } else if (index == 0) {
-                            index = 0;
-                        }
                         images.remove(image);
+                        if (index == images.size()){
+                            index = images.size()-1;
+                        }
                         //nay la phong truong hop adapter truyen vao ko phai adapter cua all
                         AllLayout.images.remove(image);
                         if (images.size() == 0) {
                             imgBack.callOnClick();
                         }
-                        mAdapter = new ViewPagerInTrashCanAdapter(main.getSupportFragmentManager(), main.getLifecycle(), images);
+                        mAdapter.notifyDataSetChanged();
                         mViewPager.setAdapter(mAdapter);
                         mViewPager.setCurrentItem(index, false);
                         txtTimeCapture.setText(String.valueOf(index + 1) + "/" + String.valueOf(images.size()));
@@ -493,9 +493,14 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                 } else if (main.getIDItemBottomNavigationView() == R.id.action_all_picture) {
                     ft.replace(R.id.replace_fragment_layout, main.allLayout);
                 }
-                if (main.getIDItemBottomNavigationView() == R.id.action_album) {
-                    ft.replace(R.id.replace_fragment_layout, main.albumLayout);
+//                else if (main.getIDItemBottomNavigationView() == R.id.action_album) {
+//                    ft.replace(R.id.replace_fragment_layout, main.albumLayout);
+//                    main.albumLayout.update();
+//                }
+                else{
+                    closeFragment();
                     main.albumLayout.update();
+
                 }
                 ft.commit();
                 main.mBottomNavigationView.setVisibility(View.VISIBLE);

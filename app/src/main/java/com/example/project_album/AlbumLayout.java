@@ -39,6 +39,7 @@ public class AlbumLayout extends Fragment {
     MainActivity main;
 
     public static ArrayList<Album> albums = new ArrayList<Album>();
+    ShowImageInAlbumFragment showimage;
     private Bundle saveInstanceState;
     private GridView girdViewAlbum;
     private GridViewAlbumAdapter adapter_album;
@@ -308,6 +309,7 @@ public class AlbumLayout extends Fragment {
                 FragmentManager fragmentmanager = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fragmentmanager.beginTransaction();
                 Fragment fragment = new ShowImageInAlbumFragment(albums.get(position));
+                showimage = (ShowImageInAlbumFragment) fragment;
                 ft.add(R.id.replace_fragment_layout,fragment);
                 ft.addToBackStack(fragment.getClass().getSimpleName());
                 ft.commit();
@@ -490,8 +492,15 @@ public class AlbumLayout extends Fragment {
         Log.e("Album Layout",k);
     }
     public void update(){
-        InitAlbums();
-        UpdateConfiguration(getResources().getConfiguration());
+        try{
+            InitAlbums();
+            UpdateConfiguration(getResources().getConfiguration());
+            showimage.image_adapter.notifyDataSetChanged();
+            debug("oke");
+        }
+        catch (Exception e){
+
+        }
         myAlbumFragment.update();
     }
 
@@ -507,6 +516,11 @@ public class AlbumLayout extends Fragment {
         Dialog dialogEnterIntoHide = new Dialog(main);
         dialogEnterIntoHide.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialogEnterIntoHide.setContentView(R.layout.custom_enter_password_hide);
+        Window window = dialogEnterIntoHide.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams attribute = window.getAttributes();
+        attribute.gravity = Gravity.CENTER;
         EditText edtPassIntoHide=dialogEnterIntoHide.findViewById(R.id.edt_pass_into_hide);
         TextView txtForgotPass=dialogEnterIntoHide.findViewById(R.id.txt_forgot_pass);
         TextView txtResetPass=dialogEnterIntoHide.findViewById(R.id.txt_reset_pass);
@@ -563,6 +577,11 @@ public class AlbumLayout extends Fragment {
         Dialog dialogForgot = new Dialog(main);
         dialogForgot.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialogForgot.setContentView(R.layout.custom_forgot_pass_for_hide);
+        Window window = dialogForgot.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams attribute = window.getAttributes();
+        attribute.gravity = Gravity.CENTER;
         TextView txtTitleForgot=dialogForgot.findViewById(R.id.title_forgot_pass_hide);
         TextView txtFirstText=dialogForgot.findViewById(R.id.txt_first_text);
         EditText edtOldPass=dialogForgot.findViewById(R.id.edt_old_pass);
@@ -605,6 +624,11 @@ public class AlbumLayout extends Fragment {
         Dialog dialogReset = new Dialog(main);
         dialogReset.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialogReset.setContentView(R.layout.custom_forgot_pass_for_hide);
+        Window window = dialogReset.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams attribute = window.getAttributes();
+        attribute.gravity = Gravity.CENTER;
         TextView txtTitleForgot=dialogReset.findViewById(R.id.title_forgot_pass_hide);
         TextView txtFirstText=dialogReset.findViewById(R.id.txt_first_text);
         EditText edtOldPass=dialogReset.findViewById(R.id.edt_old_pass);

@@ -134,6 +134,7 @@ public class AllLayout extends Fragment {
     ShowImageInAllAdapter adapter;
     RecyclerView recyclerView;
     Spinner spinner;
+    String sort = "Sắp xếp theo kích cỡ";
     private RelativeLayout rl_background;
     ArrayAdapter<String> spinnerAdapter;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 123;
@@ -485,7 +486,7 @@ public class AllLayout extends Fragment {
                     Dialog myDialog = new Dialog(main);
                     myDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     myDialog.setContentView(R.layout.custom_add_password_for_hide);
-                    Window window = dialog.getWindow();
+                    Window window = myDialog.getWindow();
                     if(window == null){
                         return;
                     }
@@ -1197,8 +1198,23 @@ public class AllLayout extends Fragment {
         v_text_color.setBackgroundColor(textColor.getDefaultColor());
         tv_sort.setTextColor(textColor);
         tv_deleteCoppy.setTextColor(textColor);
+        tv_sort.setText(sort);
+        if(main.typeSquare.equals("non_square")){
+            tv_type_square.setText("Hiện thị vuông");
+        }
+        else{
+            tv_type_square.setText("Chỉnh dạng lưới");
+        }
 
         tv_choose.setTextColor(textColor);
+        if (main.NUMCOLUMN == 9) {
+            tv_size_square_small.setEnabled(false);
+            tv_size_square_small.setTextColor(createDarkColor(textColor.getDefaultColor()));
+        }
+        if (main.NUMCOLUMN == 1) {
+            tv_size_square_big.setEnabled(false);
+            tv_size_square_big.setTextColor(createDarkColor(textColor.getDefaultColor()));
+        }
     }
 
     private void updateSizeSquareSmall() {
@@ -1294,10 +1310,12 @@ public class AllLayout extends Fragment {
     private void sortAction(){
         if (tv_sort.getText().toString().equals("Sắp xếp theo ngày")){
             tv_sort.setText("Sắp xếp theo kích cỡ");
+            sort = "Sắp xếp theo kích cỡ";
             sortDate();
         }
         else if (tv_sort.getText().toString().equals("Sắp xếp theo kích cỡ")){
             tv_sort.setText("Sắp xếp theo ngày");
+            sort = "Sắp xếp theo ngày";
             sortSize();
         }
     }

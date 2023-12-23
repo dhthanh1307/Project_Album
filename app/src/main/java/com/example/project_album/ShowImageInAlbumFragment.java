@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class ShowImageInAlbumFragment extends Fragment implements View.OnClickListener {
     private Album album;
     private MainActivity main;
-    private ShowImageInAlbumAdapter image_adapter;
+    public ShowImageInAlbumAdapter image_adapter;
     private RecyclerView recyclerView;
     private TextView tv_back_to_album,tv_choose;
     private Button btn_extend;
@@ -158,7 +158,6 @@ public class ShowImageInAlbumFragment extends Fragment implements View.OnClickLi
         else if (view.getId() == tv_add_to_album.getId()){
             dialog.cancel();
             addToAlbum();
-            Toast.makeText(main,"Đã thêm vào album",Toast.LENGTH_SHORT).show();
         }
         else if(view.getId() == tv_move.getId()){
             dialog.cancel();

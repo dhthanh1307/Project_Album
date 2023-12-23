@@ -6,7 +6,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/black"
     app:cardCornerRadius="20dp"
+    android:backgroundTint="@color/blue"
     >
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="20dp"
+        android:layout_margin="1dp">
     <LinearLayout
         android:background="@color/black"
         android:layout_width="match_parent"
@@ -79,5 +85,6 @@
 
         </LinearLayout>
     </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.cardview.widget.CardView>

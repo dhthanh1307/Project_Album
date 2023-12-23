@@ -13,8 +13,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/teal_700">
+        android:layout_weight="1">
 
         <ImageView
             android:id="@+id/img_back_in_hide"
@@ -32,18 +31,16 @@
             android:text="Chọn"
             android:textColor="@color/white"
             android:textSize="8dp" />
-
-        <TextView
-            android:id="@+id/txt_hide_recently"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_choose_in_hide"
-            android:layout_alignParentLeft="true"
-            android:text="Ảnh đã ẩn gần đây"
-            android:textColor="@color/white"
-            android:textSize="20dp" />
     </RelativeLayout>
-
+    <TextView
+        android:id="@+id/txt_hide_recently"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_choose_in_hide"
+        android:layout_alignParentLeft="true"
+        android:text="Ảnh đã ẩn gần đây"
+        android:textColor="@color/white"
+        android:textSize="20dp" />
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
@@ -63,7 +60,6 @@
             android:id="@+id/grid_view_hide"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginHorizontal="10dp"
             android:layout_marginVertical="10dp"
             android:layout_weight="1"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
