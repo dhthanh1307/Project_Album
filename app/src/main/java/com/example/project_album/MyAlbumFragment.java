@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,7 @@ public class MyAlbumFragment extends Fragment {
 
     private GridView gridViewMyAlbum;
     private MainActivity main;
-    private LinearLayout linear1;
+    private RelativeLayout linear1;
     private LinearLayout linear2;
     private TextView tv_cancel;
     private boolean isaddtoalbum = false;
@@ -33,6 +34,7 @@ public class MyAlbumFragment extends Fragment {
     private AllLayout allLayout;
     public ArrayList<Album> albums = new ArrayList<>();
     private boolean isInit = false;
+    private LinearLayout linearParent;
     public MyAlbumFragment(){
         this.isaddtoalbum = false;
     }
@@ -58,11 +60,11 @@ public class MyAlbumFragment extends Fragment {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_my_album, container, false);
         tvBack = view.findViewById(R.id.tv_back);
-        tvEdit = view.findViewById(R.id.tv_edit);
         gridViewMyAlbum = (GridView)view.findViewById(R.id.grid_view_my_album);
         linear1 = view.findViewById(R.id.linear1);
         linear2 = view.findViewById(R.id.linear2);
         tv_cancel = view.findViewById(R.id.tv_cancel);
+        linearParent = view.findViewById(R.id.linear_parent);
         tv_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -161,14 +163,12 @@ public class MyAlbumFragment extends Fragment {
     }
 
     private void setThemeText(ColorStateList textColor) {
-        tvEdit.setTextColor(textColor);
         tvBack.setTextColor(textColor);
         tv_cancel.setTextColor(textColor);
     }
 
     private void setThemeBackGround(int backgroundColor) {
-        linear1.setBackgroundColor(backgroundColor);
-        linear2.setBackgroundColor(backgroundColor);
+        linearParent.setBackgroundColor(backgroundColor);
     }
 
 }

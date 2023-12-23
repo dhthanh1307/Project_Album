@@ -17,19 +17,21 @@
         <RelativeLayout
             android:id="@+id/layout_icon"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent"
             android:gravity="center_vertical"
             android:paddingBottom="5dp">
-            <Button
-
-                android:id="@+id/btn_add_album"
-                android:layout_width="40dp"
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleType="fitStart"
-                android:drawableLeft="@drawable/ic_add_album"
-                android:foreground="@drawable/custom_button_add_foreground"/>
+                android:src="@drawable/ic_add_album"
+                android:scaleType="fitCenter"
+                android:id="@+id/btn_add_album"
+                android:backgroundTint="@android:color/transparent"
+                app:borderWidth="0dp"
+                android:tint="@color/dark_blue"
+                />
             <TextView
                 android:id="@+id/tv_album_small"
                 android:layout_alignParentLeft="true"

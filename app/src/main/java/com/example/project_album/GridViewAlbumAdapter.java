@@ -5,15 +5,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class GridViewAlbumAdapter extends BaseAdapter {
-    private Activity activity;
+    private MainActivity activity;
     private int idLayout;
     private ArrayList<Album> albums;
-    public GridViewAlbumAdapter(Activity activity, int idLayout, ArrayList<Album> albums ){
+    public GridViewAlbumAdapter(MainActivity activity, int idLayout, ArrayList<Album> albums ){
         this.activity = activity;
         this.idLayout = idLayout;
         this.albums = albums;
@@ -40,6 +41,8 @@ public class GridViewAlbumAdapter extends BaseAdapter {
         ImageView img = view.findViewById(R.id.image);
         TextView tv_name = view.findViewById(R.id.tv_album_name);
         TextView tv_length = view.findViewById(R.id.tv_album_length);
+        LinearLayout ln = view.findViewById(R.id.ln_parent);
+        ln.setBackgroundColor(activity.mainColorBackground);
         if(albums.get(i).length() != 0 ){
             img.setImageBitmap(albums.get(i).get_image(
                     albums.get(i).length() -1 ).getImgBitmap());

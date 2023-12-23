@@ -29,9 +29,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -51,7 +54,7 @@ public class AlbumLayout extends Fragment {
     private View mainView;
     private ViewGroup container;
     private static AlbumLayout instance;
-    private Button btnAddAlbum;
+    private FloatingActionButton btnAddAlbum;
     private ScrollView sv;
     private RelativeLayout layout_icon;
     public boolean isInit = false;
@@ -683,6 +686,7 @@ public class AlbumLayout extends Fragment {
         tv_all_my_album.setTextColor(textColor);
         tvHiden.setTextColor(textColor);
         tv_delete.setTextColor(textColor);
+        btnAddAlbum.setImageTintList(textColor);
     }
 
     private void setThemeBackGround(int backgroundColor) {
