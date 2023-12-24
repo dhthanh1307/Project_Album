@@ -179,6 +179,7 @@ public class DataFirebase {
                 data+="-";
             }
         }
+        debug(data);
         Map<String ,Object>map = new HashMap<>();
         map.put("key_images",data);
         map.put("name",a.getName());

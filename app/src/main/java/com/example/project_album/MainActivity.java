@@ -198,9 +198,11 @@ public class MainActivity extends FragmentActivity {
     }
     private Runnable wallPaper_backgroundTask = new Runnable() {
         @Override
-        public void run() { // busy work goes here...
+        public void run() {
             try {
                 Thread.sleep(1);
+                Paint paint = new Paint();
+                paint.setFilterBitmap(true);
                 Bitmap image = ChangeByteToBitmap(wallpaperImage);
                 Bitmap imageEdit = Bitmap.createBitmap((int)Width, (int)Height, Bitmap.Config.ARGB_8888);
 
@@ -208,18 +210,16 @@ public class MainActivity extends FragmentActivity {
                 float originalHeight = image.getHeight();
 
                 Canvas canvas = new Canvas(imageEdit);
-
+                //tim ti le scale de fix vs man hinh dien thoai
                 float scale = Width / originalWidth;
 
                 float xTranslation = 0.0f;
+                // tim do xe dich y sao cho cach goc toa do 0 bang 1 nua khoang chenh lech
                 float yTranslation = (Height - originalHeight * scale) / 2.0f;
 
                 Matrix transformation = new Matrix();
-                transformation.postTranslate(xTranslation, yTranslation);
                 transformation.preScale(scale, scale);
-
-                Paint paint = new Paint();
-                paint.setFilterBitmap(true);
+                transformation.postTranslate(xTranslation, yTranslation);
 
                 canvas.drawBitmap(image, transformation, paint);
 

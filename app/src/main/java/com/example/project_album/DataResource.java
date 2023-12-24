@@ -148,10 +148,6 @@ public class DataResource {
                             DatabaseHelper.COLUMN_ID_ALBUM +" = " +String.valueOf(idAlbum),
                     null);
             debug("Remove Successfull: "+String.valueOf(image.getId()));
-            ArrayList<Album> als = getAllAlbum();
-            for (Album album:als){
-                MainActivity.dataFirebase.updateAlbum(album);
-            }
             return true;
         }
         catch (Exception ex){

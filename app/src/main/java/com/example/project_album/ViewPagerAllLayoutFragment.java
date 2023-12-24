@@ -162,46 +162,6 @@ public class ViewPagerAllLayoutFragment extends Fragment {
             mViewPager.setOffscreenPageLimit(3);
             mViewPager.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
 
-            CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
-            compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-            compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
-                @Override
-                public void transformPage(@NonNull View page, float position) {
-                    int pageWidth = page.getWidth();
-                    int pageHeight = page.getHeight();
-                    float MIN_SCALE = 0.85f;
-                    float MIN_ALPHA = 0.5f;
-
-                    if (position < -1) { // [ -Infinity,-1 )
-                        // This page is way off-screen to the left.
-                        page.setAlpha(0);
-                    } else if (position <= 1) { // [ -1,1 ]
-                        // Modify the default slide transition to shrink the page as well
-                        float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
-                        float vertMargin = pageHeight * (1 - scaleFactor) / 2;
-                        float horzMargin = pageWidth * (1 - scaleFactor) / 2;
-                        if (position < 0) {
-                            page.setTranslationX(horzMargin - vertMargin / 2);
-                        } else {
-                            page.setTranslationX(-horzMargin + vertMargin / 2);
-                        }
-
-                        // Scale the page down ( between MIN_SCALE and 1 )
-                        page.setScaleX(scaleFactor);
-                        page.setScaleY(scaleFactor);
-
-                        // Fade the page relative to its size.
-                        page.setAlpha(MIN_ALPHA +
-                                (scaleFactor - MIN_SCALE) /
-                                        (1 - MIN_SCALE) * (1 - MIN_ALPHA));
-
-                    } else { // ( 1,+Infinity ]
-                        // This page is way off-screen to the right.
-                        page.setAlpha(0);
-                    }
-                }
-            });
-            mViewPager.setPageTransformer(compositePageTransformer);
 
             ln_bottom.setVisibility(View.INVISIBLE);
             ln_top.setVisibility(View.INVISIBLE);
@@ -376,6 +336,8 @@ public class ViewPagerAllLayoutFragment extends Fragment {
                         if (images.size() == 0) {
                             imgBack.callOnClick();
                         }
+                        MainActivity.dataResource.deleteImageInAlbum(image);
+                        main.albumLayout.updateAlbumFirebase();
                         mAdapter.notifyDataSetChanged();
                         mViewPager.setAdapter(mAdapter);
                         mViewPager.setCurrentItem(index, false);

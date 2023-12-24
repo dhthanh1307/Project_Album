@@ -408,7 +408,7 @@ public class AlbumLayout extends Fragment {
         });
         return viewchild;
     }
-    private void InitAlbums() {
+    public void InitAlbums() {
         if(!isInit) {
             ArrayList<Image> images3;
             images3 = FavoriteLayout.images;
@@ -709,6 +709,12 @@ public class AlbumLayout extends Fragment {
             MainActivity.dataResource.deleteImageInAlbum(image,album.getId());
             album.removeImage(image);
             MainActivity.dataFirebase.updateAlbum(album);
+        }
+    }
+    public void updateAlbumFirebase(){
+        InitAlbums();
+        for(int i =2;i<albums.size();i++){
+            MainActivity.dataFirebase.updateAlbum(albums.get(i));
         }
     }
 }

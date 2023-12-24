@@ -190,6 +190,8 @@ public class AllLayout extends Fragment {
         for (int j = 0; j < images.size(); j++){
             debug(images.get(j).getDate());
         }
+        main.albumLayout.InitAlbums();
+        main.albumLayout.isInit = true;
     }
 
     @Override
@@ -450,6 +452,7 @@ public class AllLayout extends Fragment {
                     main.trashCanLayout.updateTrashCan(adapter.image_chosen.get(i));
 
 
+
                     //xoa image o allLayout
                     long idImage = adapter.image_chosen.get(i).getId();
                     String key = adapter.image_chosen.get(i).getKey();
@@ -467,7 +470,9 @@ public class AllLayout extends Fragment {
 //                    Log.e("DeleteAllLayout","Adapter Size="+String.valueOf(adapter.images.size()));
                     //update trạng thái ở database
                     MainActivity.dataResource.updateStateImageDeletedIsTrue(idImage, key);
+                    MainActivity.dataResource.deleteImageInAlbum(adapter.image_chosen.get(i));
                 }
+                main.albumLayout.updateAlbumFirebase();
                 adapter.notifyDataSetChanged();
                 dialog.dismiss();
                 adapter.resetChooseSelection();
@@ -553,7 +558,9 @@ public class AllLayout extends Fragment {
 
                         //update trạng thái ở database
                         MainActivity.dataResource.updateStateImageHideIsTrue(idImage, key);
+                        MainActivity.dataResource.deleteImageInAlbum(adapter.image_chosen.get(i));
                     }
+                    main.albumLayout.updateAlbumFirebase();
                     adapter.notifyDataSetChanged();
                     dialog.dismiss();
                     adapter.resetChooseSelection();
